@@ -107,3 +107,4 @@ venv_*/
 
 # VS Code
 .vscode
+src/plot_profile/cli copy.py

@@ -1,51 +1,96 @@
-"""Command line interface of plot_profile."""
-# Standard library
-import logging
+"""Purpose: define command line inputs.
 
-# Third-party
-import click
+Author: Michel Zeller
 
+Date: 05/10/2021.
+"""
 # Local
-from . import __version__
-from .utils import count_to_log_level
+from .functions import *
 
 
 @click.command()
+@click.option("--station_id", default="06610", help="station ID: XXXXX - def: 00610")
 @click.option(
-    "--dry-run",
-    "-n",
-    flag_value="dry_run",
-    default=False,
-    help="Perform a trial run with no changes made",
+    "--start", default="2021083100", help="start date: YYYYMMDDHH - def: 2021083100"
 )
 @click.option(
-    "--verbose",
-    "-v",
-    count=True,
-    help="Increase verbosity (specify multiple times for more)",
+    "--end", default="2021083100", help="end date: YYYYMMDDHH - def: 2021083100"
 )
 @click.option(
-    "--version",
-    "-V",
-    is_flag=True,
-    help="Print version",
+    "--alt_bot",
+    default=0,
+    type=int,
+    help="altitude bottom value: int - def: 0 [m] (ground level)",
 )
-def main(*, dry_run: bool, verbose: int, version: bool) -> None:
-    logging.basicConfig(level=count_to_log_level(verbose))
+@click.option(
+    "--alt_top",
+    default=40000,
+    type=int,
+    help="altitude top value: int - def: 40000 [m]",
+)
+@click.option(
+    "--params",
+    type=click.Choice(
+        [
+            "742",
+            "gph",
+            "743",
+            "winddir",
+            "744",
+            "press",
+            "745",
+            "temp",
+            "746",
+            "relhum",
+            "747",
+            "dewp",
+            "748",
+            "windvel",
+        ],
+        case_sensitive=False,
+    ),
+    multiple=True,
+    default=("742", "745", "747", "744"),
+    help="Default: '742','745','747', '744'",
+)
+@click.option(
+    "--out_path",
+    default="plots/",
+    type=str,
+    help="path to folder where the plots should be saved - def: plots/",
+)
+def main(
+    *, station_id: str, start: str, end: str, params: tuple, alt_bot: int, alt_top: int
+) -> None:
 
-    logging.warning("This is a warning.")
-    logging.info("This is an info message.")
-    logging.debug("This is a debug message.")
+    print_steps = False
+    station_type = "profile"
 
-    if version:
-        click.echo(__version__)
-        return
-
-    if dry_run:
-        click.echo("Is dry run")
-        return
-
-    click.echo(
-        "Replace this message by putting your code into test_cli_project.cli.main"
+    start, end, params, params_tuple = reformat_inputs(
+        start=start,
+        end=end,
+        params=params,
+        station_id=station_id,
+        station_type=station_type,
+        print_steps=print_steps,
     )
-    click.echo("See click documentation at http://click.pocoo.org/")
+
+    # create dataframes
+    df = dwh2pandas(
+        params=params,
+        start=start,
+        end=end,
+        station_id=station_id,
+        station_type=station_type,
+        print_steps=print_steps,
+    )
+    params_df = extract_columns(
+        params_tuple=params_tuple,
+        data=df,
+        print_steps=print_steps,
+        alt_bot=alt_bot,
+        alt_top=alt_top,
+    )
+
+    # create plots (& add further optional arguments for the plot functions as cli)
+    create_plots(params_df=params_df, start=start, station_id=station_id)

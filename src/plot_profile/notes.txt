@@ -1,0 +1,44 @@
+Personal Notes & Documentation
+
+As a reference script I use Claire's script: dwh2pandas.py
+It is located at: ~/various/p001
+To execute it, move to this path and run:
+> /scratch/zmichel/miniconda3/envs/plot_profile/bin/python3 ../various/p001/dwh2pandas.py
+It works perfectly fine.
+
+
+/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,elev,name,wmo_ind -w 22 -s profile -p 742,745,747,748,743 -i int_ind,06610 -t 20171225000000-20171225000000
+/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,elev,name,wmo_ind -w 22 -s profile -p 742,745,747 -i int_ind,06610 -t 20210831000000-20210831000000 -C 34
+
+Documentation: plot_profile package
+
+[OPTIONS]
+
+
+➜ plot_profile --help
+Usage: plot_profile [OPTIONS]
+
+Options:
+  --station_id TEXT               station ID: XXXXX - def: 00610
+  --start TEXT                    start date: YYYYMMDDHH - def: 2021083100
+  --end TEXT                      end date: YYYYMMDDHH - def: 2021083100
+  --params [742|gph|743|winddir|744|press|745|temp|746|relhum|747|dewp|748|windvel]
+                                  Default: '742','745','747'
+  --help                          Show this message and exit.
+
+
+
+
+Input Parameters
+
+# possible parameters:
+# 742 geopotential height, gph      --> y-Achse
+# 743 wind direction, winddir
+# 744 pressure, press
+# 745 temperature, temp             --> x-Achse
+# 746 relative humidity, relhum
+# 747 dew point temperature, dewp   --> x-Achse
+# 748 wind velocity, windvel
+
+x-achse: Temperatur, Taupunkttemp
+y-achse: Höhes
