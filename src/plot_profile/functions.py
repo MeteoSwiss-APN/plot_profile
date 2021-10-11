@@ -45,6 +45,8 @@ def reformat_inputs(
         0, "742"
     )  # we ALWAYS want to retrieve the height-column. therefore it doesnt need to be an optional parameter
 
+    params.append("746")
+
     params_tuple = tuple(params)
 
     if print_steps:
@@ -198,109 +200,371 @@ def map_degrees(avg_winddir_array):
     return x_dir, y_dir
 
 
-def create_plots(
-    df, relhum_thresh, grid, clouds, outpath, station_name, start, alt_bot, alt_top
+def create_plot(
+    df,
+    relhum_thresh,
+    grid,
+    clouds,
+    outpath,
+    station_name,
+    start,
+    alt_bot,
+    alt_top,
+    params,
 ):
-    print("--- creating plots")
 
+    # optional!
     cloud_start, cloud_end = extract_clouds(df=df, relhum_thresh=relhum_thresh)
 
     fig = plt.figure()
 
-    gs = fig.add_gridspec(
-        1, 2, wspace=0, width_ratios=[2, 1]
-    )  # 2 horizontally aligned subplots wi/ ratio 2:1
-    ax = gs.subplots(sharex=False, sharey=True)
+    if (
+        "743" in params or "748" in params
+    ):  # if winddir or windvel in params: create subplot
+        print("--- creating all-in-one plot")
+        gs = fig.add_gridspec(
+            1, 2, wspace=0, width_ratios=[2, 1]
+        )  # 2 horizontally aligned subplots wi/ ratio 2:1
+        ax = gs.subplots(sharex=False, sharey=True)
 
-    fig.subplots_adjust()
-    tkw = dict(size=4, width=1.5)
-    handles_left, handles_right = [], []
+        fig.subplots_adjust()
+        tkw = dict(size=4, width=1.5)
+        handles_left, handles_right = [], []
 
-    # TEMPERATURE & DEW POINT (plottet on the regular x-axis of ax[0])
-    (temp,) = ax[0].plot(df["745"], df["742"], "b-", label="Temperature")
-    (dewp,) = ax[0].plot(df["747"], df["742"], "b--", label="Dew Point Temperature")
-    ax[0].set_xlim(
-        df["747"].min() * 1.1, df["745"].max() * 1.1
-    )  # limit for bottom x-axis:  temp; dewp
-    ax[0].set_ylim(alt_bot, alt_top)  # limit for left y-axis:    altitude
-    ax[0].set_xlabel("Temperature [°C]")
-    ax[0].set_ylabel("Altitude [m]")
-    ax[0].xaxis.label.set_color(temp.get_color())
-    ax[0].tick_params(axis="x", colors=temp.get_color(), **tkw)
-
-    handles_left.append(temp)
-    handles_left.append(dewp)
-
-    # WIND VELOCITY (plottet on the regular x-axis of ax[1])
-    (windvel,) = ax[1].plot(df["748"], df["742"], "c-", label="Wind Velocity")
-    ax[1].set_xlim(0, df["748"].max() + 10)
-    ax[1].set_xlabel("Wind Velocity [m/s]")
-    ax[1].xaxis.label.set_color(windvel.get_color())
-    ax[1].xaxis.set_major_locator(ticker.MaxNLocator(6))
-    ax[1].tick_params(axis="x", colors=windvel.get_color(), **tkw)
-    handles_right.append(windvel)
-
-    # WIND DIRECTION
-    # ax_winddir = ax[1].twiny() # additional x-axis for right subplot
-    # winddir, = ax_winddir.plot(df['743'][0::100], df['742'][0::100], "y-", label="Wind Direction")
-    # winddir, = ax_winddir.plot(df['743'], df['742'], "y-", label="Wind Direction")
-    # ax_winddir.set_xlim(0,360)
-    # ax_winddir.xaxis.set_major_locator(ticker.MaxNLocator(6))
-    # ax_winddir.set_xlabel("Wind Direction [°]")
-    # ax_winddir.xaxis.label.set_color(winddir.get_color())
-    # ax_winddir.tick_params(axis='x', colors=winddir.get_color(), **tkw)
-    # handles_right.append(winddir)
-
-    # WIND DIRECTION USING QUIVER
-    winddir_df = df["743"].groupby(pd.qcut(df.index, 10)).mean()
-    altitude_df = df["742"].groupby(pd.qcut(df.index, 10)).mean()
-    # 2) pd.df --> np.array
-    avg_winddir_array = (
-        winddir_df.to_numpy().round()
-    )  # map these values to an x-y array: [x_dir_1,..,x_dir_10], [y_dir_1,..,y_dir_10]
-    x_dir, y_dir = map_degrees(avg_winddir_array=avg_winddir_array)
-    avg_altitude_array = altitude_df.to_numpy().round()
-    arrow_anchor = [df["748"].max() + 5] * len(avg_altitude_array)
-    X, Y = np.meshgrid(arrow_anchor, avg_altitude_array)
-    qv_winddir = ax[1].quiver(
-        arrow_anchor,
-        avg_altitude_array,
-        x_dir,
-        y_dir,
-        pivot="middle",
-        scale=5,
-        color="m",
-    )
-
-    if clouds:
-        if not cloud_start:
-            print(
-                f'No clouds for this altidue range/date. (max relhum: {df["746"].max()} while relhum_thresh: {relhum_thresh})'
+        # TEMPERATURE & DEW POINT (plottet on the regular x-axis of ax[0])
+        blue = "b"
+        if "745" in params:
+            (temp,) = ax[0].plot(df["745"], df["742"], blue + "-", label="Temperature")
+            # limit for x-axis
+            x_bot = df["745"].min() * 1.1
+            x_top = df["745"].max() * 1.1
+            handles_left.append(temp)
+        if "747" in params:
+            (dewp,) = ax[0].plot(
+                df["747"], df["742"], blue + "--", label="Dew Point Temperature"
             )
-        else:
-            # plot lines which correspond to clouds
-            i = 0
-            while i < len(cloud_start):
-                ax[0].axhspan(
-                    ymin=cloud_start[i],
-                    ymax=cloud_end[i],
-                    color="grey",
-                    linestyle="-",
-                    alpha=0.5,
+            ax[0].set_xlim(
+                df["747"].min() * 1.1, df["747"].max() * 1.1
+            )  # limit for bottom x-axis:  temp; dewp
+            # limit for x-axis
+            x_bot = df["747"].min() * 1.1
+            if "745" in params:
+                x_top = df["745"].max() * 1.1
+            else:
+                x_top = df["747"].max() * 1.1
+            handles_left.append(dewp)
+
+        ax[0].set_xlim(x_bot, x_top)
+        ax[0].set_ylim(alt_bot, alt_top)  # limit for left y-axis:    altitude
+        ax[0].set_xlabel("Temperature [°C]")
+        ax[0].set_ylabel("Altitude [m]")
+        ax[0].xaxis.label.set_color(blue)
+        ax[0].tick_params(axis="x", colors=blue, **tkw)
+
+        if "748" in params:
+            # WIND VELOCITY (plottet on the regular x-axis of ax[1])
+            (windvel,) = ax[1].plot(df["748"], df["742"], "c-", label="Wind Velocity")
+            ax[1].set_xlim(0, df["748"].max() + 10)
+            ax[1].set_xlabel("Wind Velocity [m/s]")
+            ax[1].xaxis.label.set_color(windvel.get_color())
+            ax[1].xaxis.set_major_locator(ticker.MaxNLocator(6))
+            ax[1].tick_params(axis="x", colors=windvel.get_color(), **tkw)
+            handles_right.append(windvel)
+
+        if "743" in params:
+            # WIND DIRECTION USING QUIVER
+            winddir_df = df["743"].groupby(pd.qcut(df.index, 10)).mean()
+            altitude_df = df["742"].groupby(pd.qcut(df.index, 10)).mean()
+            # 2) pd.df --> np.array
+            avg_winddir_array = (
+                winddir_df.to_numpy().round()
+            )  # map these values to an x-y array: [x_dir_1,..,x_dir_10], [y_dir_1,..,y_dir_10]
+            x_dir, y_dir = map_degrees(avg_winddir_array=avg_winddir_array)
+            avg_altitude_array = altitude_df.to_numpy().round()
+
+            if "748" in params:
+                arrow_anchor = [df["748"].max() + 5] * len(avg_altitude_array)
+            else:  # if only the wind direction is plottet alongside the temp. curves remove the x-axis for ax[1]
+                arrow_anchor = [1] * len(avg_altitude_array)
+                ax[1].set_xticklabels("")
+                ax[1].set_xticks([])
+            X, Y = np.meshgrid(arrow_anchor, avg_altitude_array)
+            qv_winddir = ax[1].quiver(
+                arrow_anchor,
+                avg_altitude_array,
+                x_dir,
+                y_dir,
+                pivot="middle",
+                scale=5,
+                color="m",
+            )
+
+        if clouds:
+            if not cloud_start:
+                print(
+                    f'No clouds for this altidue range/date. (max relhum: {df["746"].max()} while relhum_thresh: {relhum_thresh})'
                 )
-                i += 1
+            else:
+                # plot lines which correspond to clouds
+                i = 0
+                while i < len(cloud_start):
+                    ax[0].axhspan(
+                        ymin=cloud_start[i],
+                        ymax=cloud_end[i],
+                        color="grey",
+                        linestyle="-",
+                        alpha=0.5,
+                    )
+                    i += 1
 
-    if grid:
-        # display & colour grid for right subplot
-        ax[1].xaxis.grid(color=windvel.get_color(), linestyle="--", linewidth=0.5)
-        ax[1].yaxis.grid(color="black", linestyle="--", linewidth=0.5)
-        ax[0].xaxis.grid(color=temp.get_color(), linestyle="--", linewidth=0.5)
-        ax[0].yaxis.grid(color="black", linestyle="--", linewidth=0.5)
-    ax[0].legend(handles=handles_left)
-    date = start[6:8] + "." + start[4:6] + "." + start[:4]
-    fig.suptitle(f"Radiosounding Data from {station_name} on {date}")
+        if grid:
+            # display & colour grid for right subplot
+            ax[1].xaxis.grid(color=windvel.get_color(), linestyle="--", linewidth=0.5)
+            ax[1].yaxis.grid(color="black", linestyle="--", linewidth=0.5)
+            ax[0].xaxis.grid(color=blue, linestyle="--", linewidth=0.5)
+            ax[0].yaxis.grid(color="black", linestyle="--", linewidth=0.5)
 
-    os.makedirs(outpath, exist_ok=True)  # create outpath if it doesn't already exist
-    start = start[:8]
-    plt.savefig(outpath + station_name + "_" + start + ".png")
-    # plt.show() # display plot
+        ax[0].legend(handles=handles_left)
+        date = start[6:8] + "." + start[4:6] + "." + start[:4]
+        fig.suptitle(f"Radiosounding Data from {station_name} on {date}")
+
+        os.makedirs(
+            outpath, exist_ok=True
+        )  # create outpath if it doesn't already exist
+        start = start[:8]
+        plt.savefig(outpath + station_name + "_" + start + ".png")
+
+    else:  # create a single plot containing the temperature and dew point temperature
+        print("--- creating temperature plot")
+
+        gs = fig.add_gridspec(1, 1, wspace=0)  # only one plot.
+        ax = gs.subplots(sharex=False, sharey=True)
+
+        fig.subplots_adjust()
+        tkw = dict(size=4, width=1.5)
+        handles_left = []
+
+        # TEMPERATURE & DEW POINT (plottet on the regular x-axis of ax[0])
+        blue = "b"
+        if "745" in params:
+            (temp,) = ax.plot(df["745"], df["742"], blue + "-", label="Temperature")
+            # limit for x-axis
+            x_bot = df["745"].min() * 1.1
+            x_top = df["745"].max() * 1.1
+            handles_left.append(temp)
+        if "747" in params:
+            (dewp,) = ax.plot(
+                df["747"], df["742"], blue + "--", label="Dew Point Temperature"
+            )
+            ax.set_xlim(
+                df["747"].min() * 1.1, df["747"].max() * 1.1
+            )  # limit for bottom x-axis:  temp; dewp
+            # limit for x-axis
+            x_bot = df["747"].min() * 1.1
+            if "745" in params:
+                x_top = df["745"].max() * 1.1
+            else:
+                x_top = df["747"].max() * 1.1
+            handles_left.append(dewp)
+
+        ax.set_xlim(x_bot, x_top)
+        ax.set_ylim(alt_bot, alt_top)  # limit for left y-axis:    altitude
+        ax.set_xlabel("Temperature [°C]")
+        ax.set_ylabel("Altitude [m]")
+        ax.xaxis.label.set_color(blue)
+        ax.tick_params(axis="x", colors=blue, **tkw)
+
+        if clouds:
+            if not cloud_start:
+                print(
+                    f'No clouds for this altidue range/date. (max relhum: {df["746"].max()} while relhum_thresh: {relhum_thresh})'
+                )
+            else:
+                # plot lines which correspond to clouds
+                i = 0
+                while i < len(cloud_start):
+                    ax.axhspan(
+                        ymin=cloud_start[i],
+                        ymax=cloud_end[i],
+                        color="grey",
+                        linestyle="-",
+                        alpha=0.5,
+                    )
+                    i += 1
+
+        if grid:
+            # display & colour grid for right subplot
+            ax.xaxis.grid(color=blue, linestyle="--", linewidth=0.5)
+            ax.yaxis.grid(color="black", linestyle="--", linewidth=0.5)
+        ax.legend(handles=handles_left)
+        date = start[6:8] + "." + start[4:6] + "." + start[:4]
+        fig.suptitle(f"Radiosounding Temperature Data from {station_name} on {date}")
+
+        os.makedirs(
+            outpath, exist_ok=True
+        )  # create outpath if it doesn't already exist
+        start = start[:8]
+        plt.savefig(outpath + station_name + "_" + start + "_temp_plot.png")
+        # plt.show() # display plot
+
+
+# """
+# def temp_plot(df, relhum_thresh, grid, clouds, outpath, station_name, start, alt_bot, alt_top):
+#     print("--- creating temperature plots")
+
+#     cloud_start, cloud_end = extract_clouds(df=df, relhum_thresh=relhum_thresh)
+
+#     fig = plt.figure()
+
+#     gs = fig.add_gridspec(
+#         1, 1, wspace=0
+#     )  # 2 horizontally aligned subplots wi/ ratio 2:1
+#     ax = gs.subplots(sharex=False, sharey=True)
+
+#     fig.subplots_adjust()
+#     tkw = dict(size=4, width=1.5)
+#     handles_left, handles_right = [], []
+
+
+#     # TEMPERATURE & DEW POINT (plottet on the regular x-axis of ax[0])
+#     (temp,) = ax.plot(df["745"], df["742"], "b-", label="Temperature")
+#     (dewp,) = ax.plot(df["747"], df["742"], "b--", label="Dew Point Temperature")
+#     ax.set_xlim(
+#         df["747"].min() * 1.1, df["745"].max() * 1.1
+#     )  # limit for bottom x-axis:  temp; dewp
+#     ax.set_ylim(alt_bot, alt_top)  # limit for left y-axis:    altitude
+#     ax.set_xlabel("Temperature [°C]")
+#     ax.set_ylabel("Altitude [m]")
+#     ax.xaxis.label.set_color(blue)
+#     ax.tick_params(axis="x", colors=blue, **tkw)
+
+#     handles_left.append(temp)
+#     handles_left.append(dewp)
+
+
+#     if clouds:
+#         if not cloud_start:
+#             print(
+#                 f'No clouds for this altidue range/date. (max relhum: {df["746"].max()} while relhum_thresh: {relhum_thresh})'
+#             )
+#         else:
+#             # plot lines which correspond to clouds
+#             i = 0
+#             while i < len(cloud_start):
+#                 ax.axhspan(
+#                     ymin=cloud_start[i],
+#                     ymax=cloud_end[i],
+#                     color="grey",
+#                     linestyle="-",
+#                     alpha=0.5,
+#                 )
+#                 i += 1
+
+#     if grid:
+#         # display & colour grid for right subplot
+#         ax.xaxis.grid(color=blue, linestyle="--", linewidth=0.5)
+#         ax.yaxis.grid(color="black", linestyle="--", linewidth=0.5)
+#     ax.legend(handles=handles_left)
+#     date = start[6:8] + "." + start[4:6] + "." + start[:4]
+#     fig.suptitle(f"Radiosounding Temperature Data from {station_name} on {date}")
+
+#     os.makedirs(outpath, exist_ok=True)  # create outpath if it doesn't already exist
+#     start = start[:8]
+#     plt.savefig(outpath + station_name + "_" + start +"_temp.png")
+#     # plt.show() # display plot
+
+
+# def wind_plot(df, relhum_thresh, grid, clouds, outpath, station_name, start, alt_bot, alt_top):
+#     print("--- creating plots")
+
+#     cloud_start, cloud_end = extract_clouds(df=df, relhum_thresh=relhum_thresh)
+
+#     fig = plt.figure()
+
+#     gs = fig.add_gridspec(
+#         1, 2, wspace=0, width_ratios=[2, 1]
+#     )  # 2 horizontally aligned subplots wi/ ratio 2:1
+#     ax = gs.subplots(sharex=False, sharey=True)
+
+#     fig.subplots_adjust()
+#     tkw = dict(size=4, width=1.5)
+#     handles_left, handles_right = [], []
+
+#     # TEMPERATURE & DEW POINT (plottet on the regular x-axis of ax[0])
+#     (temp,) = ax[0].plot(df["745"], df["742"], "b-", label="Temperature")
+#     (dewp,) = ax[0].plot(df["747"], df["742"], "b--", label="Dew Point Temperature")
+#     ax[0].set_xlim(
+#         df["747"].min() * 1.1, df["745"].max() * 1.1
+#     )  # limit for bottom x-axis:  temp; dewp
+#     ax[0].set_ylim(alt_bot, alt_top)  # limit for left y-axis:    altitude
+#     ax[0].set_xlabel("Temperature [°C]")
+#     ax[0].set_ylabel("Altitude [m]")
+#     ax[0].xaxis.label.set_color(blue)
+#     ax[0].tick_params(axis="x", colors=blue, **tkw)
+
+#     handles_left.append(temp)
+#     handles_left.append(dewp)
+
+#     # WIND VELOCITY (plottet on the regular x-axis of ax[1])
+#     (windvel,) = ax[1].plot(df["748"], df["742"], "c-", label="Wind Velocity")
+#     ax[1].set_xlim(0, df["748"].max() + 10)
+#     ax[1].set_xlabel("Wind Velocity [m/s]")
+#     ax[1].xaxis.label.set_color(windvel.get_color())
+#     ax[1].xaxis.set_major_locator(ticker.MaxNLocator(6))
+#     ax[1].tick_params(axis="x", colors=windvel.get_color(), **tkw)
+#     handles_right.append(windvel)
+
+#     # WIND DIRECTION USING QUIVER
+#     winddir_df = df["743"].groupby(pd.qcut(df.index, 10)).mean()
+#     altitude_df = df["742"].groupby(pd.qcut(df.index, 10)).mean()
+#     # 2) pd.df --> np.array
+#     avg_winddir_array = (
+#         winddir_df.to_numpy().round()
+#     )  # map these values to an x-y array: [x_dir_1,..,x_dir_10], [y_dir_1,..,y_dir_10]
+#     x_dir, y_dir = map_degrees(avg_winddir_array=avg_winddir_array)
+#     avg_altitude_array = altitude_df.to_numpy().round()
+#     arrow_anchor = [df["748"].max() + 5] * len(avg_altitude_array)
+#     X, Y = np.meshgrid(arrow_anchor, avg_altitude_array)
+#     qv_winddir = ax[1].quiver(
+#         arrow_anchor,
+#         avg_altitude_array,
+#         x_dir,
+#         y_dir,
+#         pivot="middle",
+#         scale=5,
+#         color="m",
+#     )
+
+#     if clouds:
+#         if not cloud_start:
+#             print(
+#                 f'No clouds for this altidue range/date. (max relhum: {df["746"].max()} while relhum_thresh: {relhum_thresh})'
+#             )
+#         else:
+#             # plot lines which correspond to clouds
+#             i = 0
+#             while i < len(cloud_start):
+#                 ax[0].axhspan(
+#                     ymin=cloud_start[i],
+#                     ymax=cloud_end[i],
+#                     color="grey",
+#                     linestyle="-",
+#                     alpha=0.5,
+#                 )
+#                 i += 1
+
+#     if grid:
+#         # display & colour grid for right subplot
+#         ax[1].xaxis.grid(color=windvel.get_color(), linestyle="--", linewidth=0.5)
+#         ax[1].yaxis.grid(color="black", linestyle="--", linewidth=0.5)
+#         ax[0].xaxis.grid(color=blue, linestyle="--", linewidth=0.5)
+#         ax[0].yaxis.grid(color="black", linestyle="--", linewidth=0.5)
+#     ax[0].legend(handles=handles_left)
+#     date = start[6:8] + "." + start[4:6] + "." + start[:4]
+#     fig.suptitle(f"Radiosounding Data from {station_name} on {date}")
+
+#     os.makedirs(outpath, exist_ok=True)  # create outpath if it doesn't already exist
+#     start = start[:8]
+#     plt.savefig(outpath + station_name + "_" + start + ".png")
+#     # plt.show() # display plot
+# """

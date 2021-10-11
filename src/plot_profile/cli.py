@@ -4,6 +4,9 @@ Author: Michel Zeller
 
 Date: 05/10/2021.
 """
+# Standard library
+from typing import NamedTuple
+
 # Local
 from .functions import *
 
@@ -27,7 +30,7 @@ from .functions import *
     "--alt_top",
     default=40000,
     type=int,
-    help="altitude top value: int - def: 40000 [m]",
+    help="altitude top value: int - def: 10% over max altitude of radiosounding retrieval",
 )
 @click.option(
     "--params",
@@ -39,8 +42,6 @@ from .functions import *
             "press",
             "745",
             "temp",
-            "746",
-            "relhum",
             "747",
             "dewp",
             "748",
@@ -49,7 +50,7 @@ from .functions import *
         case_sensitive=False,
     ),
     multiple=True,
-    default=("743", "745", "746", "748", "747", "744"),
+    default=("743", "745", "748", "747", "744"),
     help="Default: all",
 )
 @click.option(
@@ -60,21 +61,19 @@ from .functions import *
 )
 @click.option(
     "--grid",
-    default=False,
-    type=bool,
+    is_flag=True,
     help="Show grid on plot - def: False",
 )
 @click.option(
     "--clouds",
-    default=True,
-    type=bool,
+    is_flag=True,
     help="Show clouds on plot - def: True",
 )
 @click.option(
     "--relhum_thresh",
-    default=97,
+    default=80,
     type=float,
-    help="Define the relative humidity threshold for clouds - def: 97",
+    help="Define the relative humidity threshold for clouds - def: 80",
 )
 def main(
     *,
@@ -135,7 +134,8 @@ def main(
     if station_height > alt_bot:
         alt_bot = station_height
 
-    alt_top = df["742"].max() * 1.05
+    if alt_top == 40000:
+        alt_top = df["742"].max() * 1.05
 
     params_df = extract_columns(
         params_tuple=params_tuple,
@@ -149,7 +149,7 @@ def main(
     # params_df.to_csv('params_df.csv')
     # df.to_csv('df.csv')
 
-    create_plots(
+    create_plot(
         df=params_df,
         relhum_thresh=relhum_thresh,
         grid=grid,
@@ -159,4 +159,5 @@ def main(
         start=start,
         alt_top=alt_top,
         alt_bot=alt_bot,
+        params=params,
     )
