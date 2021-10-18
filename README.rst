@@ -12,7 +12,7 @@ To get a list of all availabe commands, just type:
 Features
 --------
 
-* TODO hello hello
+* TODO hello hello hello
 
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
 | flag         | type | description                                                     | default                                          |
