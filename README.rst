@@ -14,7 +14,7 @@ Features
 
 * TODO hello hello
 
-+-------+----------+------+
++-------+----------+------+--+
 | options flag   | type | description | default
 +=======+==========+======+==+
 | cell  | column spanning |
