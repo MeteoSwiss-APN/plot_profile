@@ -24,8 +24,8 @@ General usage: ``plot_profile [options]``
 || --params    || str || physical quantities of interest                                || all of them; hint: add multiple params like:    |
 ||             ||     || possible values: 743/winddir, 745/temp, 747/dewp, 748/windvel) || --params 743 --params temp   --params windvel   |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
-|| --outpath    || str  || path to folder where plots should be saved                   || plots/                                          |
-||              ||      || (directory is created, if it doesn't exist already)          ||                                                 |
+|| --outpath   || str || path to folder where plots should be saved                     || plots/                                          |
+||             ||     || (directory is created, if it doesn't exist already)            ||                                                 |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
 |  --grid               | bool     | add grid                                           | if_flag = True                                   |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
