@@ -53,14 +53,17 @@ The available options are:
 Remark
 --------
 **Error messages have (so far) not been implemented. Thus, follow the description of these options meticulously.**
-* to use personal settings, don't forget to use the ``--personal_settings`` flag. otherwise the individually defined axis limits won't be applied.
-* aasdf
+
+asdf
+
+
+- to use personal settings, don't forget to use the ``--personal_settings`` flag. otherwise the individually defined axis limits won't be applied.
+
 
 ToDos
 -------
-* add 2nd entry point
-* implement error messages
-* test the newly defined shortcut to stage changes
+* add 2nd entry point for model
+* implement error messages for wrong inputs
 
 Credits
 -------
