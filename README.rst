@@ -2,7 +2,7 @@
 plot_profile
 ============
 
-Plot radiosounding profiles [to be continued]
+'plot_profile' is a Python-based command line tool to retrieve and visualise observational data from radiousounding measurements.
 
 Features
 --------

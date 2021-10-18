@@ -56,3 +56,5 @@ Options:
 
 meteoswiss token for github:
 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
+
+adding personal token according go this answer: https://stackoverflow.com/questions/66231282/how-to-add-github-personal-access-token-to-visual-studio-code
