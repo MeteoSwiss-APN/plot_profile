@@ -8,14 +8,10 @@ Usage
 --------
 To get a list of all availabe commands, just type:
 ``plot_profile --help``.
-
-Features
---------
-
-* TODO hello hello hello
+General usage: ``plot_profile [options]``
 
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
-| flag         | type | description                                                     | default                                          |
+| options         | type | description                                                     | default                                       |
 +==============+======+=================================================================+==================================================+
 | --station-id | str  | station ID [XXXXX]                                              | 06610 (Payerne)                                  |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
@@ -28,49 +24,31 @@ Features
 || --params    || str || physical quantities of interest                                || all of them; hint: add multiple params like:    |
 ||             ||     || possible values: 743/winddir, 745/temp, 747/dewp, 748/windvel) || --params 743 --params temp   --params windvel   |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
-| --outpath    | str  | path to folder where plots should be saved (directory is created, if it doesn't exist already) | plots/            |
+|| --outpath    || str  || path to folder where plots should be saved                   || plots/                                          |
+||              ||      || (directory is created, if it doesn't exist already)          ||                                                 |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
-|              |      |                                                                 |                                                  |
+|  --grid               | bool     | add grid                                           | if_flag = True                                   |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|  --clouds             | bool     | add clouds                                         | if_flag = True                                   |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|  --relhum_thresh      | int      | relative humidity threshold to show clouds         | 80%                                              |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|  --print_steps        | bool     | print intermediate steps (i.e. for debugging)      | if_flag = True                                   |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|| --standard_settings  || bool    || use pre-defined standard settings                 || temp_range: -100-30 [°C], windvel_range:        |
+||                      ||         || (i.e. to compare days more easily)                ||  0-50 [km/h]. if_flag = True                    |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|  --personal_settings  | bool     | define personal axis limits                        | if_flag = True                                   |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|  --temp_min           | float    | mininum temperature                                | none                                             |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|  --temp_max           | float    | maximum temperature                                | none                                             |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|  --windvel_min        | float    | minimum wind velocity                              | none                                             |
++--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
+|  --windvel_max        | float    | maximum wind velocity                              | none                                             |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
 
-* hey hey
-
-
-
-
-..
-    Usage: plot_profile [OPTIONS]
-
-    Options:
-    --station_id TEXT               station ID: XXXXX - def: 06610
-    --date TEXT                     start date: YYYYMMDDHH - def: 2021083100
-    --alt_bot INTEGER               altitude bottom value: int - def: elevation
-                                    of radiosounding station
-    --alt_top INTEGER               altitude top value: int - def: 10% over max
-                                    altitude of radiosounding retrieval
-    --params [743|winddir|745|temp|747|dewp|748|windvel]
-                                    Default: all
-     TEXT                  path to folder where the plots should be
-                                    saved - def: plots/
-    --grid                          Show grid on plot - def: False
-    --clouds                        Show clouds on plot - def: True
-    --relhum_thresh FLOAT           Define the relative humidity threshold for
-                                    clouds - def: 80
-    --print_steps                   Add this flag to display intermediate steps.
-    --standard_settings             temp_range: -100-30 [°C], windvel_range:
-                                    0-50 [km/h]
-    --personal_settings             If this flag is added, personal 'standard'
-                                    settings can be defined using the
-                                    temp_min/max and windvel_min/max flags
-    --temp_min FLOAT                Define the minimum temperature. Disclaimer:
-                                    Add --personal_settings flag!
-    --temp_max FLOAT                Define the maximum temperature. Disclaimer:
-                                    Add --personal_settings flag!
-    --windvel_min FLOAT             Define the minimum windvelocity. Disclaimer:
-                                    Add --personal_settings flag!
-    --windvel_max FLOAT             Define the maximum windvelocity. Disclaimer:
-                                    Add --personal_settings flag!
-    --help                          Show this message and exit.
 
 Credits
 -------
