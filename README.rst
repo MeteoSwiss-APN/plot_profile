@@ -9,51 +9,25 @@ Usage
 To get a list of all availabe commands, just type:
 ``plot_profile --help``.
 
-```
-    Usage: plot_profile [OPTIONS]
-
-Options:
-  --station_id TEXT               station ID: XXXXX - def: 06610
-  --date TEXT                     start date: YYYYMMDDHH - def: 2021083100
-  --alt_bot INTEGER               altitude bottom value: int - def: elevation
-                                  of radiosounding station
-  --alt_top INTEGER               altitude top value: int - def: 10% over max
-                                  altitude of radiosounding retrieval
-  --params [743|winddir|745|temp|747|dewp|748|windvel]
-                                  Default: all
-  --outpath TEXT                  path to folder where the plots should be
-                                  saved - def: plots/
-  --grid                          Show grid on plot - def: False
-  --clouds                        Show clouds on plot - def: True
-  --relhum_thresh FLOAT           Define the relative humidity threshold for
-                                  clouds - def: 80
-  --print_steps                   Add this flag to display intermediate steps.
-  --standard_settings             temp_range: -100-30 [°C], windvel_range:
-                                  0-50 [km/h]
-  --personal_settings             If this flag is added, personal 'standard'
-                                  settings can be defined using the
-                                  temp_min/max and windvel_min/max flags
-  --temp_min FLOAT                Define the minimum temperature. Disclaimer:
-                                  Add --personal_settings flag!
-  --temp_max FLOAT                Define the maximum temperature. Disclaimer:
-                                  Add --personal_settings flag!
-  --windvel_min FLOAT             Define the minimum windvelocity. Disclaimer:
-                                  Add --personal_settings flag!
-  --windvel_max FLOAT             Define the maximum windvelocity. Disclaimer:
-                                  Add --personal_settings flag!
-  --help                          Show this message and exit.
-```
-
 Features
 --------
 
 * TODO hello hello
 
-| Syntax      | Description | Test Text     |
-| :---        |    :----:   |          ---: |
-| Header      | Title       | Here's this   |
-| Paragraph   | Text        | And more      |
+.. list-table:: Title
+   :widths: 25 25 50
+   :header-rows: 1
 
+   * - Heading row 1, column 1
+     - Heading row 1, column 2
+     - Heading row 1, column 3
+   * - Row 1, column 1
+     -
+     - Row 1, column 3
+   * - Row 2, column 1
+     - Row 2, column 2
+     - Row 2, column 3
+     -
 Credits
 -------
 
