@@ -52,8 +52,8 @@ The available options are:
 
 Remark
 --------
-**Error messages have (so far) not been implemented. Thus, follow the description of these options meticulously.**
-* _Only_ if the ``--personal_settings`` flag is added, define the desired axis limits - otherwise the x-axis will be scaled according to the day's measurements.
+**Error messages have (so far) not been implemented. Thus, follow the description of these options meticulously.** \\
+* *Only* if the ``--personal_settings`` flag is added, define the desired axis limits - otherwise the x-axis will be scaled according to the day's measurements.
 * Stick to the pre-defined data types.
 
 ToDos
