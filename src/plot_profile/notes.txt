@@ -54,6 +54,5 @@ Options:
                                   0-50 [km/h]
   --help                          Show this message and exit.
 
-
-
-asdf
+meteoswiss token for github:
+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
