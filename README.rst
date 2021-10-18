@@ -54,11 +54,8 @@ Remark
 --------
 **Error messages have (so far) not been implemented. Thus, follow the description of these options meticulously.**
 
-asdf
-
-
-- to use personal settings, don't forget to use the ``--personal_settings`` flag. otherwise the individually defined axis limits won't be applied.
-
+- to use personal settings, don't forget the ``--personal_settings`` flag. otherwise the individually defined axis limits won't be applied.
+- to try out this package, run the ``plot_profile_example.sh`` script and study the newly created directory and containing plots
 
 ToDos
 -------
