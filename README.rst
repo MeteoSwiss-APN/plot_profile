@@ -14,13 +14,21 @@ Features
 
 * TODO hello hello
 
-.. list-table:: Title
-   :widths: 25 25 50
-   :header-rows: 1
++-------+----------+------+
+| Table Headings   | Here |
++-------+----------+------+
+| Sub   | Headings | Too  |
++=======+==========+======+
+| cell  | column spanning |
++ spans +----------+------+
+| rows  | normal   | cell |
++-------+----------+------+
+| multi | * cells can be  |
+| line  | * formatted     |
+| cells | * paragraphs    |
+| too   |                 |
++-------+-----------------+
 
-   * - Heading row 1, column 1
-   * - Heading row 1, column 1
-   * - Heading row 1, column 1
 Credits
 -------
 
