@@ -26,13 +26,14 @@ Features
 | --alt_top    | int  | upper boundary for altitude                                     | 10% over max altitude of radiosounding retrieval |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
 || --params    || str || physical quantities of interest                                || all of them; hint: add multiple params like:    |
-||             ||     || possible values: 743/winddir, 745/temp, 747/dewp, 748/windvel) || --params 743 --params temp   --params windvel |
+||             ||     || possible values: 743/winddir, 745/temp, 747/dewp, 748/windvel) || --params 743 --params temp   --params windvel   |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
-|              |      |                                                                 |                                                  |
+| --outpath    | str  | path to folder where plots should be saved (directory is created, if it doesn't exist already) | plots/            |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
 |              |      |                                                                 |                                                  |
 +--------------+------+-----------------------------------------------------------------+--------------------------------------------------+
 
+* hey hey
 
 
 
@@ -49,7 +50,7 @@ Features
                                     altitude of radiosounding retrieval
     --params [743|winddir|745|temp|747|dewp|748|windvel]
                                     Default: all
-    --outpath TEXT                  path to folder where the plots should be
+     TEXT                  path to folder where the plots should be
                                     saved - def: plots/
     --grid                          Show grid on plot - def: False
     --clouds                        Show clouds on plot - def: True
