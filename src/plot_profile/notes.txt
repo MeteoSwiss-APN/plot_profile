@@ -34,25 +34,6 @@ Temperature and Wind together:                always multi plot
 
 Usage: plot_profile [OPTIONS]
 
-Options:
-  --station_id TEXT               station ID: XXXXX - def: 06610
-  --date TEXT                     start date: YYYYMMDDHH - def: 2021083100
-  --alt_bot INTEGER               altitude bottom value: int - def: elevation
-                                  of radiosounding station
-  --alt_top INTEGER               altitude top value: int - def: 10% over max
-                                  altitude of radiosounding retrieval
-  --params [743|winddir|745|temp|747|dewp|748|windvel]
-                                  Default: all
-  --out_path TEXT                 path to folder where the plots should be
-                                  saved - def: plots/
-  --grid                          Show grid on plot - def: False
-  --clouds                        Show clouds on plot - def: True
-  --relhum_thresh FLOAT           Define the relative humidity threshold for
-                                  clouds - def: 80
-  --print_steps                   Add this flag to display intermediate steps.
-  --standard_settings             temp_range: -100-30 [°C], windvel_range:
-                                  0-50 [km/h]
-  --help                          Show this message and exit.
 
 meteoswiss token for github:
 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
