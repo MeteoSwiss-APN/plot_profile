@@ -2,13 +2,14 @@
 plot_profile
 ============
 
-'plot_profile' is a Python-based command line tool to retrieve and visualise observational data from radiousounding measurements.
+*plot_profile* is a Python-based command line tool to retrieve and visualise observational data from radiousounding measurements.
 
 Usage
 --------
 To get a list of all availabe commands, just type:
 ``plot_profile --help``.
-General usage: ``plot_profile [options]``
+General usage: ``plot_profile [options]`` \\
+The available options are:
 
 +---------------------------+------+-----------------------------------------------------------------+--------------------------------------------------+
 | options                   | type | description                                                     | default                                          |
@@ -49,6 +50,15 @@ General usage: ``plot_profile [options]``
 |  --windvel_max            | float| maximum wind velocity                                           | none                                             |
 +---------------------------+------+-----------------------------------------------------------------+--------------------------------------------------+
 
+Remark
+--------
+**Error messages have (so far) not been implemented. Thus, follow the description of these options meticulously.**
+* _Only_ if the ``--personal_settings`` flag is added, define the desired axis limits - otherwise the x-axis will be scaled according to the day's measurements.
+* Stick to the pre-defined data types.
+
+ToDos
+-------
+* add 2nd entry point
 
 Credits
 -------
