@@ -58,6 +58,7 @@ scripts = [
     "plot_profile=plot_profile.cli:main",
     "plot_rs=plot_profile.cli_rs:main",
     # "plot_rs_icon=plot_profile.cli_rs_icon:main",
+    "plot_icon=plot_profile.cli_icon:main",
 ]
 
 setup(
