@@ -130,6 +130,8 @@ def main(
     windvel_max: float,
 ) -> None:
 
+    # test
+
     df, station_name, relevant_params = get_data(
         date=date,
         params=params,
