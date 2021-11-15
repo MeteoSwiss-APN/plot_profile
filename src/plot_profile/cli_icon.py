@@ -11,15 +11,26 @@ from typing import NamedTuple
 import click
 
 # Local
-from .get_data import *
+from .get_icon import *
 from .plot_data import *
 
 
 @click.command()
-# @click.argument("station_id") # non-optional
-@click.argument("--file", type=str, help="icon output file in netcdf format")
+@click.option("--folder", type=str, help="path to folder with icon output")
+@click.option(
+    "--leadtime", type=int, multiple=True, default=(0,), help="simulation lead time"
+)
+@click.option("--lat", type=float, help="latitude of location")
+@click.option("--lon", type=float, help="longitude of location")
+@click.option("--ind", type=int, default=-1, help="index of location")
+@click.option(
+    "--grid",
+    type=str,
+    default="/store/mch/msopr/tsm/fieldextra/static/share/grid_descriptions/ICON-1E_DOM01_R19B08.nc",
+    help="icon file with HEIGHT field",
+)
 @click.option("--alt_bot", default=0, type=int, help="altitude bottom:  int")
-@click.option("--alt_top", default=40000, type=int, help="altitude top value: int")
+@click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
 @click.option(
     "--var",
     type=click.Choice(
@@ -41,7 +52,7 @@ from .plot_data import *
     help="path to folder where the plots should be saved - def: plots/",
 )
 @click.option(
-    "--grid",
+    "--show_grid",
     is_flag=True,
     help="Show grid on plot - def: False",
 )
@@ -82,12 +93,17 @@ from .plot_data import *
 )
 def main(
     *,
-    file: str,
+    folder: str,
+    leadtime: int,
+    lat: float,
+    lon: float,
+    ind: int,
+    grid: str,
     alt_bot: int,
     alt_top: int,
     var: str,
     outpath: str,
-    grid: bool,
+    show_grid: bool,
     print_steps: bool,
     standard_settings: bool,
     personal_settings: bool,
@@ -97,33 +113,44 @@ def main(
     windvel_max: float,
 ) -> None:
 
-    df, station_name, relevant_params = get_data(
-        date=date,
-        params=params,
-        station_id=station_id,
-        print_steps=print_steps,
-        alt_bot=alt_bot,
-        alt_top=alt_top,
-    )
-
-    create_plot(
-        df=df,
-        relhum_thresh=relhum_thresh,
+    df = get_icon(
+        folder=folder,
+        leadtime=leadtime,
+        lat=lat,
+        lon=lon,
+        ind=ind,
         grid=grid,
-        clouds=clouds,
-        outpath=outpath,
-        station_name=station_name,
-        date=date,
-        alt_top=alt_top,
+        var=var,
         alt_bot=alt_bot,
-        params=relevant_params,
-        print_steps=print_steps,
-        standard_settings=standard_settings,
-        personal_settings=personal_settings,
-        temp_min=temp_min,
-        temp_max=temp_max,
-        windvel_min=windvel_min,
-        windvel_max=windvel_max,
+        alt_top=alt_top,
     )
+    # df, station_name, relevant_params = get_data(
+    #    date=date,
+    #    params=params,
+    #    station_id=station_id,
+    #    print_steps=print_steps,
+    #    alt_bot=alt_bot,
+    #    alt_top=alt_top,
+    # )
+
+    # create_plot(
+    #    df=df,
+    #    relhum_thresh=relhum_thresh,
+    #    grid=grid,
+    #    clouds=clouds,
+    #    outpath=outpath,
+    #    station_name=station_name,
+    #    date=date,
+    #    alt_top=alt_top,
+    #    alt_bot=alt_bot,
+    #    params=relevant_params,
+    #    print_steps=print_steps,
+    #    standard_settings=standard_settings,
+    #    personal_settings=personal_settings,
+    #    temp_min=temp_min,
+    #    temp_max=temp_max,
+    #    windvel_min=windvel_min,
+    #    windvel_max=windvel_max,
+    # )
 
     print("--- Done.")
