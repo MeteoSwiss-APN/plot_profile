@@ -20,8 +20,8 @@ from .plot_data import *
 @click.option(
     "--leadtime", type=int, multiple=True, default=(0,), help="simulation lead time"
 )
-@click.option("--lat", type=float, help="latitude of location")
-@click.option("--lon", type=float, help="longitude of location")
+@click.option("--lat", default=46.81281, type=float, help="latitude of location")
+@click.option("--lon", default=6.94363, type=float, help="longitude of location")
 @click.option("--ind", type=int, default=-1, help="index of location")
 @click.option(
     "--grid",
