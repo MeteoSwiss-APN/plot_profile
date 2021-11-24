@@ -26,8 +26,8 @@ from .plot_data import *
 @click.option(
     "--grid",
     type=str,
-    default="/store/mch/msopr/tsm/fieldextra/static/share/grid_descriptions/ICON-1E_DOM01_R19B08.nc",
-    help="icon file with HEIGHT field",
+    default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
+    help="icon file containing HEIGHT field",
 )
 @click.option("--alt_bot", default=0, type=int, help="altitude bottom:  int")
 @click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
@@ -124,14 +124,6 @@ def main(
         alt_bot=alt_bot,
         alt_top=alt_top,
     )
-    # df, station_name, relevant_params = get_data(
-    #    date=date,
-    #    params=params,
-    #    station_id=station_id,
-    #    print_steps=print_steps,
-    #    alt_bot=alt_bot,
-    #    alt_top=alt_top,
-    # )
 
     # create_plot(
     #    df=df,

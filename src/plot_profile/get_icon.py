@@ -6,8 +6,7 @@ Date: 11/11/2021
 """
 
 # Standard library
-import subprocess  # use: run command line commands from python
-from io import StringIO
+import sys
 from pathlib import Path
 
 # Third-party
@@ -64,6 +63,25 @@ def ind_from_latlon(lats, lons, lat, lon, verbose=False):
     return ind
 
 
+def calc_hhl(hfl):
+    """Interpolate from full levels to half levels.
+
+    Args:
+        hfl (1d array): values of a variable defined on N full model levels
+
+    Returns:
+        1d array        values of this variable interpolated to N-1 half model levels
+
+    """
+    if hfl.ndim == 1:
+        hhl = hfl[1:] + (hfl[:-1] - hfl[1:]) / 2
+    else:
+        print("height field has too many dimensions")
+        sys.exit(1)
+
+    return hhl
+
+
 def get_icon(folder, leadtime, lat, lon, ind, grid, var, alt_bot, alt_top):
     """Retrieve vertical profile of variable from icon simulation.
 
@@ -82,7 +100,6 @@ def get_icon(folder, leadtime, lat, lon, ind, grid, var, alt_bot, alt_top):
         pandas dataframe:       icon simulation values
 
     """
-    df = pd.DataFrame()
     print(folder)
 
     # list icon files
@@ -106,28 +123,38 @@ def get_icon(folder, leadtime, lat, lon, ind, grid, var, alt_bot, alt_top):
 
     # load constants file
     if Path(grid).is_file():
-        ds_const = xr.open_dataset(grid).squeeze()
+        ds_grid = xr.open_dataset(grid).squeeze()
     else:
         print("grid file does not exist!")
 
     # load latitude and longitude grid of constants file
-    lats_const = ds_const.clat.values
-    lons_const = ds_const.clon.values
+    lats_grid = ds_grid.clat_1.values
+    lons_grid = ds_grid.clon_1.values
 
     # convert from radians to degrees if given in radians
-    if lats_const.max() < 2.0 and lons_const.max() < 2.0:
+    if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
         print("assuming that lats and lons are given in radians")
-        lats_const = np.rad2deg(lats_const)
-        lons_const = np.rad2deg(lons_const)
+        lats_grid = np.rad2deg(lats_grid)
+        lons_grid = np.rad2deg(lons_grid)
 
-    if ds.cells_1.size != ds_const.cell.size:
-        print("Attention: Size of output and grid file does not match!")
+    if ds.cells_1.size != ds_grid.cells_1.size:
+        print("Attention: Sizes of output and grid file do not match!")
 
     print("Latitude and logitude of selected index in grid file:")
-    print(f"{lats_const[ind]:.2f}, {lons_const[ind]:.2f}")
+    print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
 
-    # ipdb.set_trace()
-    # subselect column
-    # dss = ds.isel(cells_1=ind)
+    # subselect values from column
+    values = ds.isel(cells_1=ind)[var].values
+    height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
 
-    return df
+    # subselect rows with specified height
+    df_height = pd.Series(data=calc_hhl(height))
+
+    df_values = pd.DataFrame(
+        columns=leadtime,
+        data=values.transpose(),
+    )
+
+    crit = (df_height < alt_top) & (df_height > alt_bot)
+
+    return df_height[crit], df_values[crit]
