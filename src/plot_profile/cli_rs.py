@@ -11,12 +11,11 @@ from typing import NamedTuple
 import click
 
 # Local
-from .get_data import *
-from .plot_data import *
+from .get_data import get_data
+from .plot_data import create_plot
 
 
 @click.command()
-# @click.argument("station_id") # make the station ID non-optional
 @click.option("--station_id", default="06610", help="station ID: XXXXX - def: 06610")
 @click.option(
     "--date", default="2021083100", help="start date: YYYYMMDDHH - def: 2021083100"
@@ -130,8 +129,6 @@ def main(
     windvel_max: float,
 ) -> None:
 
-    # test
-
     df, station_name, relevant_params = get_data(
         date=date,
         params=params,
@@ -141,24 +138,25 @@ def main(
         alt_top=alt_top,
     )
 
-    create_plot(
-        df=df,
-        relhum_thresh=relhum_thresh,
-        grid=grid,
-        clouds=clouds,
-        outpath=outpath,
-        station_name=station_name,
-        date=date,
-        alt_top=alt_top,
-        alt_bot=alt_bot,
-        params=relevant_params,
-        print_steps=print_steps,
-        standard_settings=standard_settings,
-        personal_settings=personal_settings,
-        temp_min=temp_min,
-        temp_max=temp_max,
-        windvel_min=windvel_min,
-        windvel_max=windvel_max,
-    )
+    if False:
+        create_plot(
+            df=df,
+            relhum_thresh=relhum_thresh,
+            grid=grid,
+            clouds=clouds,
+            outpath=outpath,
+            station_name=station_name,
+            date=date,
+            alt_top=alt_top,
+            alt_bot=alt_bot,
+            params=relevant_params,
+            print_steps=print_steps,
+            standard_settings=standard_settings,
+            personal_settings=personal_settings,
+            temp_min=temp_min,
+            temp_max=temp_max,
+            windvel_min=windvel_min,
+            windvel_max=windvel_max,
+        )
 
     print("--- Done.")
