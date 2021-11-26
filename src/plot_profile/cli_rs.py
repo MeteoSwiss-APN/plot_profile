@@ -138,25 +138,24 @@ def main(
         alt_top=alt_top,
     )
 
-    if False:
-        create_plot(
-            df=df,
-            relhum_thresh=relhum_thresh,
-            grid=grid,
-            clouds=clouds,
-            outpath=outpath,
-            station_name=station_name,
-            date=date,
-            alt_top=alt_top,
-            alt_bot=alt_bot,
-            params=relevant_params,
-            print_steps=print_steps,
-            standard_settings=standard_settings,
-            personal_settings=personal_settings,
-            temp_min=temp_min,
-            temp_max=temp_max,
-            windvel_min=windvel_min,
-            windvel_max=windvel_max,
-        )
+    create_plot(
+        df=df,
+        relhum_thresh=relhum_thresh,
+        grid=grid,
+        clouds=clouds,
+        outpath=outpath,
+        station_name=station_name,
+        date=date,
+        alt_top=alt_top,
+        alt_bot=alt_bot,
+        params=relevant_params,
+        print_steps=print_steps,
+        standard_settings=standard_settings,
+        personal_settings=personal_settings,
+        temp_min=temp_min,
+        temp_max=temp_max,
+        windvel_min=windvel_min,
+        windvel_max=windvel_max,
+    )
 
     print("--- Done.")
