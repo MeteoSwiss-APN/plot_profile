@@ -10,17 +10,25 @@ import os
 from mmap import ACCESS_DEFAULT
 
 # Third-party
-import matplotlib.pyplot as plt  # use: to create plots
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib import ticker
-
-# from .get_data import *
-
-# import pdb  # use: python debugger, i.e. pdb.set_trace()
 
 
+# docstring check
 def extract_clouds(df, relhum_thresh, print_steps):
+    """Extract the cloud layers based on the relative humidity threshold.
+
+    Args:
+        df:                 df          dataframe containing relevant rows/columns
+        relhum_thresh:      float       relative humitdity threshold needed to be classified as cloud
+        print_steps:        bool        optional parameter to print intermediate steps in terminal
+
+    Returns:
+        cloud_start:        array       array containing cloud layer start altitudes
+        cloud_end:          array       array containing cloud layer end altitudes
+
+    """
     cloud_df = df[["altitude", "relhum"]]  # extract the altitude & relhum columns
     cloud_df = cloud_df[
         cloud_df["relhum"] >= relhum_thresh
@@ -61,25 +69,35 @@ def extract_clouds(df, relhum_thresh, print_steps):
             print(
                 f"cloud list: {cloud_list} \n cloud array: {cloud_array} \n cloud start: {cloud_start}  \n cloud_end: {cloud_end}"
             )
-
         return cloud_start, cloud_end
 
 
+# docstring check
 def map_degrees(avg_winddir_array):
+    """Map the wind directions (°) from to x-y values.
+
+    Args:
+        avg_winddir_array:  array       direction of wind in degrees
+
+    Returns:
+        x_dir:              array        x-coordinate of winddir array
+        y_dir:              array        y-coordinate of winddir array
+
+    """
     x_dir, y_dir, i = [], [], 0
     while i < len(avg_winddir_array):
         x_dir.append(np.cos(avg_winddir_array[i] - 90))
         y_dir.append(np.sin(avg_winddir_array[i] - 90))
         i += 1
-    # print(f'x_dir = {x_dir} and y_dir = {y_dir}')
     return x_dir, y_dir
 
 
+# docstring check
 def adjustFigAspect(fig, aspect=1):
-    """**summary line** this function was taken from stackoverflow, to create plots with different aspect ratios.
+    """Create plots with different aspect ratios (taken from stackoverflow).
 
-    **description starts after blank line above***
     Adjust the subplot parameters so that the figure has the correct aspect ratio.
+
     """
     # no blank lines allowed here according to the docstring rules.
     xsize, ysize = fig.get_size_inches()
@@ -95,7 +113,19 @@ def adjustFigAspect(fig, aspect=1):
     )
 
 
+# docstring check
 def plot_clouds(df, relhum_thresh, print_steps, ax, params, plot_properties):
+    """Add clouds to plot.
+
+    Args:
+        df:                 df          dataframe containing relevant rows/columns
+        relhum_thresh:      float       relative humitdity threshold needed to be classified as cloud
+        print_steps:        bool        optional parameter to print intermediate steps in terminal
+        ax:                 axes        current axes to add clouds to
+        params:             tuple       parameters, that should be included in the plot ('743', '745', '748', '747')
+        plot_properties:    dict        depending on the params, different plot properties need to be used. these are defined in this dict.
+
+    """
     cloud_start, cloud_end = extract_clouds(
         df=df, relhum_thresh=relhum_thresh, print_steps=print_steps
     )
@@ -128,7 +158,16 @@ def plot_clouds(df, relhum_thresh, print_steps, ax, params, plot_properties):
     return
 
 
+# docstring check
 def plot_grid(ax, plot_properties, params):
+    """Add grid to current axes.
+
+    Args:
+        ax:                 axes        current axes to add clouds to
+        params:             tuple       parameters, that should be included in the plot ('743', '745', '748', '747')
+        plot_properties:    dict        depending on the params, different plot properties need to be used. these are defined in this dict.
+
+    """
     if params in plot_properties:  # single plot case:
         ax.xaxis.grid(
             color=plot_properties[params]["xlabel_color"], linestyle="--", linewidth=0.5
@@ -152,6 +191,7 @@ def plot_grid(ax, plot_properties, params):
     return
 
 
+# docstring check
 def check_settings(
     standard_settings,
     params,
@@ -162,6 +202,25 @@ def check_settings(
     temp_max,
     plot_properties,
 ):
+    """Check, which axis limits should be used (standard/personal settings).
+
+    Args:
+        standard_settings:      bool        option, to use standard settings (temp_range: -100-30 [°C], windvel_range: 0-50 [km/h])
+        params:                 tuple       parameters, that should be included in the plot ('743', '745', '748', '747')
+        personal_settings:      bool        option, to use personal settings (temp_range: temp_min-temp_max, windvel_range: windvel_min-windvel_max)
+        windvel_min:            float       lower bound for wind velocity
+        windvel_max:            float       upper bound for wind velocity
+        temp_min:               float       lower bound for temperature
+        temp_max:               float       upper bound for temperature
+        plot_properties:        dict        depending on the params, different plot properties need to be used. these are defined in this dict.
+
+    Returns:
+        x_min_wind:             float       lower bound for wind velocity
+        x_max_wind:             float       upper bound for wind velocity
+        x_max_temp:             float       lower bound for temperature
+        x_max_temp:             float       upper bound for temperature
+
+    """
     if params in plot_properties:  # single plot case
         x_min, x_max = 0, 0
         if standard_settings:  # here, the standard settings are being defined
@@ -214,6 +273,7 @@ def create_plot(
     windvel_min,
     windvel_max,
 ):
+    """All input parameters - see other functions for definition. This function just creates and saves the plot."""
     fig = plt.figure()
 
     blue = "b"
