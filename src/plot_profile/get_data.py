@@ -168,6 +168,22 @@ def extract_rows(df, print_steps, alt_bot, alt_top, all_params):
 
 
 def get_data(date, params, station_id, print_steps, alt_bot, alt_top):
+    """Retrieve and parse the relevant data from the server and return a complete dataframe containing the data.
+
+    Args:
+        date:               str         YYYYMMDDHH
+        params:             tuple       parameters, that should be included in the plot ('743', '745', '748', '747') (these refer to different physical quantities, see below)
+        station_id:         str         ID of station (i.e. Payerne has ID: 06610)
+        print_steps:        bool        optional parameter to print intermediate steps in terminal
+        alt_bot:            int         lower altitude limit
+        alt_top:            int         upper altitude limit
+
+    Returns:
+        df:                 df          dataframe w/ columns forall params
+        station_name:       str         station name corresponding to station ID
+        relevant_params:    tuple       params + standard params. i.e. ('742', '743', '745', '746', '747', '748')
+
+    """
     # station_id and parameter_id dicts
     params_dict = {
         "742": "742",
