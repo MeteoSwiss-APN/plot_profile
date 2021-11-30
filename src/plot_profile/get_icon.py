@@ -20,8 +20,6 @@ from click.decorators import option
 # Local
 from .variables import vdf
 
-# import ipdb
-
 
 def lfff_name(lt):
     """Create mch-filename for icon ctrl run for given leadtime.
@@ -112,11 +110,9 @@ def get_icon(
     # specify variable (pandas dataframe with attributes)
     var = vdf[var_shortname]
 
-    # print folder (for debugging only)
-    print(folder)
-
     # list icon files
     date_str = date.strftime("%y%m%d%H")
+    print(f"Looking for files in {str(Path(folder, date_str))}")
     files = [Path(folder, date_str, lfff_name(lt)) for lt in leadtime]
 
     # load as xarray dataset
@@ -170,6 +166,22 @@ def get_icon(
     )
 
     # criteria: height specifcations
-    crit = (df_height < alt_top) & (df_height > alt_bot)
+
+    # crit = (df_height < alt_top) & (df_height > alt_bot)
+    # exclude rows above specified altitude (alt_top)
+    crit_upper = df_height < alt_top
+    # set last False in to True
+    last_false = crit_upper[crit_upper == False]
+    if len(last_false) > 0:
+        crit_upper[last_false.index.max()] = True
+
+    # exclude rows below specified altitude (alt_bot)
+    crit_lower = df_height > alt_bot
+    last_false = crit_lower[crit_lower == False]
+    if len(last_false) > 0:
+        crit_lower[last_false.index.max()] = True
+
+    # combine selection criteria
+    crit = crit_upper & crit_lower
 
     return df_height[crit], df_values[crit]

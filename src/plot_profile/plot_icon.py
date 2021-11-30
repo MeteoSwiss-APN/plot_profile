@@ -9,18 +9,25 @@ Date: 25/11/2021.
 from pathlib import Path
 
 # Third-party
-# Standard packages
 # import ipdb
 import matplotlib.pyplot as plt
 import pandas as pd
 
 # Local
-# Local packages
 from .variables import vdf
 
 
 def create_plot(
-    var_shortname, df_height, df_values, outpath, date, alt_bot, alt_top, loc, model
+    var_shortname,
+    df_height,
+    df_values,
+    outpath,
+    date,
+    alt_bot,
+    alt_top,
+    loc,
+    model,
+    appendix,
 ):
     """Plot vertical profile of variable.
 
@@ -34,6 +41,7 @@ def create_plot(
         alt_top (int):                  upper boundary of altitude
         loc (str):                      location string
         model (str):                    name of nwp model
+        appendix (str):                 add to output filename to e.g. distinguish versions
 
     """
     # specify variable (pandas dataframe with attributes)
@@ -66,6 +74,8 @@ def create_plot(
     ax.legend(fancybox=True)
 
     # save figure
-    name = f'{model}_{loc}_{date.strftime("%y%m%d%H")}_{var.short_name}'
+    name = f'{model}_{date.strftime("%y%m%d%H")}_{var.short_name}_{loc}'
+    if appendix:
+        name = name + "_" + appendix
     plt.tight_layout()
-    plt.savefig("/scratch/swester/tmp/dummy.png")
+    plt.savefig(f"/scratch/swester/tmp/{name}.png")

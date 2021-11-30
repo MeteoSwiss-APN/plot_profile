@@ -18,8 +18,9 @@ from .plot_icon import create_plot
 
 
 @click.command()
-@click.option("--alt_bot", default=0, type=int, help="altitude bottom:  int")
+@click.option("--alt_bot", default=490, type=int, help="altitude bottom:  int")
 @click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
+@click.option("--appendix", default=None, type=str, help="append to output filename")
 @click.option(
     "--date",
     type=click.DateTime(formats=["%y%m%d%H"]),
@@ -104,6 +105,7 @@ def main(
     *,
     alt_bot: int,
     alt_top: int,
+    appendix: str,
     date: str,
     folder: str,
     grid: str,
@@ -125,33 +127,32 @@ def main(
     windvel_max: float,
 ) -> None:
 
-    # height, values = get_icon(
-    #    folder=folder,
-    #    date=date,
-    #    leadtime=leadtime,
-    #    lat=lat,
-    #    lon=lon,
-    #    ind=ind,
-    #    grid=grid,
-    #    var_shortname=var,
-    #    alt_bot=alt_bot,
-    #    alt_top=alt_top,
-    # )
+    height, values = get_icon(
+        folder=folder,
+        date=date,
+        leadtime=leadtime,
+        lat=lat,
+        lon=lon,
+        ind=ind,
+        grid=grid,
+        var_shortname=var,
+        alt_bot=alt_bot,
+        alt_top=alt_top,
+    )
 
-    #
-    #    # for faster debugging of plotting function
-    #    f = open('/scratch/swester/tmp/height.pckl', 'wb')
-    #    pickle.dump(height, f)
-    #    f.close()
-    #    f = open('/scratch/swester/tmp/values.pckl', 'wb')
-    #    pickle.dump(values, f)
-    #    f.close()
-    f1 = open("/scratch/swester/tmp/height.pckl", "rb")
-    height = pickle.load(f1)
-    f1.close()
-    f2 = open("/scratch/swester/tmp/values.pckl", "rb")
-    values = pickle.load(f2)
-    f2.close()
+    ## for faster debugging of plotting function
+    # f = open('/scratch/swester/tmp/height.pckl', 'wb')
+    # pickle.dump(height, f)
+    # f.close()
+    # f = open('/scratch/swester/tmp/values.pckl', 'wb')
+    # pickle.dump(values, f)
+    # f.close()
+    # f1 = open("/scratch/swester/tmp/height.pckl", "rb")
+    # height = pickle.load(f1)
+    # f1.close()
+    # f2 = open("/scratch/swester/tmp/values.pckl", "rb")
+    # values = pickle.load(f2)
+    # f2.close()
 
     create_plot(
         var_shortname=var,
@@ -163,6 +164,7 @@ def main(
         alt_top=alt_top,
         loc=loc,
         model=model,
+        appendix=appendix,
     )
 
     print("--- Done.")
