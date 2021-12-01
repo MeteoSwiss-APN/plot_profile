@@ -28,6 +28,8 @@ def create_plot(
     loc,
     model,
     appendix,
+    xmin,
+    xmax,
 ):
     """Plot vertical profile of variable.
 
@@ -42,6 +44,8 @@ def create_plot(
         loc (str):                      location string
         model (str):                    name of nwp model
         appendix (str):                 add to output filename to e.g. distinguish versions
+        xmin (float):                   minimum value of xaxis
+        xmax (float):                   maximum value of xaxis
 
     """
     # specify variable (pandas dataframe with attributes)
@@ -63,10 +67,16 @@ def create_plot(
         print(f"Plotting leadtime: {lt}")
         ax.plot(values, df_height.values, label=f"+ {lt:02} h")
 
+    # define min and max values for xaxis
+    if not xmin:
+        xmin = var.min_value
+    if not xmax:
+        xmax = var.max_value
+
     # adjust appearance
     ax.set(
         xlabel=f"{var.long_name} [{var.unit}]",
-        xlim=(var.min_value, var.max_value),
+        # xlim=(xmin, xmax),
         ylabel="Altitude [m asl]",
         ylim=(alt_bot, alt_top),
         title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
@@ -74,8 +84,10 @@ def create_plot(
     ax.legend(fancybox=True)
 
     # save figure
-    name = f'{model}_{date.strftime("%y%m%d%H")}_{var.short_name}_{loc}'
+    name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
     if appendix:
         name = name + "_" + appendix
     plt.tight_layout()
-    plt.savefig(f"/scratch/swester/tmp/{name}.png")
+    out_name = Path(outpath, f"{name}.png")
+    plt.savefig(out_name)
+    print(f"Saved as: {str(out_name)}")

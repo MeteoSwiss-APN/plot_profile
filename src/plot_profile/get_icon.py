@@ -154,7 +154,7 @@ def get_icon(
     print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
 
     # subselect values from column
-    values = ds.isel(cells_1=ind)[var.icon_name].values
+    values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
     height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
 
     # create pandas objects of height and data values

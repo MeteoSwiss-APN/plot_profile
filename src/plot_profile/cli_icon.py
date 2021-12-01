@@ -18,65 +18,13 @@ from .plot_icon import create_plot
 
 
 @click.command()
-@click.option("--alt_bot", default=490, type=int, help="altitude bottom:  int")
-@click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
-@click.option("--appendix", default=None, type=str, help="append to output filename")
+# options without default value
 @click.option(
     "--date",
     type=click.DateTime(formats=["%y%m%d%H"]),
     help="init date of icon simulation: YYMMDDHH",
 )
 @click.option("--folder", type=str, help="path to folder with icon output")
-@click.option("--ind", type=int, default=-1, help="index of location")
-@click.option(
-    "--grid",
-    type=str,
-    default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
-    help="icon file containing HEIGHT field",
-)
-@click.option("--lat", default=46.81281, type=float, help="latitude of location")
-@click.option("--lon", default=6.94363, type=float, help="longitude of location")
-@click.option(
-    "--leadtime", type=int, multiple=True, default=(0,), help="simulation lead time"
-)
-@click.option("--loc", default="pay", type=str, help="location name")
-@click.option("--model", default="icon-1", type=str, help="nwp model name")
-@click.option(
-    "--outpath",
-    default="/scratch/swester/tmp",
-    type=str,
-    help="path to folder where the plots should be saved - def: /scratch/user/tmp",
-)
-@click.option(
-    "--personal_settings",
-    is_flag=True,
-    help="If this flag is added, personal 'standard' settings can be defined using the temp_min/max and windvel_min/max flags",
-)
-@click.option(
-    "--print_steps",
-    is_flag=True,
-    help="Add this flag to display intermediate steps.",
-)
-@click.option(
-    "--show_grid",
-    is_flag=True,
-    help="Show grid on plot - def: False",
-)
-@click.option(
-    "--standard_settings",
-    is_flag=True,
-    help="temp_range: -100-30 [°C], windvel_range: 0-50 [km/h]",
-)
-@click.option(
-    "--temp_min",
-    type=float,
-    help="Define the minimum temperature. Disclaimer: Add --personal_settings flag!",
-)
-@click.option(
-    "--temp_max",
-    type=float,
-    help="Define the maximum temperature. Disclaimer: Add --personal_settings flag!",
-)
 @click.option(
     "--var",
     type=click.Choice(
@@ -88,26 +36,47 @@ from .plot_icon import create_plot
         case_sensitive=True,
     ),
     multiple=False,
-    default=("temp"),
     help="variable name",
 )
+# options with default value
+@click.option("--alt_bot", default=490, type=int, help="altitude bottom:  int")
+@click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
+@click.option("--appendix", type=str, help="append to output filename")
+@click.option("--ind", type=int, default=-1, help="index of location")
 @click.option(
-    "--windvel_min",
-    type=float,
-    help="Define the minimum windvelocity. Disclaimer: Add --personal_settings flag!",
+    "--grid",
+    type=str,
+    default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
+    help="icon file containing HEIGHT field",
 )
 @click.option(
-    "--windvel_max",
-    type=float,
-    help="Define the maximum windvelocity. Disclaimer: Add --personal_settings flag!",
+    "--leadtime", type=int, multiple=True, default=(0,), help="simulation lead time"
 )
+@click.option("--lat", default=46.81281, type=float, help="latitude of location")
+@click.option("--lon", default=6.94363, type=float, help="longitude of location")
+@click.option("--loc", default="pay", type=str, help="location name")
+@click.option("--model", default="icon-1", type=str, help="nwp model name")
+@click.option(
+    "--outpath",
+    default="/scratch/swester/tmp",
+    type=str,
+    help="path to folder where the plots should be saved - def: /scratch/user/tmp",
+)
+@click.option(
+    "--show_grid",
+    is_flag=True,
+    help="Show grid on plot - def: False",
+)
+@click.option("--xmin", type=float, help="Minimum value of xaxis")
+@click.option("--xmax", type=float, help="Maximum value of xaxis")
 def main(
     *,
+    date: str,
+    folder: str,
+    var: str,
     alt_bot: int,
     alt_top: int,
     appendix: str,
-    date: str,
-    folder: str,
     grid: str,
     ind: int,
     leadtime: int,
@@ -116,15 +85,9 @@ def main(
     loc: str,
     model: str,
     outpath: str,
-    personal_settings: bool,
-    print_steps: bool,
-    standard_settings: bool,
     show_grid: bool,
-    temp_min: float,
-    temp_max: float,
-    var: str,
-    windvel_min: float,
-    windvel_max: float,
+    xmin: float,
+    xmax: float,
 ) -> None:
 
     height, values = get_icon(
@@ -165,6 +128,8 @@ def main(
         loc=loc,
         model=model,
         appendix=appendix,
+        xmin=xmin,
+        xmax=xmax,
     )
 
     print("--- Done.")
