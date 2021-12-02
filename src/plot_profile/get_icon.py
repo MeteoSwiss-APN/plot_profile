@@ -6,6 +6,7 @@ Date: 11/11/2021
 """
 
 # Standard library
+import datetime as dt
 import sys
 from pathlib import Path
 
@@ -15,6 +16,9 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from click.decorators import option
+
+# Local
+from .variables import vdf
 
 
 def lfff_name(lt):
@@ -82,17 +86,20 @@ def calc_hhl(hfl):
     return hhl
 
 
-def get_icon(folder, leadtime, lat, lon, ind, grid, var, alt_bot, alt_top):
+def get_icon(
+    folder, date, leadtime, lat, lon, ind, grid, var_shortname, alt_bot, alt_top
+):
     """Retrieve vertical profile of variable from icon simulation.
 
     Args:
         folder (str):           here are the icon simulation output files
+        date (datetime object): init date of simulation
         leadtime (list of int): simulation leadtime(s)
         lat (float):            latitude of location
         lon (float):            longitude of location
         ind (int):              index of location
         grid (str):             icon grid file containing HEIGHT field
-        var (str):              variable name in icon file
+        var_shortname (str):    variable shortname
         alt_bot (int):          lower boundary of plot
         alt_top (int):          upper boundary of plot
 
@@ -100,10 +107,13 @@ def get_icon(folder, leadtime, lat, lon, ind, grid, var, alt_bot, alt_top):
         pandas dataframe:       icon simulation values
 
     """
-    print(folder)
+    # specify variable (pandas dataframe with attributes)
+    var = vdf[var_shortname]
 
     # list icon files
-    files = [Path(folder, lfff_name(lt)) for lt in leadtime]
+    date_str = date.strftime("%y%m%d%H")
+    print(f"Looking for files in {str(Path(folder, date_str))}")
+    files = [Path(folder, date_str, lfff_name(lt)) for lt in leadtime]
 
     # load as xarray dataset
     ds = xr.open_mfdataset(files).squeeze()
@@ -144,10 +154,10 @@ def get_icon(folder, leadtime, lat, lon, ind, grid, var, alt_bot, alt_top):
     print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
 
     # subselect values from column
-    values = ds.isel(cells_1=ind)[var].values
+    values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
     height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
 
-    # subselect rows with specified height
+    # create pandas objects of height and data values
     df_height = pd.Series(data=calc_hhl(height))
 
     df_values = pd.DataFrame(
@@ -155,6 +165,23 @@ def get_icon(folder, leadtime, lat, lon, ind, grid, var, alt_bot, alt_top):
         data=values.transpose(),
     )
 
-    crit = (df_height < alt_top) & (df_height > alt_bot)
+    # criteria: height specifcations
+
+    # crit = (df_height < alt_top) & (df_height > alt_bot)
+    # exclude rows above specified altitude (alt_top)
+    crit_upper = df_height < alt_top
+    # set last False in to True
+    last_false = crit_upper[crit_upper == False]
+    if len(last_false) > 0:
+        crit_upper[last_false.index.max()] = True
+
+    # exclude rows below specified altitude (alt_bot)
+    crit_lower = df_height > alt_bot
+    last_false = crit_lower[crit_lower == False]
+    if len(last_false) > 0:
+        crit_lower[last_false.index.max()] = True
+
+    # combine selection criteria
+    crit = crit_upper & crit_lower
 
     return df_height[crit], df_values[crit]
