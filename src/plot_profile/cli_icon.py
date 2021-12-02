@@ -43,6 +43,30 @@ from .plot_icon import create_plot
 @click.option("--alt_bot", default=490, type=int, help="altitude bottom:  int")
 @click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
 @click.option("--appendix", type=str, help="append to output filename")
+@click.option(
+    "--datatypes",
+    type=click.Choice(
+        [
+            "eps",
+            "jpeg",
+            "jpg",
+            "pdf",
+            "pgf",
+            "png",
+            "ps",
+            "raw",
+            "rgba",
+            "svg",
+            "svgz",
+            "tif",
+            "tiff",
+        ],
+        case_sensitive=False,
+    ),
+    multiple=True,
+    default=["png"],
+    help="Choose data type(s) of final result. Default: png",
+)
 @click.option("--ind", type=int, default=-1, help="index of location")
 @click.option(
     "--grid",
@@ -59,9 +83,8 @@ from .plot_icon import create_plot
 @click.option("--model", default="icon-1", type=str, help="nwp model name")
 @click.option(
     "--outpath",
-    default="/scratch/swester/tmp",
     type=str,
-    help="path to folder where the plots should be saved - def: /scratch/user/tmp",
+    help="path to folder where the plots should be saved - def: None",
 )
 @click.option(
     "--show_grid",
@@ -89,48 +112,51 @@ def main(
     show_grid: bool,
     xmin: float,
     xmax: float,
+    datatypes: tuple,
 ) -> None:
 
-    height, values = get_icon(
-        folder=folder,
-        date=date,
-        leadtime=leadtime,
-        lat=lat,
-        lon=lon,
-        ind=ind,
-        grid=grid,
-        var_shortname=var,
-        alt_bot=alt_bot,
-        alt_top=alt_top,
-    )
+    if True:
+        height, values = get_icon(
+            folder=folder,
+            date=date,
+            leadtime=leadtime,
+            lat=lat,
+            lon=lon,
+            ind=ind,
+            grid=grid,
+            var_shortname=var,
+            alt_bot=alt_bot,
+            alt_top=alt_top,
+        )
 
-    ## for faster debugging of plotting function
-    # f = open('/scratch/swester/tmp/height.pckl', 'wb')
-    # pickle.dump(height, f)
-    # f.close()
-    # f = open('/scratch/swester/tmp/values.pckl', 'wb')
-    # pickle.dump(values, f)
-    # f.close()
-    # f1 = open("/scratch/swester/tmp/height.pckl", "rb")
-    # height = pickle.load(f1)
-    # f1.close()
-    # f2 = open("/scratch/swester/tmp/values.pckl", "rb")
-    # values = pickle.load(f2)
-    # f2.close()
+        ## for faster debugging of plotting function
+        # f = open('/scratch/swester/tmp/height.pckl', 'wb')
+        # pickle.dump(height, f)
+        # f.close()
+        # f = open('/scratch/swester/tmp/values.pckl', 'wb')
+        # pickle.dump(values, f)
+        # f.close()
+        # f1 = open("/scratch/swester/tmp/height.pckl", "rb")
+        # height = pickle.load(f1)
+        # f1.close()
+        # f2 = open("/scratch/swester/tmp/values.pckl", "rb")
+        # values = pickle.load(f2)
+        # f2.close()
 
-    create_plot(
-        var_shortname=var,
-        df_height=height,
-        df_values=values,
-        outpath=outpath,
-        date=date,
-        alt_bot=alt_bot,
-        alt_top=alt_top,
-        loc=loc,
-        model=model,
-        appendix=appendix,
-        xmin=xmin,
-        xmax=xmax,
-    )
+        create_plot(
+            var_shortname=var,
+            df_height=height,
+            df_values=values,
+            outpath=outpath,
+            date=date,
+            alt_bot=alt_bot,
+            alt_top=alt_top,
+            loc=loc,
+            model=model,
+            appendix=appendix,
+            xmin=xmin,
+            xmax=xmax,
+            datatypes=datatypes,
+        )
 
     print("--- Done.")
