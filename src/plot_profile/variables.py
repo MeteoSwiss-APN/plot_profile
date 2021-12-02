@@ -76,7 +76,16 @@ vdf["qc"].short_name = "qc"
 vdf["qc"].icon_name = "QC"
 vdf["qc"].long_name = "Cloud water"
 vdf["qc"].unit = "g/kg"
-vdf["qc"].min_value = 0
-vdf["qc"].max_value = 0.05
+vdf["qc"].min_value = -0.01
+vdf["qc"].max_value = 0.07
 vdf["qc"].dwh_id = 999
 vdf["qc"].mult = 1000
+
+# cloud cover
+vdf["qc"].short_name = "clc"
+vdf["qc"].icon_name = "CLC"
+vdf["qc"].long_name = "Cloud cover"
+vdf["qc"].unit = ""
+vdf["qc"].min_value = -0.05
+vdf["qc"].max_value = 1.05
+vdf["qc"].dwh_id = 999
