@@ -4,3 +4,6 @@ pandas
 matplotlib
 xarray
 dask
+netcdf4
+ipdb
+seaborn
