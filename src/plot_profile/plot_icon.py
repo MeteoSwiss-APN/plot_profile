@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Local
+from .utils import save_fig
 from .variables import vdf
 
 
@@ -30,6 +31,7 @@ def create_plot(
     appendix,
     xmin,
     xmax,
+    datatypes,
 ):
     """Plot vertical profile of variable.
 
@@ -46,6 +48,7 @@ def create_plot(
         appendix (str):                 add to output filename to e.g. distinguish versions
         xmin (float):                   minimum value of xaxis
         xmax (float):                   maximum value of xaxis
+        datatypes (tuple):              tuple containig all desired datatypes for the output files
 
     """
     # specify variable (pandas dataframe with attributes)
@@ -88,6 +91,6 @@ def create_plot(
     if appendix:
         name = name + "_" + appendix
     plt.tight_layout()
-    out_name = Path(outpath, f"{name}.png")
-    plt.savefig(out_name)
-    print(f"Saved as: {str(out_name)}")
+
+    save_fig(filename=name, datatypes=datatypes, outpath=outpath)
+    return
