@@ -1,4 +1,4 @@
-"""Purpose: get data.
+"""Purpose: Parse Data.
 
 Author: Michel Zeller
 
@@ -13,11 +13,19 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
-# import pdb  # use: python debugger, i.e. pdb.set_trace()
-
 
 def reformat_params(params, params_dict):
-    # input_params = params
+    """Reformat the input parameters.
+
+    Args:
+        params:             tuple       parameters, that should be included in the plot ('743', '745', '748', '747') (these refer to different physical quantities, see below)
+        params_dict:        dict        dictionary containing the mapping between the parameter ids and the corresponding physical quantities as words
+
+    Returns:
+        all_params:         tuple       all params that are possible
+        relevant_params:    tuple       actually chosen params + the standard params in a list
+
+    """
     params = list(params)  # tuple --> str-array
 
     i = 0
@@ -46,11 +54,27 @@ def reformat_params(params, params_dict):
         "747",
         "748",
     )  # hard-coded, 'cause why not
-
     return all_params, relevant_params
 
 
 def reformat_inputs(date, params, station_id, params_dict, stations_dict, print_steps):
+    """Reformat all command line inputs. Helper function.
+
+    Args:
+        date:               str         YYYYMMDDHH
+        params:             tuple       parameters, that should be included in the plot ('743', '745', '748', '747') (these refer to different physical quantities, see below)
+        station_id:         str         ID of station (i.e. Payerne has ID: 06610)
+        params_dict:        dict        dictionary containing the mapping between the parameter ids and the corresponding physical quantities as words
+        stations_dict:      type        dictionary containint the mapping between the station ids and the corresponding station names
+        print_steps:        bool        optional parameter to print intermediate steps in terminal
+
+    Returns:
+        date:               str         YYYYMMDDHH+MMSS
+        all_params:         tuple       list of all parameters that are included in the output plots
+        relevant_params:    tuple       list of relevant parameters, that are plottet
+        station_name:       str         Name of station
+
+    """
     print("--- reformating inputs")
 
     date = date + "0000"  # add minutes and seconds to date
@@ -66,6 +90,17 @@ def reformat_inputs(date, params, station_id, params_dict, stations_dict, print_
 
 
 def dwh2pandas(station_id, date, print_steps):
+    """Retrieve dwh file and load into pandas dataframe.
+
+    Args:
+        station_id:         str         ID of station (i.e. Payerne has ID: 06610)
+        date:               str         YYYYMMDDHHMMSS
+        print_steps:        bool        optional parameter to print intermediate steps in terminal
+
+    Returns:
+        data:               df          unfiltered dataframe from dataretrieval
+
+    """
     cmd = (
         "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,elev,name,wmo_ind -w 22 -s profile -p "
         + "742,743,745,746,747,748"  # extract all columns containing relevant paramenters (i.e. all except the pressure column.)
@@ -135,7 +170,19 @@ def dwh2pandas(station_id, date, print_steps):
 
 
 def extract_rows(df, print_steps, alt_bot, alt_top, all_params):
+    """Extract the rows from the complete dataframe, that are within the specified altitude limits.
 
+    Args:
+        df:                 df          dataframe w/ columns for all params
+        print_steps:        bool        optional parameter to print intermediate steps in terminal
+        alt_bot:            int         lower altitude limit
+        alt_top:            int         upper altitude limit
+        all_params:         tuple       all params that are possible
+
+    Returns:
+        params_df:          df          dataframe containing only the relevant rows/columns
+
+    """
     print("--- extracting relevant rows from dataframe")
 
     station_height = df["elev"].iloc[0]
@@ -168,6 +215,22 @@ def extract_rows(df, print_steps, alt_bot, alt_top, all_params):
 
 
 def get_data(date, params, station_id, print_steps, alt_bot, alt_top):
+    """Retrieve and parse the relevant data from the server and return a complete dataframe containing the data.
+
+    Args:
+        date:               str         YYYYMMDDHH
+        params:             tuple       parameters, that should be included in the plot ('743', '745', '748', '747') (these refer to different physical quantities, see below)
+        station_id:         str         ID of station (i.e. Payerne has ID: 06610)
+        print_steps:        bool        optional parameter to print intermediate steps in terminal
+        alt_bot:            int         lower altitude limit
+        alt_top:            int         upper altitude limit
+
+    Returns:
+        df:                 df          dataframe w/ columns for all params
+        station_name:       str         station name corresponding to station ID
+        relevant_params:    tuple       params + standard params. i.e. ('742', '743', '745', '746', '747', '748')
+
+    """
     # station_id and parameter_id dicts
     params_dict = {
         "742": "742",

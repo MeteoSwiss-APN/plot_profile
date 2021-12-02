@@ -11,12 +11,11 @@ from typing import NamedTuple
 import click
 
 # Local
-from .get_data import *
-from .plot_data import *
+from .get_data import get_data
+from .plot_data import create_plot
 
 
 @click.command()
-# @click.argument("station_id") # make the station ID non-optional
 @click.option("--station_id", default="06610", help="station ID: XXXXX - def: 06610")
 @click.option(
     "--date", default="2021083100", help="start date: YYYYMMDDHH - def: 2021083100"
