@@ -9,11 +9,7 @@ import pandas as pd
 
 vdf = pd.DataFrame(
     # variables
-    columns=[
-        "temp",
-        "qc",
-        "qv",
-    ],
+    columns=["temp", "qc", "qv", "clc", "ddt_t_rad_lw", "ddt_t_rad_sw"],
     # attributes
     index=[
         "icon_name",
@@ -99,3 +95,7 @@ vdf["ddt_t_rad_sw"].short_name = "ddt_t_rad_sw"
 vdf["ddt_t_rad_sw"].icon_name = "SOHR_RAD"
 vdf["ddt_t_rad_sw"].long_name = "T-tend SW radiation"
 vdf["ddt_t_rad_sw"].unit = "K/s"
+
+
+if __name__ == "__main__":
+    print(vdf)
