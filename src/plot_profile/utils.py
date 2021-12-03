@@ -38,12 +38,12 @@ def save_fig(filename, datatypes, outpath, fig=None):
             filepath = Path(f"/scratch/{username}/tmp/{filename}.{datatype}")
             Path(filepath).parents[0].mkdir(parents=True, exist_ok=True)
             plt.savefig(filepath)
-
+            print(f"--- file saved @ {filepath}")
         return
     else:
         for datatype in datatypes:
             filepath = Path(f"{outpath}/{filename}.{datatype}")
             Path(filepath).parents[0].mkdir(parents=True, exist_ok=True)
             plt.savefig(filepath)
-            print(f"Path to file:\t{filepath}")
+            print(f"--- file saved @ {filepath}")
         return
