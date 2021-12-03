@@ -65,6 +65,7 @@ vdf["qv"].long_name = "Specific humidity"
 vdf["qv"].unit = "g/kg"
 vdf["qv"].min_value = 0
 vdf["qv"].max_value = 6
+vdf["qv"].color = "blue"
 vdf["qv"].mult = 1000
 
 # cloud water
@@ -74,6 +75,7 @@ vdf["qc"].long_name = "Cloud water"
 vdf["qc"].unit = "g/kg"
 vdf["qc"].min_value = -0.01
 vdf["qc"].max_value = 0.07
+vdf["qc"].color = "green"
 vdf["qc"].mult = 1000
 
 # cloud cover
@@ -83,18 +85,21 @@ vdf["clc"].long_name = "Cloud cover"
 vdf["clc"].unit = ""
 vdf["clc"].min_value = -0.05
 vdf["clc"].max_value = 1.05
+vdf["clc"].color = "black"
 
 # temperature tendency due to longwave radiative heating
 vdf["ddt_t_rad_lw"].short_name = "ddt_t_rad_lw"
 vdf["ddt_t_rad_lw"].icon_name = "THHR_RAD"
 vdf["ddt_t_rad_lw"].long_name = "T-tend LW radiation"
 vdf["ddt_t_rad_lw"].unit = "K/s"
+vdf["ddt_t_rad_lw"].color = "magenta"
 
 # temperature tendency due to longwave radiative heating
 vdf["ddt_t_rad_sw"].short_name = "ddt_t_rad_sw"
 vdf["ddt_t_rad_sw"].icon_name = "SOHR_RAD"
 vdf["ddt_t_rad_sw"].long_name = "T-tend SW radiation"
 vdf["ddt_t_rad_sw"].unit = "K/s"
+vdf["ddt_t_rad_sw"].color = "brown"
 
 
 if __name__ == "__main__":

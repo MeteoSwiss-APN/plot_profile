@@ -87,7 +87,7 @@ def calc_hhl(hfl):
 
 
 def get_icon(
-    folder, date, leadtime, lat, lon, ind, grid, var_shortname, alt_bot, alt_top
+    folder, date, leadtime, lat, lon, ind, grid, variables_list, alt_bot, alt_top
 ):
     """Retrieve vertical profile of variable from icon simulation.
 
@@ -107,81 +107,90 @@ def get_icon(
         pandas dataframe:       icon simulation values
 
     """
-    # specify variable (pandas dataframe with attributes)
-    var = vdf[var_shortname]
+    print("--- retrieving & filtering data")
 
-    # list icon files
-    date_str = date.strftime("%y%m%d%H")
-    print(f"Looking for files in {str(Path(folder, date_str))}")
-    files = [Path(folder, date_str, lfff_name(lt)) for lt in leadtime]
+    data_dict = {}
+    for variable in variables_list:
+        # specify variable (pandas dataframe with attributes)
+        var = vdf[variable]
 
-    # load as xarray dataset
-    ds = xr.open_mfdataset(files).squeeze()
+        # list icon files
+        date_str = date.strftime("%y%m%d%H")
+        # print(f"Looking for files in {str(Path(folder, date_str))}")
+        files = [Path(folder, date_str, lfff_name(lt)) for lt in leadtime]
 
-    # extract latitude and longitude
-    lats = ds.clat_1.values
-    lons = ds.clon_1.values
+        # load as xarray dataset
+        ds = xr.open_mfdataset(files).squeeze()
 
-    # convert from radians to degrees if given in radians
-    if lats.max() < 2.0 and lons.max() < 2.0:
-        print("assuming that lats and lons are given in radians")
-        lats = np.rad2deg(lats)
-        lons = np.rad2deg(lons)
+        # extract latitude and longitude
+        lats = ds.clat_1.values
+        lons = ds.clon_1.values
 
-    # find index closest to specified lat, lon
-    ind = ind_from_latlon(lats, lons, lat, lon, True)
+        # convert from radians to degrees if given in radians
+        if lats.max() < 2.0 and lons.max() < 2.0:
+            print("assuming that lats and lons are given in radians")
+            lats = np.rad2deg(lats)
+            lons = np.rad2deg(lons)
 
-    # load constants file
-    if Path(grid).is_file():
-        ds_grid = xr.open_dataset(grid).squeeze()
-    else:
-        print("grid file does not exist!")
+        # find index closest to specified lat, lon
+        ind = ind_from_latlon(lats, lons, lat, lon, False)
 
-    # load latitude and longitude grid of constants file
-    lats_grid = ds_grid.clat_1.values
-    lons_grid = ds_grid.clon_1.values
+        # load constants file
+        if Path(grid).is_file():
+            ds_grid = xr.open_dataset(grid).squeeze()
+        else:
+            print("grid file does not exist!")
 
-    # convert from radians to degrees if given in radians
-    if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
-        print("assuming that lats and lons are given in radians")
-        lats_grid = np.rad2deg(lats_grid)
-        lons_grid = np.rad2deg(lons_grid)
+        # load latitude and longitude grid of constants file
+        lats_grid = ds_grid.clat_1.values
+        lons_grid = ds_grid.clon_1.values
 
-    if ds.cells_1.size != ds_grid.cells_1.size:
-        print("Attention: Sizes of output and grid file do not match!")
+        # convert from radians to degrees if given in radians
+        if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
+            print("assuming that lats and lons are given in radians")
+            lats_grid = np.rad2deg(lats_grid)
+            lons_grid = np.rad2deg(lons_grid)
 
-    print("Latitude and logitude of selected index in grid file:")
-    print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
+        if ds.cells_1.size != ds_grid.cells_1.size:
+            print("Attention: Sizes of output and grid file do not match!")
 
-    # subselect values from column
-    values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
-    height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
+        # print("Latitude and logitude of selected index in grid file:")
+        # print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
 
-    # create pandas objects of height and data values
-    df_height = pd.Series(data=calc_hhl(height))
+        # subselect values from column
+        values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
+        height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
 
-    df_values = pd.DataFrame(
-        columns=leadtime,
-        data=values.transpose(),
-    )
+        # create pandas objects of height and data values
+        df_height = pd.Series(data=calc_hhl(height))
 
-    # criteria: height specifcations
+        df_values = pd.DataFrame(
+            columns=leadtime,
+            data=values.transpose(),
+        )
 
-    # crit = (df_height < alt_top) & (df_height > alt_bot)
-    # exclude rows above specified altitude (alt_top)
-    crit_upper = df_height < alt_top
-    # set last False in to True
-    last_false = crit_upper[crit_upper == False]
-    if len(last_false) > 0:
-        crit_upper[last_false.index.max()] = True
+        # criteria: height specifcations
 
-    # exclude rows below specified altitude (alt_bot)
-    crit_lower = df_height > alt_bot
-    last_false = crit_lower[crit_lower == False]
-    if len(last_false) > 0:
-        crit_lower[last_false.index.max()] = True
+        # crit = (df_height < alt_top) & (df_height > alt_bot)
+        # exclude rows above specified altitude (alt_top)
+        crit_upper = df_height < alt_top
+        # set last False in to True
+        last_false = crit_upper[crit_upper == False]
+        if len(last_false) > 0:
+            crit_upper[last_false.index.max()] = True
 
-    # combine selection criteria
-    crit = crit_upper & crit_lower
+        # exclude rows below specified altitude (alt_bot)
+        crit_lower = df_height > alt_bot
+        last_false = crit_lower[crit_lower == False]
+        if len(last_false) > 0:
+            crit_lower[last_false.index.max()] = True
 
-    return df_height[crit], df_values[crit]
+        # combine selection criteria
+        crit = crit_upper & crit_lower
+
+        data_dict["height"] = df_height[crit]
+        data_dict[variable] = df_values[crit]
+
+    return data_dict
+
+    return df_height[crit], df_values[crit], data_dict

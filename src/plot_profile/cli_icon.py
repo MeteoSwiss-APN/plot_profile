@@ -4,12 +4,6 @@ Author: Stephanie Westerhuis
 
 Date: 10/11/2021.
 """
-# test
-# Standard library
-# import ipdb
-import pickle
-from typing import NamedTuple
-
 # Third-party
 import click
 
@@ -36,7 +30,8 @@ from .plot_icon import create_plot
         ],
         case_sensitive=True,
     ),
-    multiple=False,
+    multiple=True,
+    # default=['temp'],
     help="variable name",
 )
 # options with default value
@@ -115,48 +110,52 @@ def main(
     datatypes: tuple,
 ) -> None:
 
-    if True:
-        height, values = get_icon(
-            folder=folder,
-            date=date,
-            leadtime=leadtime,
-            lat=lat,
-            lon=lon,
-            ind=ind,
-            grid=grid,
-            var_shortname=var,
-            alt_bot=alt_bot,
-            alt_top=alt_top,
-        )
+    # if it should be desired, that only two variables can be plotted and otherwise
+    # an AssertionError get thrown, switch to True
+    if False:
+        assert (
+            len(var) < 3
+        ), f"It is possible to plot at most 2 variables in one plot. The variables {var} variables were entered. Re-run command with fewer variables"
 
-        ## for faster debugging of plotting function
-        # f = open('/scratch/swester/tmp/height.pckl', 'wb')
-        # pickle.dump(height, f)
-        # f.close()
-        # f = open('/scratch/swester/tmp/values.pckl', 'wb')
-        # pickle.dump(values, f)
-        # f.close()
-        # f1 = open("/scratch/swester/tmp/height.pckl", "rb")
-        # height = pickle.load(f1)
-        # f1.close()
-        # f2 = open("/scratch/swester/tmp/values.pckl", "rb")
-        # values = pickle.load(f2)
-        # f2.close()
+    # if it should be desired, that only the first two variables among multiple varibles
+    # get plottet (with displaying a warning that only they get plottet) switch this to True
+    if False:
+        try:
+            assert (
+                len(var) < 3
+            ), f"It is possible to plot at most 2 variables in one plot. The variables {var} variables were entered. Creating plot only for the first two variables {var[:2]}"
 
-        create_plot(
-            var_shortname=var,
-            df_height=height,
-            df_values=values,
-            outpath=outpath,
-            date=date,
-            alt_bot=alt_bot,
-            alt_top=alt_top,
-            loc=loc,
-            model=model,
-            appendix=appendix,
-            xmin=xmin,
-            xmax=xmax,
-            datatypes=datatypes,
-        )
+        except AssertionError as msg:
+            print(msg)
+            var = var[:2]
 
-    print("--- Done.")
+    data_dict = get_icon(
+        folder=folder,
+        date=date,
+        leadtime=leadtime,
+        lat=lat,
+        lon=lon,
+        ind=ind,
+        grid=grid,
+        variables_list=var,
+        alt_bot=alt_bot,
+        alt_top=alt_top,
+    )
+
+    create_plot(
+        variables_list=var,
+        data_dict=data_dict,
+        outpath=outpath,
+        date=date,
+        alt_bot=alt_bot,
+        alt_top=alt_top,
+        loc=loc,
+        model=model,
+        appendix=appendix,
+        xmin=xmin,
+        xmax=xmax,
+        datatypes=datatypes,
+        leadtime=leadtime,
+    )
+
+    print("--- done")
