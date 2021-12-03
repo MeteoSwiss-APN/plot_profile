@@ -6,7 +6,6 @@ Date: 11/29/2021
 """
 # Third-party
 import pandas as pd
-from numpy.core.fromnumeric import _var_dispatcher
 
 vdf = pd.DataFrame(
     # variables
@@ -42,6 +41,9 @@ vdf.loc["linestyle"] = "solid"
 vdf.loc["mult"][:] = 1
 vdf.loc["plus"][:] = 0
 vdf.loc["avg"][:] = False
+vdf.loc["min_value"][:] = None
+vdf.loc["max_value"][:] = None
+vdf.loc["dwh_id"][:] = None
 
 
 # fill variable dataframe with specific values
@@ -53,7 +55,6 @@ vdf["temp"].long_name = "Temperature"
 vdf["temp"].unit = "K"
 vdf["temp"].min_value = 275
 vdf["temp"].max_value = 287
-vdf["temp"].dwh_id = 999
 vdf["temp"].color = "red"
 vdf["temp"].marker = "o"
 vdf["temp"].linestyle = "-"
@@ -68,7 +69,6 @@ vdf["qv"].long_name = "Specific humidity"
 vdf["qv"].unit = "g/kg"
 vdf["qv"].min_value = 0
 vdf["qv"].max_value = 6
-vdf["qv"].dwh_id = 999
 vdf["qv"].mult = 1000
 
 # cloud water
@@ -78,14 +78,24 @@ vdf["qc"].long_name = "Cloud water"
 vdf["qc"].unit = "g/kg"
 vdf["qc"].min_value = -0.01
 vdf["qc"].max_value = 0.07
-vdf["qc"].dwh_id = 999
 vdf["qc"].mult = 1000
 
 # cloud cover
-vdf["qc"].short_name = "clc"
-vdf["qc"].icon_name = "CLC"
-vdf["qc"].long_name = "Cloud cover"
-vdf["qc"].unit = ""
-vdf["qc"].min_value = -0.05
-vdf["qc"].max_value = 1.05
-vdf["qc"].dwh_id = 999
+vdf["clc"].short_name = "clc"
+vdf["clc"].icon_name = "CLC"
+vdf["clc"].long_name = "Cloud cover"
+vdf["clc"].unit = ""
+vdf["clc"].min_value = -0.05
+vdf["clc"].max_value = 1.05
+
+# temperature tendency due to longwave radiative heating
+vdf["ddt_t_rad_lw"].short_name = "ddt_t_rad_lw"
+vdf["ddt_t_rad_lw"].icon_name = "THHR_RAD"
+vdf["ddt_t_rad_lw"].long_name = "T-tend LW radiation"
+vdf["ddt_t_rad_lw"].unit = "K/s"
+
+# temperature tendency due to longwave radiative heating
+vdf["ddt_t_rad_sw"].short_name = "ddt_t_rad_sw"
+vdf["ddt_t_rad_sw"].icon_name = "SOHR_RAD"
+vdf["ddt_t_rad_sw"].long_name = "T-tend SW radiation"
+vdf["ddt_t_rad_sw"].unit = "K/s"
