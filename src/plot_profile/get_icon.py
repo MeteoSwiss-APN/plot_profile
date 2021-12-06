@@ -86,7 +86,7 @@ def calc_hhl(hfl):
     return hhl
 
 
-def slice_top_bottom(df_height, alt_top, alt_bot):
+def slice_top_bottom(df_height, alt_top, alt_bot, verbose):
     """Criteria to cut away top and bottom of dataframe.
 
     Args:
@@ -106,14 +106,19 @@ def slice_top_bottom(df_height, alt_top, alt_bot):
         crit_upper[last_false.index.max()] = True
 
     # exclude rows below specified altitude (alt_bot)
-    crit_lower = df_height > alt_bot
-    last_false = crit_lower[crit_lower == False]
-    # include first False
-    if len(last_false) > 0:
-        crit_lower[last_false.index.max()] = True
+    if alt_bot is None:
+        crit = crit_upper
+        if verbose:
+            print("No bottom specified, use minimal height.")
+    else:
+        crit_lower = df_height > alt_bot
+        last_false = crit_lower[crit_lower == False]
+        # include first False
+        if len(last_false) > 0:
+            crit_lower[last_false.index.max()] = True
 
-    # combine selection criteria
-    crit = crit_upper & crit_lower
+        # combine selection criteria
+        crit = crit_upper & crit_lower
 
     return crit
 
@@ -228,7 +233,7 @@ def get_icon(
     df_height = pd.Series(data=calc_hhl(height))
 
     # get criteria to cut away top and bottom
-    crit = slice_top_bottom(df_height, alt_top, alt_bot)
+    crit = slice_top_bottom(df_height, alt_top, alt_bot, verbose)
 
     # fill HEIGHT as sliced pandas series into dictionary
     data_dict["height"] = df_height[crit]
@@ -242,7 +247,7 @@ def get_icon(
             values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
         except KeyError:
             print(f"{var.icon_name} cannot be found in forecast file")
-            sys.exit(1)
+            continue
 
         # fill into dataframe
         df_values = pd.DataFrame(

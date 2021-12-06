@@ -32,7 +32,7 @@ from .plot_icon import create_plot
     help="variable name(s)",
 )
 # options with default value
-@click.option("--alt_bot", default=0, type=int, help="altitude bottom:  int")
+@click.option("--alt_bot", type=int, help="altitude bottom:  int")
 @click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
 @click.option("--appendix", type=str, help="append to output filename")
 @click.option(
@@ -83,7 +83,7 @@ from .plot_icon import create_plot
     is_flag=True,
     help="Show grid on plot - def: False",
 )
-@click.option("--verbose", is_flag=True, default=True, help="Output details")
+@click.option("--verbose", is_flag=True, default=False, help="Output details")
 @click.option("--xmin", type=float, help="Minimum value of xaxis")
 @click.option("--xmax", type=float, help="Maximum value of xaxis")
 def main(
@@ -156,6 +156,7 @@ def main(
         xmax=xmax,
         datatypes=datatypes,
         leadtime=leadtime,
+        verbose=verbose,
     )
 
     print("--- done")

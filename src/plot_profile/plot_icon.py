@@ -6,17 +6,44 @@ Date: 25/11/2021.
 """
 
 # Standard library
-import random
 from pathlib import Path
 
 # Third-party
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 # Local
 from .utils import save_fig
 from .variables import vdf
+
+# import ipdb
+
+
+def get_yrange(alt_bot, alt_top, df_height):
+    """Define values for lower and upper boundary of plot.
+
+    Args:
+        alt_bot (int):
+        alt_top (int):
+        df_height (pandas Series):
+
+    Returns:
+        tuple of float: min height, max height
+
+    """
+    if alt_bot is None:
+        ymin = df_height.iloc[-1]
+    else:
+        ymin = alt_bot
+
+    if alt_top is None:
+        ymax = df_height.iloc[0]
+    else:
+        ymax = alt_top
+
+    return ymin, ymax
 
 
 def plot_single_variable(
@@ -33,10 +60,18 @@ def plot_single_variable(
     datatypes,
     df_height,
     variable,
+    verbose,
 ):
 
     print(f"--- creating plot for variable {variable}")
-    df_values = data_dict[variable]
+
+    # load values from dictionary
+    # test whether variable is even available
+    try:
+        df_values = data_dict[variable]
+    except KeyError:
+        print(f"No plot is generated for {variable}.")
+        return
 
     # specify variable (pandas dataframe with attributes)
     var = vdf[variable]
@@ -52,18 +87,23 @@ def plot_single_variable(
     # create figure
     fig, ax = plt.subplots()
 
-    # loop over leadtimes to create one line for each leadtime
-    first_leadtime = True
-    for (lt, values) in df_values.iteritems():
-        print(f"--- adding leadtime: {lt}")
-        if first_leadtime:
-            color = var.color
-        else:
-            color = (np.random.random(), np.random.random(), np.random.random())
-            # color = ["#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])]
+    # define color sequence
+    lts = df_values.columns  # leadtimes
+    if len(lts) == 1:
+        colors = [
+            var.color,
+        ]
+    else:
+        colors = sns.color_palette("husl", n_colors=len(lts))
 
-        ax.plot(values, df_height.values, label=f"+ {lt:02} h", color=color)
-        first_leadtime = False
+    # loop over leadtimes to create one line for each leadtime
+    icolor = 0
+    for (lt, values) in df_values.iteritems():
+        if verbose:
+            print(f"Adding leadtime: {lt}.")
+
+        ax.plot(values, df_height.values, label=f"+ {lt:02} h", color=colors[icolor])
+        icolor = icolor + 1
 
     # define min and max values for xaxis
     if not xmin:
@@ -76,13 +116,18 @@ def plot_single_variable(
         xlabel=f"{var.long_name} [{var.unit}]",
         # xlim=(xmin, xmax),
         ylabel="Altitude [m asl]",
-        ylim=(alt_bot, alt_top),
+        ylim=(get_yrange(alt_bot, alt_top, df_height)),
         title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
     )
     ax.legend(fancybox=True)
 
     # save figure
-    name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
+    if len(lts) == 1:
+        name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_+{lts[0]}h_{var.short_name}_{loc}'
+    else:
+        name = (
+            f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
+        )
     if appendix:
         name = name + "_" + appendix
     plt.tight_layout()
@@ -105,15 +150,33 @@ def plot_two_variables(
     xmin,
     xmax,
     datatypes,
+    verbose,
 ):
     print(f"--- creating plot for variables ({variables_list[0]}, {variables_list[1]})")
+
     # specify first variable (bottom x-axis) (pandas dataframe with attributes)
+    # test whether variable is even available first
+    try:
+        df_values_0 = data_dict[variables_list[0]]
+    except KeyError:
+        print(f"{variables_list[0]} is not available.")
+        print(f"No plot is generated for {variables_list[0]} and {variables_list[1]}.")
+        return
+
     var_0 = vdf[variables_list[0]]
-    df_values_0 = data_dict[variables_list[0]]
 
     # specify second variable (top x-axis) (pandas dataframe with attributes)
+    # test whether variable is even available first
+    try:
+        df_values_1 = data_dict[variables_list[1]]
+    except KeyError:
+        print(f"{variables_list[1]} is not available.")
+        print(f"No plot is generated for {variables_list[0]} and {variables_list[1]}.")
+        return
     var_1 = vdf[variables_list[1]]
-    df_values_1 = data_dict[variables_list[1]]
+
+    # leadtimes
+    lts = df_values_0.columns
 
     # figure settings
     plt.rcParams["figure.figsize"] = (4.5, 6)
@@ -177,7 +240,7 @@ def plot_two_variables(
         xlabel=f"{var_0.long_name} [{var_0.unit}]",
         # xlim=(xmin_bottom, xmax_bottom),
         ylabel="Altitude [m asl]",
-        ylim=(alt_bot, alt_top),
+        ylim=(get_yrange(alt_bot, alt_top, df_height)),
         title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
     )
 
@@ -185,7 +248,7 @@ def plot_two_variables(
         xlabel=f"{var_1.long_name} [{var_1.unit}]",
         # xlim=(xmin_top, xmax_top),
         ylabel="Altitude [m asl]",
-        ylim=(alt_bot, alt_top),
+        ylim=(get_yrange(alt_bot, alt_top, df_height)),
         label=f"{variables_list[1]}",
     )
 
@@ -201,7 +264,10 @@ def plot_two_variables(
     # ax_top.legend(fancybox=True)
 
     # save figure
-    name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var_0.short_name}_{var_1.short_name}_{loc}'
+    if len(lts) == 1:
+        name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_+{lts[0]}h_{var_0.short_name}_{var_1.short_name}_{loc}'
+    else:
+        name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var_0.short_name}_{var_1.short_name}_{loc}'
     if appendix:
         name = name + "_" + appendix
     plt.tight_layout()
@@ -224,6 +290,7 @@ def plot_all_variables_individually(
     xmin,
     xmax,
     datatypes,
+    verbose,
 ):
     for variable in variables_list:
         plot_single_variable(
@@ -240,6 +307,7 @@ def plot_all_variables_individually(
             datatypes=datatypes,
             df_height=df_height,
             variable=variable,
+            verbose=verbose,
         )
     return
 
@@ -258,6 +326,7 @@ def create_plot(
     xmax,
     datatypes,
     leadtime,
+    verbose,
 ):
     """Plot vertical profile of variable.
 
@@ -275,7 +344,8 @@ def create_plot(
         xmin (float):                   minimum value of xaxis
         xmax (float):                   maximum value of xaxis
         datatypes (tuple):              tuple containig all desired datatypes for the output files
-        leadtime (list):                List of all lead times of interest
+        leadtime (list):                list of all lead times of interest
+        verbose (bool):                 print verbose messages
 
     """
     assert (
@@ -300,6 +370,7 @@ def create_plot(
             datatypes=datatypes,
             df_height=df_height,
             variable=variables_list[0],
+            verbose=verbose,
         )
 
     # CASE: one plot, two variables
@@ -318,6 +389,7 @@ def create_plot(
             xmin,
             xmax,
             datatypes,
+            verbose,
         )
 
     if len(variables_list) > 2:
@@ -335,5 +407,6 @@ def create_plot(
             xmin,
             xmax,
             datatypes,
+            verbose,
         )
     return
