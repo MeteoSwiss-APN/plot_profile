@@ -86,8 +86,50 @@ def calc_hhl(hfl):
     return hhl
 
 
+def slice_top_bottom(df_height, alt_top, alt_bot):
+    """Criteria to cut away top and bottom of dataframe.
+
+    Args:
+        df_height (pandas dataframe):   height variable
+        alt_top (int):                  top
+        alt_bot (int):                  bottom
+
+    Returns:
+        list of booleans
+
+    """
+    # exclude rows above specified altitude (alt_top)
+    crit_upper = df_height < alt_top
+    # set last False to True
+    last_false = crit_upper[crit_upper == False]
+    if len(last_false) > 0:
+        crit_upper[last_false.index.max()] = True
+
+    # exclude rows below specified altitude (alt_bot)
+    crit_lower = df_height > alt_bot
+    last_false = crit_lower[crit_lower == False]
+    # include first False
+    if len(last_false) > 0:
+        crit_lower[last_false.index.max()] = True
+
+    # combine selection criteria
+    crit = crit_upper & crit_lower
+
+    return crit
+
+
 def get_icon(
-    folder, date, leadtime, lat, lon, ind, grid, variables_list, alt_bot, alt_top
+    folder,
+    date,
+    leadtime,
+    lat,
+    lon,
+    ind,
+    grid,
+    variables_list,
+    alt_bot,
+    alt_top,
+    verbose,
 ):
     """Retrieve vertical profile of variable from icon simulation.
 
@@ -109,88 +151,106 @@ def get_icon(
     """
     print("--- retrieving & filtering data")
 
+    # create dictionary to collect data of height and variables
     data_dict = {}
+
+    # list icon files
+    date_str = date.strftime("%y%m%d%H")
+
+    if verbose:
+        print(f"Looking for files in {str(Path(folder, date_str))}")
+
+    files = [Path(folder, date_str, lfff_name(lt)) for lt in leadtime]
+
+    # load as xarray dataset
+    if verbose:
+        print("Loading files into xarray dataset.")
+    ds = xr.open_mfdataset(files).squeeze()
+    if verbose:
+        print("Finished loading files into xarray dataset.")
+
+    # extract latitude and longitude
+    lats = ds.clat_1.values
+    lons = ds.clon_1.values
+
+    if verbose:
+        print("Assuming that variable's grid corresponds to clat_1 and clon_1.")
+
+    # convert from radians to degrees if given in radians
+    if lats.max() < 2.0 and lons.max() < 2.0:
+        print("Assuming that lats and lons are given in radians.")
+        lats = np.rad2deg(lats)
+        lons = np.rad2deg(lons)
+
+    # find index closest to specified lat, lon
+    if not ind:
+        ind = ind_from_latlon(lats, lons, lat, lon, False)
+        if verbose:
+            print(f"Determined ind: {ind}.")
+
+    # load constants file
+    if verbose:
+        print(f"Load grid from: {grid}")
+    if Path(grid).is_file():
+        ds_grid = xr.open_dataset(grid).squeeze()
+    else:
+        print("Grid file does not exist!")
+        sys.exit(1)
+
+    # load latitude and longitude grid of constants file
+    lats_grid = ds_grid.clat_1.values
+    lons_grid = ds_grid.clon_1.values
+
+    # convert from radians to degrees if given in radians
+    if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
+        print("Assuming that lats and lons of grid file are given in radians.")
+        lats_grid = np.rad2deg(lats_grid)
+        lons_grid = np.rad2deg(lons_grid)
+
+    # check whether forecast and grid file match
+    if ds.cells_1.size != ds_grid.cells_1.size:
+        print("Sizes of forecast and grid file do not match!")
+        sys.exit(1)
+
+    # lat and lon from grid file
+    if verbose:
+        print("Latitude and logitude of selected index in grid file:")
+        print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
+
+    # load HEIGHT from grid file
+    try:
+        height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
+    except KeyError:
+        print(f"Variable HEIGHT does not exist in grid file: {grid}")
+        sys.exit(1)
+
+    # create pandas objects of height values
+    df_height = pd.Series(data=calc_hhl(height))
+
+    # get criteria to cut away top and bottom
+    crit = slice_top_bottom(df_height, alt_top, alt_bot)
+
+    # fill HEIGHT as sliced pandas series into dictionary
+    data_dict["height"] = df_height[crit]
+
     for variable in variables_list:
         # specify variable (pandas dataframe with attributes)
         var = vdf[variable]
 
-        # list icon files
-        date_str = date.strftime("%y%m%d%H")
-        # print(f"Looking for files in {str(Path(folder, date_str))}")
-        files = [Path(folder, date_str, lfff_name(lt)) for lt in leadtime]
-
-        # load as xarray dataset
-        ds = xr.open_mfdataset(files).squeeze()
-
-        # extract latitude and longitude
-        lats = ds.clat_1.values
-        lons = ds.clon_1.values
-
-        # convert from radians to degrees if given in radians
-        if lats.max() < 2.0 and lons.max() < 2.0:
-            print("assuming that lats and lons are given in radians")
-            lats = np.rad2deg(lats)
-            lons = np.rad2deg(lons)
-
-        # find index closest to specified lat, lon
-        ind = ind_from_latlon(lats, lons, lat, lon, False)
-
-        # load constants file
-        if Path(grid).is_file():
-            ds_grid = xr.open_dataset(grid).squeeze()
-        else:
-            print("grid file does not exist!")
-
-        # load latitude and longitude grid of constants file
-        lats_grid = ds_grid.clat_1.values
-        lons_grid = ds_grid.clon_1.values
-
-        # convert from radians to degrees if given in radians
-        if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
-            print("assuming that lats and lons are given in radians")
-            lats_grid = np.rad2deg(lats_grid)
-            lons_grid = np.rad2deg(lons_grid)
-
-        if ds.cells_1.size != ds_grid.cells_1.size:
-            print("Attention: Sizes of output and grid file do not match!")
-
-        # print("Latitude and logitude of selected index in grid file:")
-        # print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
-
         # subselect values from column
-        values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
-        height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
+        try:
+            values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
+        except KeyError:
+            print(f"{var.icon_name} cannot be found in forecast file")
+            sys.exit(1)
 
-        # create pandas objects of height and data values
-        df_height = pd.Series(data=calc_hhl(height))
-
+        # fill into dataframe
         df_values = pd.DataFrame(
             columns=leadtime,
             data=values.transpose(),
         )
 
-        # criteria: height specifcations
-
-        # crit = (df_height < alt_top) & (df_height > alt_bot)
-        # exclude rows above specified altitude (alt_top)
-        crit_upper = df_height < alt_top
-        # set last False in to True
-        last_false = crit_upper[crit_upper == False]
-        if len(last_false) > 0:
-            crit_upper[last_false.index.max()] = True
-
-        # exclude rows below specified altitude (alt_bot)
-        crit_lower = df_height > alt_bot
-        last_false = crit_lower[crit_lower == False]
-        if len(last_false) > 0:
-            crit_lower[last_false.index.max()] = True
-
-        # combine selection criteria
-        crit = crit_upper & crit_lower
-
-        data_dict["height"] = df_height[crit]
+        # add to dictionary
         data_dict[variable] = df_values[crit]
 
     return data_dict
-
-    return df_height[crit], df_values[crit], data_dict

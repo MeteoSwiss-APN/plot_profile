@@ -11,9 +11,11 @@ import click
 from .get_icon import get_icon
 from .plot_icon import create_plot
 
+# import ipdb
+
 
 @click.command()
-# options without default value
+# options without default value (mandatory to specify by user)
 @click.option(
     "--date",
     type=click.DateTime(formats=["%y%m%d%H"]),
@@ -23,19 +25,14 @@ from .plot_icon import create_plot
 @click.option(
     "--var",
     type=click.Choice(
-        [
-            "temp",
-            "qc",
-            "qv",
-        ],
+        ["temp", "qc", "qv", "clc", "ddt_t_rad_lw", "ddt_t_rad_sw"],
         case_sensitive=True,
     ),
     multiple=True,
-    # default=['temp'],
-    help="variable name",
+    help="variable name(s)",
 )
 # options with default value
-@click.option("--alt_bot", default=490, type=int, help="altitude bottom:  int")
+@click.option("--alt_bot", default=0, type=int, help="altitude bottom:  int")
 @click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
 @click.option("--appendix", type=str, help="append to output filename")
 @click.option(
@@ -56,13 +53,13 @@ from .plot_icon import create_plot
             "tif",
             "tiff",
         ],
-        case_sensitive=False,
+        case_sensitive=True,
     ),
     multiple=True,
     default=["png"],
     help="Choose data type(s) of final result. Default: png",
 )
-@click.option("--ind", type=int, default=-1, help="index of location")
+@click.option("--ind", type=int, help="index of location")
 @click.option(
     "--grid",
     type=str,
@@ -86,6 +83,7 @@ from .plot_icon import create_plot
     is_flag=True,
     help="Show grid on plot - def: False",
 )
+@click.option("--verbose", is_flag=True, default=True, help="Output details")
 @click.option("--xmin", type=float, help="Minimum value of xaxis")
 @click.option("--xmax", type=float, help="Maximum value of xaxis")
 def main(
@@ -96,6 +94,7 @@ def main(
     alt_bot: int,
     alt_top: int,
     appendix: str,
+    datatypes: tuple,
     grid: str,
     ind: int,
     leadtime: int,
@@ -105,9 +104,9 @@ def main(
     model: str,
     outpath: str,
     show_grid: bool,
+    verbose: bool,
     xmin: float,
     xmax: float,
-    datatypes: tuple,
 ) -> None:
 
     # if it should be desired, that only two variables can be plotted and otherwise
@@ -140,6 +139,7 @@ def main(
         variables_list=var,
         alt_bot=alt_bot,
         alt_top=alt_top,
+        verbose=verbose,
     )
 
     create_plot(
