@@ -11,33 +11,32 @@ import click
 from .get_icon import get_icon
 from .plot_icon import create_plot
 
+# import ipdb
+
 
 @click.command()
-# options without default value
+# options without default value (mandatory to specify by user)
 @click.option(
     "--date",
     type=click.DateTime(formats=["%y%m%d%H"]),
-    help="init date of icon simulation: YYMMDDHH",
+    help="MANDATORY: Init date of icon simulation: YYMMDDHH.",
 )
-@click.option("--folder", type=str, help="path to folder with icon output")
+@click.option("--folder", type=str, help="MANDATORY: Path to folder with icon output.")
 @click.option(
     "--var",
     type=click.Choice(
-        [
-            "temp",
-            "qc",
-            "qv",
-        ],
+        ["temp", "qc", "qv", "clc", "ddt_t_rad_lw", "ddt_t_rad_sw"],
         case_sensitive=True,
     ),
     multiple=True,
-    # default=['temp'],
-    help="variable name",
+    help="MANDATORY: Variable name(s).",
 )
 # options with default value
-@click.option("--alt_bot", default=490, type=int, help="altitude bottom:  int")
-@click.option("--alt_top", default=2000, type=int, help="altitude top value: int")
-@click.option("--appendix", type=str, help="append to output filename")
+@click.option("--alt_bot", type=int, help="Altitude bottom. Def: surface.")
+@click.option("--alt_top", default=2000, type=int, help="Altitude top. Def: 2000")
+@click.option(
+    "--appendix", type=str, help="String to append to output filename. Def: None"
+)
 @click.option(
     "--datatypes",
     type=click.Choice(
@@ -56,38 +55,58 @@ from .plot_icon import create_plot
             "tif",
             "tiff",
         ],
-        case_sensitive=False,
+        case_sensitive=True,
     ),
     multiple=True,
     default=["png"],
-    help="Choose data type(s) of final result. Default: png",
+    help="Choose data type(s) of final result. Def: png",
 )
-@click.option("--ind", type=int, default=-1, help="index of location")
+@click.option("--ind", type=int, help="Index of location (known from previous runs).")
 @click.option(
     "--grid",
     type=str,
-    default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
-    help="icon file containing HEIGHT field",
+    default="ICON-1E operational 2021: /store/s83/swester/grids/HEIGHT_ICON-1E.nc",
+    help="Icon file containing HEIGHT field.",
 )
 @click.option(
-    "--leadtime", type=int, multiple=True, default=(0,), help="simulation lead time"
+    "--leadtime",
+    type=int,
+    multiple=True,
+    default=(0,),
+    help="Leadtime(s) to be shown in one plot. Def: 0.",
 )
-@click.option("--lat", default=46.81281, type=float, help="latitude of location")
-@click.option("--lon", default=6.94363, type=float, help="longitude of location")
-@click.option("--loc", default="pay", type=str, help="location name")
-@click.option("--model", default="icon-1", type=str, help="nwp model name")
+@click.option(
+    "--lat", default=46.81281, type=float, help="Latitude of location. Def: 46.81 (PAY)"
+)
+@click.option(
+    "--lon", default=6.94363, type=float, help="Longitude of location. Def: 6.94 (PAY)"
+)
+@click.option("--loc", default="pay", type=str, help="Name of location. Def: pay")
+@click.option("--model", default="icon-1", type=str, help="NWP model name. Def: icon-1")
 @click.option(
     "--outpath",
     type=str,
-    help="path to folder where the plots should be saved - def: None",
+    help="Path to folder where the plots should be saved. Def: /scratch/USER/tmp",
 )
 @click.option(
     "--show_grid",
     is_flag=True,
-    help="Show grid on plot - def: False",
+    help="Show grid on plot. Def: False",
 )
-@click.option("--xmin", type=float, help="Minimum value of xaxis")
-@click.option("--xmax", type=float, help="Maximum value of xaxis")
+@click.option(
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="Output details on what is happening.",
+)
+@click.option("--xmin", type=float, help="Minimum value of xaxis. Def: Fits values.")
+@click.option("--xmax", type=float, help="Maximum value of xaxis. Def: Fits values.")
+@click.option(
+    "--xrange_fix",
+    is_flag=True,
+    default=False,
+    help="Use fix xrange from variable dataframe. Overwrites specified xmin and xmax.",
+)
 def main(
     *,
     date: str,
@@ -96,6 +115,7 @@ def main(
     alt_bot: int,
     alt_top: int,
     appendix: str,
+    datatypes: tuple,
     grid: str,
     ind: int,
     leadtime: int,
@@ -105,30 +125,20 @@ def main(
     model: str,
     outpath: str,
     show_grid: bool,
+    verbose: bool,
     xmin: float,
     xmax: float,
-    datatypes: tuple,
-) -> None:
+    xrange_fix: bool,
+):
+    """Plot vertical profiles of variables from ICON simulation.
 
-    # if it should be desired, that only two variables can be plotted and otherwise
-    # an AssertionError get thrown, switch to True
-    if False:
-        assert (
-            len(var) < 3
-        ), f"It is possible to plot at most 2 variables in one plot. The variables {var} variables were entered. Re-run command with fewer variables"
+    If 1, 3, or more variables are specified, each will be plotted individually.
+    If 2 variables are given, they will be shown in the same figure.
 
-    # if it should be desired, that only the first two variables among multiple varibles
-    # get plottet (with displaying a warning that only they get plottet) switch this to True
-    if False:
-        try:
-            assert (
-                len(var) < 3
-            ), f"It is possible to plot at most 2 variables in one plot. The variables {var} variables were entered. Creating plot only for the first two variables {var[:2]}"
+    Example command:
+    plot_icon --date 21111012 --folder /scratch/swester/output_icon/ICON-1/ --var qv --var temp --var qc --leadtime 12 --leadtime 13
 
-        except AssertionError as msg:
-            print(msg)
-            var = var[:2]
-
+    """
     data_dict = get_icon(
         folder=folder,
         date=date,
@@ -140,6 +150,7 @@ def main(
         variables_list=var,
         alt_bot=alt_bot,
         alt_top=alt_top,
+        verbose=verbose,
     )
 
     create_plot(
@@ -154,8 +165,10 @@ def main(
         appendix=appendix,
         xmin=xmin,
         xmax=xmax,
+        xrange_fix=xrange_fix,
         datatypes=datatypes,
         leadtime=leadtime,
+        verbose=verbose,
     )
 
     print("--- done")

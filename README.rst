@@ -4,63 +4,27 @@ plot_profile
 
 *plot_profile* is a Python-based command line tool to retrieve and visualise observational data from radiousounding measurements.
 
+Installation
+------------
+1. ``git clone git@github.com:MeteoSwiss-APN/plot_profile.git``
+2. ``conda activate base``
+3. ``conda install pip``
+4. ``conda deactivate``
+5. ``make venv install`` (or: ``install-dev``)
+
+*I am not sure whether step 2 and 3 are required*
+
 Usage
---------
-To get a list of all availabe commands, just type:
-``plot_profile --help``.
-General usage: ``plot_profile [options]`` \\
-The available options are:
+-----
+1. ``conda activate plot_profile``
+2. Available entry-points (show available options with ``--help``)
 
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-|       options       | type  |                          description                           |                     default                      |
-+=====================+=======+================================================================+==================================================+
-| --station-id        | str   | station ID [XXXXX]                                             | 06610 (Payerne)                                  |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --date              | str   | date of interest [YYYYMMDDHH]                                  | 2021083100                                       |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --alt_bot           | int   | lower boundary for altitude                                    | elevation of radiosounding station               |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --alt_top           | int   | upper boundary for altitude                                    | 10% over max altitude of radiosounding retrieval |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --params            | str   | physical quantities of interest                                | all of them; hint: add multiple params like:     |
-|                     |       | possible values: 743/winddir, 745/temp, 747/dewp, 748/windvel) | --params 743 --params temp   --params windvel    |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --outpath           | str   | path to folder where plots should be saved                     | plots/                                           |
-|                     |       | (directory is created, if it doesn't exist already)            |                                                  |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --grid              | bool  | add grid                                                       | if_flag = True                                   |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --clouds            | bool  | add clouds                                                     | if_flag = True                                   |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --relhum_thresh     | int   | relative humidity threshold to show clouds                     | 80%                                              |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --print_steps       | bool  | print intermediate steps (i.e. for debugging)                  | if_flag = True                                   |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --standard_settings | bool  | use pre-defined standard settings                              | temp_range: -100-30 [°C], windvel_range:         |
-|                     |       | (i.e. to compare days more easily)                             | 0-50 [km/h]. if_flag = True                      |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --personal_settings | bool  | define personal axis limits                                    | if_flag = True                                   |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --temp_min          | float | mininum temperature                                            | none                                             |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --temp_max          | float | maximum temperature                                            | none                                             |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --windvel_min       | float | minimum wind velocity                                          | none                                             |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
-| --windvel_max       | float | maximum wind velocity                                          | none                                             |
-+---------------------+-------+----------------------------------------------------------------+--------------------------------------------------+
+  a) ``plot_rs``: plot radiousounding
+  b) ``plot_icon``: plot vertical profiles of variables from ICON simulations
 
-Remark
---------
-**Error messages have (so far) not been implemented. Thus, follow the description of these options meticulously.**
 
-- to use personal settings, don't forget the ``--personal_settings`` flag. otherwise the individually defined axis limits won't be applied.
-- to try out this package, run the ``plot_profile_example.sh`` script and study the newly created directory and containing plots
-
-ToDos
--------
-* add 2nd entry point for model
-* implement error messages for wrong inputs
+Example command:
+``plot_icon --date 21111012 --folder /scratch/swester/output_icon/ICON-1/ --var qv --var temp --var qc --leadtime 12 --leadtime 13``
 
 Credits
 -------
