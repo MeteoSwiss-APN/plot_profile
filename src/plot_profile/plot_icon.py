@@ -6,6 +6,7 @@ Date: 25/11/2021.
 """
 
 # Standard library
+import datetime as dt
 from pathlib import Path
 
 # Third-party
@@ -44,6 +45,22 @@ def get_yrange(alt_bot, alt_top, df_height):
         ymax = alt_top
 
     return ymin, ymax
+
+
+def str_valid_time(ini, lt):
+    """Calculate valid time, create nice string.
+
+    Args:
+        ini (datetime obj):     init date and time
+        lt (int):               leadtime
+
+    Returns:
+        str:                    valid time (HH:MM)
+
+    """
+    valid = ini + dt.timedelta(hours=lt)
+
+    return valid.strftime("%H:%M")
 
 
 def plot_single_variable(
@@ -102,7 +119,12 @@ def plot_single_variable(
         if verbose:
             print(f"Adding leadtime: {lt}.")
 
-        ax.plot(values, df_height.values, label=f"+ {lt:02} h", color=colors[icolor])
+        ax.plot(
+            values,
+            df_height.values,
+            label=str_valid_time(date, lt),
+            color=colors[icolor],
+        )
         icolor = icolor + 1
 
     # define min and max values for xaxis
@@ -207,7 +229,7 @@ def plot_two_variables(
         ln = ax_bottom.plot(
             values,
             df_height.values,
-            label=f"+ {lt:02} h ({variables_list[0]})",
+            label=f"{str_valid_time(date, lt)}: {variables_list[0]}",
             color=var_0.color,
             linestyle=linestyle_dict[tmp],
         )
@@ -220,7 +242,7 @@ def plot_two_variables(
         ln = ax_top.plot(
             values,
             df_height.values,
-            label=f"+ {lt:02} h ({variables_list[1]})",
+            label=f"{str_valid_time(date, lt)}: {variables_list[1]}",
             color=var_1.color,
             linestyle=linestyle_dict[tmp],
         )
@@ -238,7 +260,7 @@ def plot_two_variables(
     # adjust appearance
     ax_bottom.set(
         xlabel=f"{var_0.long_name} [{var_0.unit}]",
-        # xlim=(xmin_bottom, xmax_bottom),
+        xlim=(xmin_bottom, xmax_bottom),
         ylabel="Altitude [m asl]",
         ylim=(get_yrange(alt_bot, alt_top, df_height)),
         title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
@@ -246,7 +268,7 @@ def plot_two_variables(
 
     ax_top.set(
         xlabel=f"{var_1.long_name} [{var_1.unit}]",
-        # xlim=(xmin_top, xmax_top),
+        xlim=(xmin_top, xmax_top),
         ylabel="Altitude [m asl]",
         ylim=(get_yrange(alt_bot, alt_top, df_height)),
         label=f"{variables_list[1]}",
@@ -348,9 +370,9 @@ def create_plot(
         verbose (bool):                 print verbose messages
 
     """
-    assert (
-        len(leadtime) <= 5
-    ), "It is not possible, to have more than 5 lead-times in one plot."
+    # assert (
+    #    len(leadtime) <= 5
+    # ), "It is not possible, to have more than 5 lead-times in one plot."
 
     df_height = data_dict["height"]
 

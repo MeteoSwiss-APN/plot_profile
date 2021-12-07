@@ -91,14 +91,20 @@ vdf["clc"].color = "yellowgreen"
 vdf["ddt_t_rad_lw"].short_name = "ddt_t_rad_lw"
 vdf["ddt_t_rad_lw"].icon_name = "THHR_RAD"
 vdf["ddt_t_rad_lw"].long_name = "T-tend LW radiation"
-vdf["ddt_t_rad_lw"].unit = "K/s"
+vdf["ddt_t_rad_lw"].unit = "K/s x 1e-3"
+vdf["ddt_t_rad_lw"].mult = 1000
+vdf["ddt_t_rad_lw"].min_value = -0.6
+vdf["ddt_t_rad_lw"].max_value = 0.6
 vdf["ddt_t_rad_lw"].color = "seagreen"
 
 # temperature tendency due to longwave radiative heating
 vdf["ddt_t_rad_sw"].short_name = "ddt_t_rad_sw"
 vdf["ddt_t_rad_sw"].icon_name = "SOHR_RAD"
 vdf["ddt_t_rad_sw"].long_name = "T-tend SW radiation"
-vdf["ddt_t_rad_sw"].unit = "K/s"
+vdf["ddt_t_rad_sw"].unit = "K/s x 1e-3"
+vdf["ddt_t_rad_sw"].mult = 1000
+vdf["ddt_t_rad_sw"].min_value = -0.6
+vdf["ddt_t_rad_sw"].max_value = 0.6
 vdf["ddt_t_rad_sw"].color = "gold"
 
 
