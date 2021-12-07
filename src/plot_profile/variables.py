@@ -6,6 +6,7 @@ Date: 11/29/2021
 """
 # Third-party
 import pandas as pd
+import seaborn as sns
 
 vdf = pd.DataFrame(
     # variables
@@ -23,6 +24,7 @@ vdf = pd.DataFrame(
         "color",
         "marker",
         "linestyle",
+        "colormap",
         # value transformations
         "mult",
         "plus",
@@ -34,6 +36,7 @@ vdf = pd.DataFrame(
 vdf.loc["color"] = "black"
 vdf.loc["marker"][:] = "o"
 vdf.loc["linestyle"] = "solid"
+vdf.loc["colormap"] = sns.color_palette("viridis", as_cmap=True)
 vdf.loc["mult"][:] = 1
 vdf.loc["plus"][:] = 0
 vdf.loc["avg"][:] = False
