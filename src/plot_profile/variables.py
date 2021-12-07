@@ -48,14 +48,14 @@ vdf.loc["dwh_id"][:] = None
 vdf["temp"].short_name = "temp"
 vdf["temp"].icon_name = "T"
 vdf["temp"].long_name = "Temperature"
-vdf["temp"].unit = "K"
+vdf["temp"].unit = "°C"
 vdf["temp"].min_value = 275
 vdf["temp"].max_value = 287
 vdf["temp"].color = "orangered"
 vdf["temp"].marker = "o"
 vdf["temp"].linestyle = "-"
 vdf["temp"].mult = 1
-vdf["temp"].plus = 0
+vdf["temp"].plus = -273
 vdf["temp"].avg = False
 
 # specific humidity
@@ -91,21 +91,21 @@ vdf["clc"].color = "yellowgreen"
 vdf["ddt_t_rad_lw"].short_name = "ddt_t_rad_lw"
 vdf["ddt_t_rad_lw"].icon_name = "THHR_RAD"
 vdf["ddt_t_rad_lw"].long_name = "T-tend LW radiation"
-vdf["ddt_t_rad_lw"].unit = "K/s x 1e-3"
-vdf["ddt_t_rad_lw"].mult = 1000
-vdf["ddt_t_rad_lw"].min_value = -0.6
-vdf["ddt_t_rad_lw"].max_value = 0.6
+vdf["ddt_t_rad_lw"].unit = "K/h"
+vdf["ddt_t_rad_lw"].mult = 3600
+vdf["ddt_t_rad_lw"].min_value = -1.0
+vdf["ddt_t_rad_lw"].max_value = 1.0
 vdf["ddt_t_rad_lw"].color = "seagreen"
 
 # temperature tendency due to longwave radiative heating
 vdf["ddt_t_rad_sw"].short_name = "ddt_t_rad_sw"
 vdf["ddt_t_rad_sw"].icon_name = "SOHR_RAD"
 vdf["ddt_t_rad_sw"].long_name = "T-tend SW radiation"
-vdf["ddt_t_rad_sw"].unit = "K/s x 1e-3"
-vdf["ddt_t_rad_sw"].mult = 1000
-vdf["ddt_t_rad_sw"].min_value = -0.6
-vdf["ddt_t_rad_sw"].max_value = 0.6
-vdf["ddt_t_rad_sw"].color = "gold"
+vdf["ddt_t_rad_sw"].unit = "K/h"
+vdf["ddt_t_rad_sw"].mult = 3600
+vdf["ddt_t_rad_sw"].min_value = -1.0
+vdf["ddt_t_rad_sw"].max_value = 1.0
+vdf["ddt_t_rad_sw"].color = "goldenrod"
 
 
 if __name__ == "__main__":
