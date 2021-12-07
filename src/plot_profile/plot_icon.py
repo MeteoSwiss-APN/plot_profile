@@ -74,6 +74,7 @@ def plot_single_variable(
     appendix,
     xmin,
     xmax,
+    xrange_fix,
     datatypes,
     df_height,
     variable,
@@ -127,20 +128,24 @@ def plot_single_variable(
         )
         icolor = icolor + 1
 
-    # define min and max values for xaxis
-    if not xmin:
-        xmin = var.min_value
-    if not xmax:
-        xmax = var.max_value
-
     # adjust appearance
     ax.set(
         xlabel=f"{var.long_name} [{var.unit}]",
-        # xlim=(xmin, xmax),
         ylabel="Altitude [m asl]",
         ylim=(get_yrange(alt_bot, alt_top, df_height)),
         title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
     )
+
+    # define min and max values for xaxis
+    if xrange_fix:
+        ax.set_xlim(var.min_value, var.max_value)
+    else:
+        try:
+            ax.set_xlim(xmin, xmax)
+        except NameError:
+            if verbose:
+                print("No xrange defined.")
+
     ax.legend(fancybox=True)
 
     # save figure
@@ -171,6 +176,7 @@ def plot_two_variables(
     appendix,
     xmin,
     xmax,
+    xrange_fix,
     datatypes,
     verbose,
 ):
@@ -311,6 +317,7 @@ def plot_all_variables_individually(
     appendix,
     xmin,
     xmax,
+    xrange_fix,
     datatypes,
     verbose,
 ):
@@ -326,6 +333,7 @@ def plot_all_variables_individually(
             appendix=appendix,
             xmin=xmin,
             xmax=xmax,
+            xrange_fix=xrange_fix,
             datatypes=datatypes,
             df_height=df_height,
             variable=variable,
@@ -346,6 +354,7 @@ def create_plot(
     appendix,
     xmin,
     xmax,
+    xrange_fix,
     datatypes,
     leadtime,
     verbose,
@@ -365,6 +374,7 @@ def create_plot(
         appendix (str):                 add to output filename to e.g. distinguish versions
         xmin (float):                   minimum value of xaxis
         xmax (float):                   maximum value of xaxis
+        xrange_fix(bool):               take fix xrange from variables.py
         datatypes (tuple):              tuple containig all desired datatypes for the output files
         leadtime (list):                list of all lead times of interest
         verbose (bool):                 print verbose messages
@@ -389,6 +399,7 @@ def create_plot(
             appendix=appendix,
             xmin=xmin,
             xmax=xmax,
+            xrange_fix=xrange_fix,
             datatypes=datatypes,
             df_height=df_height,
             variable=variables_list[0],
@@ -410,6 +421,7 @@ def create_plot(
             appendix,
             xmin,
             xmax,
+            xrange_fix,
             datatypes,
             verbose,
         )
@@ -428,6 +440,7 @@ def create_plot(
             appendix,
             xmin,
             xmax,
+            xrange_fix,
             datatypes,
             verbose,
         )

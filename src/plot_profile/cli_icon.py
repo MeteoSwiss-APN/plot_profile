@@ -86,6 +86,12 @@ from .plot_icon import create_plot
 @click.option("--verbose", is_flag=True, default=False, help="Output details")
 @click.option("--xmin", type=float, help="Minimum value of xaxis")
 @click.option("--xmax", type=float, help="Maximum value of xaxis")
+@click.option(
+    "--xrange_fix",
+    is_flag=True,
+    default=False,
+    help="Use fix xrange from variable dataframe.",
+)
 def main(
     *,
     date: str,
@@ -107,26 +113,8 @@ def main(
     verbose: bool,
     xmin: float,
     xmax: float,
+    xrange_fix: bool,
 ) -> None:
-
-    # if it should be desired, that only two variables can be plotted and otherwise
-    # an AssertionError get thrown, switch to True
-    if False:
-        assert (
-            len(var) < 3
-        ), f"It is possible to plot at most 2 variables in one plot. The variables {var} variables were entered. Re-run command with fewer variables"
-
-    # if it should be desired, that only the first two variables among multiple varibles
-    # get plottet (with displaying a warning that only they get plottet) switch this to True
-    if False:
-        try:
-            assert (
-                len(var) < 3
-            ), f"It is possible to plot at most 2 variables in one plot. The variables {var} variables were entered. Creating plot only for the first two variables {var[:2]}"
-
-        except AssertionError as msg:
-            print(msg)
-            var = var[:2]
 
     data_dict = get_icon(
         folder=folder,
@@ -154,6 +142,7 @@ def main(
         appendix=appendix,
         xmin=xmin,
         xmax=xmax,
+        xrange_fix=xrange_fix,
         datatypes=datatypes,
         leadtime=leadtime,
         verbose=verbose,
