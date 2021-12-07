@@ -22,6 +22,10 @@ Usage
   a) ``plot_rs``: plot radiousounding
   b) ``plot_icon``: plot vertical profiles of variables from ICON simulations
 
+
+Example command:
+``plot_icon --date 21111012 --folder /scratch/swester/output_icon/ICON-1/ --var qv --var temp --var qc --leadtime 12 --leadtime 13``
+
 Credits
 -------
 
