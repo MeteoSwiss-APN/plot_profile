@@ -1,4 +1,4 @@
-"""Purpose: define command line inputs.
+"""Purpose: Compare ICON with radiosounding.
 
 Author: Stephanie Westerhuis
 

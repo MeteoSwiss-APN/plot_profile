@@ -65,8 +65,8 @@ from .plot_icon import create_plot
 @click.option(
     "--grid",
     type=str,
-    default="ICON-1E operational 2021: /store/s83/swester/grids/HEIGHT_ICON-1E.nc",
-    help="Icon file containing HEIGHT field.",
+    default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
+    help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
 )
 @click.option(
     "--leadtime",
