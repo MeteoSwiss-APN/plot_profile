@@ -7,12 +7,9 @@ Date: 25/11/2021.
 
 # Standard library
 import datetime as dt
-from pathlib import Path
 
 # Third-party
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import seaborn as sns
 
 # Local
@@ -79,6 +76,8 @@ def plot_single_variable(
     df_height,
     variable,
     verbose,
+    grid,
+    zeroline,
 ):
 
     print(f"--- creating plot for variable {variable}")
@@ -104,6 +103,15 @@ def plot_single_variable(
 
     # create figure
     fig, ax = plt.subplots()
+
+    # add grid to figure
+    if grid:
+        ax.xaxis.grid(color="black", linestyle="--", linewidth=0.5)
+        ax.yaxis.grid(color="black", linestyle="--", linewidth=0.5)
+
+    # add zero-line to figure
+    if zeroline:
+        ax.axvline(linewidth=2, color="k")
 
     # define color sequence
     lts = df_values.columns  # leadtimes
@@ -179,11 +187,13 @@ def plot_two_variables(
     xrange_fix,
     datatypes,
     verbose,
+    grid,
+    zeroline,
 ):
     print(f"--- creating plot for variables ({variables_list[0]}, {variables_list[1]})")
 
     # specify first variable (bottom x-axis) (pandas dataframe with attributes)
-    # test whether variable is even available first
+    # test whether variable is even available
     try:
         df_values_0 = data_dict[variables_list[0]]
     except KeyError:
@@ -194,7 +204,7 @@ def plot_two_variables(
     var_0 = vdf[variables_list[0]]
 
     # specify second variable (top x-axis) (pandas dataframe with attributes)
-    # test whether variable is even available first
+    # test whether variable is even available
     try:
         df_values_1 = data_dict[variables_list[1]]
     except KeyError:
@@ -227,6 +237,25 @@ def plot_two_variables(
     # create figure
     fig, ax_bottom = plt.subplots()
     ax_top = ax_bottom.twiny()  # add shared x-axis
+
+    # add grid to figure, if show_grid flag was provided
+    if grid:
+        visibility = 0.5
+        ax_bottom.xaxis.grid(
+            color=var_0.color, linestyle="-", linewidth=0.5, alpha=visibility
+        )
+        ax_bottom.yaxis.grid(
+            color="black", linestyle="-", linewidth=0.5, alpha=visibility
+        )
+        ax_top.xaxis.grid(
+            color=var_1.color, linestyle="-", linewidth=0.5, alpha=visibility
+        )
+
+    # add zeroline to figure, if zeroline flag was provided
+    if zeroline:
+        ax_bottom.axvline(linewidth=2, color=var_0.color)
+        ax_top.axvline(linewidth=2, color=var_1.color)
+
     ln0, ln1 = list(), list()
     # loop over leadtimes to create one line for each leadtime corresponding to variable 1
     tmp = 0
@@ -241,6 +270,7 @@ def plot_two_variables(
         )
         ln0 += ln
         tmp += 1
+
     # loop over leadtimes to create one line for each leadtime corresponding to variable 1
     tmp = 0
     for (lt, values) in df_values_1.iteritems():
@@ -287,9 +317,6 @@ def plot_two_variables(
         labs,
         # loc=0
     )
-
-    # ax_bottom.legend(fancybox=True)
-    # ax_top.legend(fancybox=True)
 
     # save figure
     if len(lts) == 1:
@@ -358,6 +385,8 @@ def create_plot(
     datatypes,
     leadtime,
     verbose,
+    grid,
+    zeroline,
 ):
     """Plot vertical profile of variable.
 
@@ -378,6 +407,8 @@ def create_plot(
         datatypes (tuple):              tuple containig all desired datatypes for the output files
         leadtime (list):                list of all lead times of interest
         verbose (bool):                 print verbose messages
+        zeroline (bool):                add zeroline to plot
+        grid (bool):                    add grid to plot
 
     """
     # assert (
@@ -404,6 +435,8 @@ def create_plot(
             df_height=df_height,
             variable=variables_list[0],
             verbose=verbose,
+            grid=grid,
+            zeroline=zeroline,
         )
 
     # CASE: one plot, two variables
@@ -424,6 +457,8 @@ def create_plot(
             xrange_fix,
             datatypes,
             verbose,
+            grid,
+            zeroline=zeroline,
         )
 
     if len(variables_list) > 2:
