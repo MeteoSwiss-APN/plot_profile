@@ -5,4 +5,6 @@ Author: Michel Zeller
 Date: 08/12/2021.
 """
 
-print("attack of the cookiemonster")
+
+def main():
+    print("attack of the cookiemonster")
