@@ -9,7 +9,11 @@ Date: 25/11/2021.
 import datetime as dt
 
 # Third-party
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import matplotlib.units as munits
+import numpy as np
+import pandas as pd
 import seaborn as sns
 
 # Local
@@ -496,19 +500,42 @@ def create_heatmap(
     leadtime,
     verbose,
 ):
+    plt.tick_params(axis="both", labelsize=8)
     df_height = data_dict[
         "height"
     ].to_frame()  # convert pandas series to pandas dataframe
     df_height.rename(
         columns={0: "height"}, inplace=True
     )  # rename the first column from '0' to 'height'
-    ymin, ymax = get_yrange(alt_bot, alt_top, df_height)
-    # plt.rcParams["figure.figsize"] = (4.5, 6)
-    # iterate through the
+
+    # generate new column names for the dataframes
+    lt_dt, col_dict, lt_dt_2 = [], {}, []
+    tmp = 0
+    start_date = date.date()
+    for lt in leadtime:
+        lt_dt_2.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
+
+        if (date + dt.timedelta(hours=lt)).date() != start_date:
+            start_date = (date + dt.timedelta(hours=lt)).date()
+            tmp = 0
+
+        if tmp == 0:
+            col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M")
+            lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M"))
+            # col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M")
+            # lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
+            tmp = 1
+        else:
+            col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%H:%M")
+            lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%H:%M"))
+
+    lt_dt_series = pd.Series(lt_dt)
+
+    # dates
+    init_date = date.strftime("%b %-d, %Y")
+    init_hour = date.hour
 
     for variable in variables_list:
-
-        # specify variable (pandas dataframe with attributes)
         var = vdf[variable]
         print(f"--- creating heatmap for {var.long_name}")
 
@@ -520,39 +547,29 @@ def create_heatmap(
             print(f"No plot is generated for {variable}.")
             return
 
-        lt_dt, col_dict = [], {}
-        for lt in leadtime:
-            col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d, %H:%M")
-            lt_dt.append(date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d, %H:%M")
+        # rename the column names from leadtimes as int to leadtimes ad datetime objects
         df_values.rename(columns=col_dict, inplace=True)
 
-        ax = sns.heatmap(
+        fig, ax = plt.subplots()
+        im = ax.pcolormesh(
+            lt_dt_series,
+            np.round(df_values.index.to_list()),
             df_values,
-            annot=False,
-            cbar=True,
-            fmt="g",
-            cmap="viridis",
-            yticklabels=False,  # change back to defaul
+            shading="auto",
+            cmap=var.colormap,
         )
-
-        # ax.set_yticks(ticks=list(range(ymin,ymax)))
-
-        # dates
-        init_date = date.strftime("%b %-d, %Y")
-        init_hour = date.hour
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.ax.set_ylabel(
+            f"{var.long_name} [{var.unit}]"
+        )  # cbar.ax.set_title("placeholder")
 
         # adjust appearance
-
+        plt.tick_params(axis="both", labelsize=8)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right")  # rotated x-axis ticks
         ax.set_title(
             f"{model.upper()} 'HeatMap' @ {loc.upper()}: {init_date}, {init_hour} UTC"
         )
-        # ax.set_yticklabels(ymin,ymax)
-        # ax.set(
-        # xlabel=f"time", # TODO: convert the leadtimes to datetime objects!
-        # ylabel="Altitude [m asl]",
-        # ylim=(get_yrange(alt_bot, alt_top, df_height)),
-        # title=f"{model.upper()} 'HeatMap' @ {loc.upper()}: {init_date}, {init_hour} UTC",
-        # )
+        ax.set_ylabel(f"Altitude a.s.l [m]")
         # save figure
         name = (
             f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
@@ -562,14 +579,4 @@ def create_heatmap(
         plt.tight_layout()
 
         save_fig(filename=name, datatypes=datatypes, outpath=outpath)
-
-        # plt.savefig('heatmap.png')
-
-        # specify variable (pandas dataframe with attributes)
-        var = vdf[variable]
-
-        # leadtimes
-        lts = df_values.columns  # leadtimes
-        # print(f'lts={lts} vs leadtimes={leadtime}')
-
     return
