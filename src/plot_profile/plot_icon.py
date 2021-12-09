@@ -32,12 +32,12 @@ def get_yrange(alt_bot, alt_top, df_height):
 
     """
     if alt_bot is None:
-        ymin = df_height.iloc[-1]
+        ymin = int(df_height.iloc[-1])
     else:
         ymin = alt_bot
 
     if alt_top is None:
-        ymax = df_height.iloc[0]
+        ymax = int(df_height.iloc[0])
     else:
         ymax = alt_top
 
@@ -479,4 +479,97 @@ def create_plot(
             datatypes,
             verbose,
         )
+    return
+
+
+def create_heatmap(
+    variables_list,
+    data_dict,
+    outpath,
+    date,
+    alt_bot,
+    alt_top,
+    loc,
+    model,
+    appendix,
+    datatypes,
+    leadtime,
+    verbose,
+):
+    df_height = data_dict[
+        "height"
+    ].to_frame()  # convert pandas series to pandas dataframe
+    df_height.rename(
+        columns={0: "height"}, inplace=True
+    )  # rename the first column from '0' to 'height'
+    ymin, ymax = get_yrange(alt_bot, alt_top, df_height)
+    # plt.rcParams["figure.figsize"] = (4.5, 6)
+    # iterate through the
+
+    for variable in variables_list:
+
+        # specify variable (pandas dataframe with attributes)
+        var = vdf[variable]
+        print(f"--- creating heatmap for {var.long_name}")
+
+        try:
+            df_values = data_dict[variable]
+            # df_values['height']=df_height['height']
+            df_values.set_index(df_height["height"], inplace=True)
+        except KeyError:
+            print(f"No plot is generated for {variable}.")
+            return
+
+        lt_dt, col_dict = [], {}
+        for lt in leadtime:
+            col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d, %H:%M")
+            lt_dt.append(date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d, %H:%M")
+        df_values.rename(columns=col_dict, inplace=True)
+
+        ax = sns.heatmap(
+            df_values,
+            annot=False,
+            cbar=True,
+            fmt="g",
+            cmap="viridis",
+            yticklabels=False,  # change back to defaul
+        )
+
+        # ax.set_yticks(ticks=list(range(ymin,ymax)))
+
+        # dates
+        init_date = date.strftime("%b %-d, %Y")
+        init_hour = date.hour
+
+        # adjust appearance
+
+        ax.set_title(
+            f"{model.upper()} 'HeatMap' @ {loc.upper()}: {init_date}, {init_hour} UTC"
+        )
+        # ax.set_yticklabels(ymin,ymax)
+        # ax.set(
+        # xlabel=f"time", # TODO: convert the leadtimes to datetime objects!
+        # ylabel="Altitude [m asl]",
+        # ylim=(get_yrange(alt_bot, alt_top, df_height)),
+        # title=f"{model.upper()} 'HeatMap' @ {loc.upper()}: {init_date}, {init_hour} UTC",
+        # )
+        # save figure
+        name = (
+            f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
+        )
+        if appendix:
+            name = name + "_" + appendix
+        plt.tight_layout()
+
+        save_fig(filename=name, datatypes=datatypes, outpath=outpath)
+
+        # plt.savefig('heatmap.png')
+
+        # specify variable (pandas dataframe with attributes)
+        var = vdf[variable]
+
+        # leadtimes
+        lts = df_values.columns  # leadtimes
+        # print(f'lts={lts} vs leadtimes={leadtime}')
+
     return
