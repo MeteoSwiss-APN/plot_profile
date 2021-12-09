@@ -107,6 +107,11 @@ from .plot_icon import create_plot
     default=False,
     help="Use fix xrange from variable dataframe. Overwrites specified xmin and xmax.",
 )
+@click.option(
+    "--zeroline",
+    is_flag=True,
+    help="Show grid on plot. Def: False",
+)
 def main(
     *,
     date: str,
@@ -125,6 +130,7 @@ def main(
     model: str,
     outpath: str,
     show_grid: bool,
+    zeroline: bool,
     verbose: bool,
     xmin: float,
     xmax: float,
@@ -169,6 +175,8 @@ def main(
         datatypes=datatypes,
         leadtime=leadtime,
         verbose=verbose,
+        grid=show_grid,
+        zeroline=zeroline,
     )
 
     print("--- done")

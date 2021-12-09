@@ -7,10 +7,11 @@ Date: 25/11/2021.
 
 # Standard library
 import datetime as dt
-from pathlib import Path
 
 # Third-party
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import matplotlib.units as munits
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -35,12 +36,12 @@ def get_yrange(alt_bot, alt_top, df_height):
 
     """
     if alt_bot is None:
-        ymin = df_height.iloc[-1]
+        ymin = int(df_height.iloc[-1])
     else:
         ymin = alt_bot
 
     if alt_top is None:
-        ymax = df_height.iloc[0]
+        ymax = int(df_height.iloc[0])
     else:
         ymax = alt_top
 
@@ -79,6 +80,8 @@ def plot_single_variable(
     df_height,
     variable,
     verbose,
+    grid,
+    zeroline,
 ):
 
     print(f"--- creating plot for variable {variable}")
@@ -104,6 +107,15 @@ def plot_single_variable(
 
     # create figure
     fig, ax = plt.subplots()
+
+    # add grid to figure
+    if grid:
+        ax.xaxis.grid(color="black", linestyle="--", linewidth=0.5)
+        ax.yaxis.grid(color="black", linestyle="--", linewidth=0.5)
+
+    # add zero-line to figure
+    if zeroline:
+        ax.axvline(linewidth=2, color="k")
 
     # define color sequence
     lts = df_values.columns  # leadtimes
@@ -179,11 +191,13 @@ def plot_two_variables(
     xrange_fix,
     datatypes,
     verbose,
+    grid,
+    zeroline,
 ):
     print(f"--- creating plot for variables ({variables_list[0]}, {variables_list[1]})")
 
     # specify first variable (bottom x-axis) (pandas dataframe with attributes)
-    # test whether variable is even available first
+    # test whether variable is even available
     try:
         df_values_0 = data_dict[variables_list[0]]
     except KeyError:
@@ -194,7 +208,7 @@ def plot_two_variables(
     var_0 = vdf[variables_list[0]]
 
     # specify second variable (top x-axis) (pandas dataframe with attributes)
-    # test whether variable is even available first
+    # test whether variable is even available
     try:
         df_values_1 = data_dict[variables_list[1]]
     except KeyError:
@@ -227,6 +241,25 @@ def plot_two_variables(
     # create figure
     fig, ax_bottom = plt.subplots()
     ax_top = ax_bottom.twiny()  # add shared x-axis
+
+    # add grid to figure, if show_grid flag was provided
+    if grid:
+        visibility = 0.5
+        ax_bottom.xaxis.grid(
+            color=var_0.color, linestyle="-", linewidth=0.5, alpha=visibility
+        )
+        ax_bottom.yaxis.grid(
+            color="black", linestyle="-", linewidth=0.5, alpha=visibility
+        )
+        ax_top.xaxis.grid(
+            color=var_1.color, linestyle="-", linewidth=0.5, alpha=visibility
+        )
+
+    # add zeroline to figure, if zeroline flag was provided
+    if zeroline:
+        ax_bottom.axvline(linewidth=2, color=var_0.color)
+        ax_top.axvline(linewidth=2, color=var_1.color)
+
     ln0, ln1 = list(), list()
     # loop over leadtimes to create one line for each leadtime corresponding to variable 1
     tmp = 0
@@ -241,6 +274,7 @@ def plot_two_variables(
         )
         ln0 += ln
         tmp += 1
+
     # loop over leadtimes to create one line for each leadtime corresponding to variable 1
     tmp = 0
     for (lt, values) in df_values_1.iteritems():
@@ -287,9 +321,6 @@ def plot_two_variables(
         labs,
         # loc=0
     )
-
-    # ax_bottom.legend(fancybox=True)
-    # ax_top.legend(fancybox=True)
 
     # save figure
     if len(lts) == 1:
@@ -358,6 +389,8 @@ def create_plot(
     datatypes,
     leadtime,
     verbose,
+    grid,
+    zeroline,
 ):
     """Plot vertical profile of variable.
 
@@ -378,6 +411,8 @@ def create_plot(
         datatypes (tuple):              tuple containig all desired datatypes for the output files
         leadtime (list):                list of all lead times of interest
         verbose (bool):                 print verbose messages
+        zeroline (bool):                add zeroline to plot
+        grid (bool):                    add grid to plot
 
     """
     # assert (
@@ -404,6 +439,8 @@ def create_plot(
             df_height=df_height,
             variable=variables_list[0],
             verbose=verbose,
+            grid=grid,
+            zeroline=zeroline,
         )
 
     # CASE: one plot, two variables
@@ -424,6 +461,8 @@ def create_plot(
             xrange_fix,
             datatypes,
             verbose,
+            grid,
+            zeroline=zeroline,
         )
 
     if len(variables_list) > 2:
@@ -444,4 +483,100 @@ def create_plot(
             datatypes,
             verbose,
         )
+    return
+
+
+def create_heatmap(
+    variables_list,
+    data_dict,
+    outpath,
+    date,
+    alt_bot,
+    alt_top,
+    loc,
+    model,
+    appendix,
+    datatypes,
+    leadtime,
+    verbose,
+):
+    plt.tick_params(axis="both", labelsize=8)
+    df_height = data_dict[
+        "height"
+    ].to_frame()  # convert pandas series to pandas dataframe
+    df_height.rename(
+        columns={0: "height"}, inplace=True
+    )  # rename the first column from '0' to 'height'
+
+    # generate new column names for the dataframes
+    lt_dt, col_dict, lt_dt_2 = [], {}, []
+    tmp = 0
+    start_date = date.date()
+    for lt in leadtime:
+        lt_dt_2.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
+
+        if (date + dt.timedelta(hours=lt)).date() != start_date:
+            start_date = (date + dt.timedelta(hours=lt)).date()
+            tmp = 0
+
+        if tmp == 0:
+            col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M")
+            lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M"))
+            # col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M")
+            # lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
+            tmp = 1
+        else:
+            col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%H:%M")
+            lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%H:%M"))
+
+    lt_dt_series = pd.Series(lt_dt)
+
+    # dates
+    init_date = date.strftime("%b %-d, %Y")
+    init_hour = date.hour
+
+    for variable in variables_list:
+        var = vdf[variable]
+        print(f"--- creating heatmap for {var.long_name}")
+
+        try:
+            df_values = data_dict[variable]
+            # df_values['height']=df_height['height']
+            df_values.set_index(df_height["height"], inplace=True)
+        except KeyError:
+            print(f"No plot is generated for {variable}.")
+            return
+
+        # rename the column names from leadtimes as int to leadtimes ad datetime objects
+        df_values.rename(columns=col_dict, inplace=True)
+
+        fig, ax = plt.subplots()
+        im = ax.pcolormesh(
+            lt_dt_series,
+            np.round(df_values.index.to_list()),
+            df_values,
+            shading="auto",
+            cmap=var.colormap,
+        )
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.ax.set_ylabel(
+            f"{var.long_name} [{var.unit}]"
+        )  # cbar.ax.set_title("placeholder")
+
+        # adjust appearance
+        plt.tick_params(axis="both", labelsize=8)
+        plt.setp(ax.get_xticklabels(), rotation=45, ha="right")  # rotated x-axis ticks
+        ax.set_title(
+            f"{model.upper()} 'HeatMap' @ {loc.upper()}: {init_date}, {init_hour} UTC"
+        )
+        ax.set_ylabel(f"Altitude a.s.l [m]")
+        # save figure
+        name = (
+            f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
+        )
+        if appendix:
+            name = name + "_" + appendix
+        plt.tight_layout()
+
+        save_fig(filename=name, datatypes=datatypes, outpath=outpath)
     return

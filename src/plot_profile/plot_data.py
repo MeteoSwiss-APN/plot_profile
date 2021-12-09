@@ -15,7 +15,6 @@ import numpy as np
 import pandas as pd
 
 
-# docstring check
 def extract_clouds(df, relhum_thresh, print_steps):
     """Extract the cloud layers based on the relative humidity threshold.
 
@@ -72,7 +71,6 @@ def extract_clouds(df, relhum_thresh, print_steps):
         return cloud_start, cloud_end
 
 
-# docstring check
 def map_degrees(avg_winddir_array):
     """Map the wind directions (°) from to x-y values.
 
@@ -92,7 +90,6 @@ def map_degrees(avg_winddir_array):
     return x_dir, y_dir
 
 
-# docstring check
 def adjustFigAspect(fig, aspect=1):
     """Create plots with different aspect ratios (taken from stackoverflow).
 
@@ -113,7 +110,6 @@ def adjustFigAspect(fig, aspect=1):
     )
 
 
-# docstring check
 def plot_clouds(df, relhum_thresh, print_steps, ax, params, plot_properties):
     """Add clouds to plot.
 
@@ -158,7 +154,6 @@ def plot_clouds(df, relhum_thresh, print_steps, ax, params, plot_properties):
     return
 
 
-# docstring check
 def plot_grid(ax, plot_properties, params):
     """Add grid to current axes.
 
@@ -191,7 +186,6 @@ def plot_grid(ax, plot_properties, params):
     return
 
 
-# docstring check
 def check_settings(
     standard_settings,
     params,
