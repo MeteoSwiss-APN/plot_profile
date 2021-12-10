@@ -566,10 +566,8 @@ def create_heatmap(
         # adjust appearance
         plt.tick_params(axis="both", labelsize=8)
         plt.setp(ax.get_xticklabels(), rotation=45, ha="right")  # rotated x-axis ticks
-        ax.set_title(
-            f"{model.upper()} 'HeatMap' @ {loc.upper()}: {init_date}, {init_hour} UTC"
-        )
-        ax.set_ylabel(f"Altitude a.s.l [m]")
+        ax.set_title(f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC")
+        ax.set_ylabel(f"Altitude [m asl]")
         # save figure
         name = (
             f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
