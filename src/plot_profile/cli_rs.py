@@ -65,14 +65,13 @@ from .plot_data import create_plot
 @click.option(
     "--clouds",
     is_flag=True,
-    # default=True,
-    help="Show clouds on plot - def: True",
+    help="Show clouds on plot - def: False",
 )
 @click.option(
     "--relhum_thresh",
-    default=80,
+    default=95,
     type=float,
-    help="Define the relative humidity threshold for clouds - def: 80",
+    help="Define the relative humidity threshold for clouds - def: 95",
 )
 @click.option(
     "--print_steps",

@@ -99,6 +99,7 @@ vdf["ddt_t_rad_lw"].mult = 3600
 vdf["ddt_t_rad_lw"].min_value = -1.0
 vdf["ddt_t_rad_lw"].max_value = 1.0
 vdf["ddt_t_rad_lw"].color = "seagreen"
+vdf["ddt_t_rad_lw"].colormap = sns.color_palette("vlag", as_cmap=True)
 
 # temperature tendency due to longwave radiative heating
 vdf["ddt_t_rad_sw"].short_name = "ddt_t_rad_sw"
@@ -109,6 +110,7 @@ vdf["ddt_t_rad_sw"].mult = 3600
 vdf["ddt_t_rad_sw"].min_value = -1.0
 vdf["ddt_t_rad_sw"].max_value = 1.0
 vdf["ddt_t_rad_sw"].color = "goldenrod"
+vdf["ddt_t_rad_sw"].colormap = sns.light_palette("goldenrod", as_cmap=True)
 
 
 if __name__ == "__main__":

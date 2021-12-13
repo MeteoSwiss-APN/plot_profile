@@ -12,6 +12,8 @@ import click
 from .get_icon import get_icon
 from .plot_icon import create_heatmap
 
+# import ipdb
+
 
 @click.command()
 # options without default value (mandatory to specify by user)
@@ -72,14 +74,14 @@ from .plot_icon import create_heatmap
     "--start_leadtime",
     type=int,
     multiple=False,
-    default=(0,),
+    default=0,
     help="Leadtime(s) to be shown in one plot. Def: 0.",
 )
 @click.option(
     "--end_leadtime",
     type=int,
     multiple=False,
-    default=(0,),
+    default=10,
     help="Leadtime(s) to be shown in one plot. Def: 10.",
 )
 @click.option(
@@ -153,20 +155,17 @@ def main(
     xmax: float,
     xrange_fix: bool,
 ):
-    """Plot vertical profiles of variables from ICON simulation.
-
-    If 1, 3, or more variables are specified, each will be plotted individually.
-    If 2 variables are given, they will be shown in the same figure.
+    """Plot heatmap (time-height crosssection) of variable from ICON simulation.
 
     Example command:
-    plot_icon --date 21111012 --folder /scratch/swester/output_icon/ICON-1/ --var qv --var temp --var qc --leadtime 12 --leadtime 13
+    TODO
 
     """
-    leadtime = list(range(start_leadtime, end_leadtime + 1, step))
+    leadtimes = list(range(start_leadtime, end_leadtime + 1, step))
     data_dict = get_icon(
         folder=folder,
         date=date,
-        leadtime=leadtime,
+        leadtime=leadtimes,
         lat=lat,
         lon=lon,
         ind=ind,
@@ -188,7 +187,7 @@ def main(
         model=model,
         appendix=appendix,
         datatypes=datatypes,
-        leadtime=leadtime,
+        leadtime=leadtimes,
         verbose=verbose,
     )
 
