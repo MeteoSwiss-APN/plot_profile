@@ -14,6 +14,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+# Local
+from .utils import save_fig
+
 
 def extract_clouds(df, relhum_thresh, print_steps):
     """Extract the cloud layers based on the relative humidity threshold.
@@ -279,16 +282,10 @@ def create_plot(
         date[6:8] + "." + date[4:6] + "." + date[:4]
     )  # nicely formated date for figure title, i.e. DD.MM.YYYY
 
-    outpath = outpath + date_ugly + "/"
-
     gs_multi = fig.add_gridspec(
         1, 2, wspace=0, width_ratios=[2, 1]
     )  # 2 horizontally aligned subplots
     gs_single = fig.add_gridspec(1, 1, wspace=0)
-
-    os.makedirs(
-        outpath, exist_ok=True
-    )  # create plot folder if it doesn't already exist
 
     # properties dict for single plot cases
     plot_properties = {
@@ -329,7 +326,7 @@ def create_plot(
         ("742", "746", "747"): {
             "name": "dewp",
             "which_plot": "--- creating dewp plot",
-            "label": "Dew Point Temperature ",
+            "label": "Dew point temperature ",
             "xlabel": "Temperature [°C]",
             "xlabel_color": "b",
             "line_color": "b--",
@@ -342,7 +339,7 @@ def create_plot(
             "name": "temperature",
             "which_plot": "--- creating temp+dewp plot",
             "label": "Temperature",
-            "label_dewp": "Dew Point Temperature",
+            "label_dewp": "Dew point temperature",
             "xlabel": "Temperature [°C]",
             "xlabel_color": "b",
             "line_color": "b-",
@@ -367,7 +364,7 @@ def create_plot(
 
         ax.set_xlabel(plot_properties[params]["xlabel"])
         ax.xaxis.label.set_color(plot_properties[params]["xlabel_color"])
-        ax.set_ylabel("Altitude [m]")
+        ax.set_ylabel("Altitude [m asl]")
 
         if params == (
             "742",
@@ -410,17 +407,21 @@ def create_plot(
 
             if True:
                 fig.suptitle(f"Radiosounding Data from {station_name} on {date_nice}")
-                path_to_figure = (
-                    outpath
-                    + station_name
+                name = (
+                    station_name
                     + "_"
                     + date_ugly
                     + "_"
                     + plot_properties[params]["name"]
-                    + "_plot.png"
                 )
-                print("Saved plot: ", os.getcwd() + "/" + path_to_figure)
-                plt.savefig(path_to_figure)
+
+                save_fig(
+                    filename=name,
+                    datatypes=[
+                        "png",
+                    ],
+                    outpath=outpath,
+                )
                 return
 
         (plot,) = ax.plot(
@@ -476,17 +477,16 @@ def create_plot(
         if True:  # save figure
             ax.legend(handles=handles)
             fig.suptitle(f"Radiosounding Data from {station_name} on {date_nice}")
-            path_to_figure = (
-                outpath
-                + station_name
-                + "_"
-                + date_ugly
-                + "_"
-                + plot_properties[params]["name"]
-                + "_plot.png"
+            name = (
+                station_name + "_" + date_ugly + "_" + plot_properties[params]["name"]
             )
-            print("Saved plot: ", os.getcwd() + "/" + path_to_figure)
-            plt.savefig(path_to_figure)
+            save_fig(
+                filename=name,
+                datatypes=[
+                    "png",
+                ],
+                outpath=outpath,
+            )
             return
 
     else:  # multi plot cases
@@ -636,11 +636,14 @@ def create_plot(
             if True:  # save figure
                 ax[0].legend(handles=handles_left)
                 fig.suptitle(f"Radiosounding Data from {station_name} on {date_nice}")
-                path_to_figure = (
-                    outpath + station_name + "_" + date_ugly + "_complete_plot.png"
+                name = station_name + "_" + date_ugly + "_complete"
+                save_fig(
+                    filename=name,
+                    datatypes=[
+                        "png",
+                    ],
+                    outpath=outpath,
                 )
-                print("Saved plot: ", os.getcwd() + "/" + path_to_figure)
-                plt.savefig(path_to_figure)
                 return
 
         if "743" in params and "748" in params:  # plot windvel & winddir
@@ -719,9 +722,12 @@ def create_plot(
             if True:  # save figure
                 ax[0].legend(handles=handles_left)
                 fig.suptitle(f"Radiosounding Data from {station_name} on {date_nice}")
-                path_to_figure = (
-                    outpath + station_name + "_" + date_ugly + "_wind_plot.png"
+                name = station_name + "_" + date_ugly + "_wind"
+                save_fig(
+                    filename=name,
+                    datatypes=[
+                        "png",
+                    ],
+                    outpath=outpath,
                 )
-                print("Saved plot: ", os.getcwd() + "/" + path_to_figure)
-                plt.savefig(path_to_figure)
                 return
