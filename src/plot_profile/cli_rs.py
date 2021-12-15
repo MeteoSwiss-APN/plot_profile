@@ -4,9 +4,6 @@ Author: Michel Zeller
 
 Date: 05/10/2021.
 """
-# Standard library
-from typing import NamedTuple
-
 # Third-party
 import click
 
@@ -127,7 +124,25 @@ def main(
     windvel_min: float,
     windvel_max: float,
 ) -> None:
+    """Plot vertical profiles of variables from Radio Sounding Data.
 
+    Available variables are: windvel/winddir/temp/dewp.
+
+    If (wind or windvel) AND (temp or dewp) are plottet, two plots side by side will be created.
+    Otherwise one plot containing up to two variables (wind/windvel or temp/dewp).
+
+    Personal axis limits can be specified by using the '--personal_settings' flag in conjunction with the
+    axis limits one wants to define.
+
+    Standard (pre-defined) axis limits can be used by applying the '--standard_settings' flag. Check out
+    the standard settings by executing: plot_rs --help
+
+    Otherwise the axes limits will be fitted to the data.
+
+    Example command:
+    plot_rs --date 2021111012 --outpath plots/ --grid --clouds --relhum_thresh 85 --params windvel --params winddir --params dewp --params temp
+
+    """
     df, station_name, relevant_params = get_data(
         date=date,
         params=params,
