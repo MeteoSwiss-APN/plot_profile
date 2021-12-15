@@ -158,7 +158,7 @@ def plot_single_variable(
         ax.set_xlim(var.min_value, var.max_value)
     else:
         try:
-            ax.set_xlim(xmin, xmax)
+            ax.set_xlim(xmin[0], xmax[0])
         except NameError:
             if verbose:
                 print("No xrange defined.")
@@ -296,28 +296,19 @@ def plot_two_variables(
         ln1 += ln
         tmp += 1
 
-    # define min and max values for bottom xaxis
-    # TODO: min and max for two variables
-    # if not xmin:
-    #    xmin_bottom = var_0.min_value
-    #    xmin_top = var_1.min_value
-    # if not xmax:
-    #    xmax_bottom = var_0.max_value
-    #    xmax_top = var_1.max_value
     # define min and max values for xaxis
-    #  if flag --xrange_fix is set: use values from variable dataframe
-    #  else check whether user has specified min and max
-    #  or just let matplotlib handle the job (default)
-    # if xrange_fix:
-    #    ax_bottom.set_xlim(var_0.min_value, var_0.max_value)
-    #    ax_top.set_xlim(var_1.min_value, var_1.max_value)
-    # else:
-    #    try:
-    #        ax_bottom.set_xlim(xmin, xmax)
-    #        ax_top.set_xlim(xmin, xmax)
-    #    except NameError:
-    #        if verbose:
-    #            print("No xrange defined for both variables.")
+    # if flag --xrange_fix is set: use values from variable dataframe
+    # else check whether user has specified min and max for BOTH variables
+    # or just let matplotlib handle the job (default)
+    if xrange_fix:
+        ax_bottom.set_xlim(var_0.min_value, var_0.max_value)
+        ax_top.set_xlim(var_1.min_value, var_1.max_value)
+    else:
+        assert len(xmin) == len(
+            variables_list
+        ), f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax})"
+        ax_bottom.set_xlim(xmin[0], xmax[0])
+        ax_top.set_xlim(xmin[1], xmax[1])
 
     # adjust appearance
     ax_bottom.set(
