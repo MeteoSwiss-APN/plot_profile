@@ -6,6 +6,7 @@ Date: 05/10/2021.
 """
 
 # Standard library
+import datetime
 import os
 from mmap import ACCESS_DEFAULT
 
@@ -277,10 +278,31 @@ def create_plot(
     cyan = "c"
     magenta = "m"
 
-    date_ugly = date[:8]
+    # date parts for the filename
+    date_ugly = date[2:8]
+    hour = date[8:]
+
+    # nicely formated date for figure title, i.e. DD.MM.YYYY HH:MM:SS Timezone
     date_nice = (
-        date[6:8] + "." + date[4:6] + "." + date[:4]
-    )  # nicely formated date for figure title, i.e. DD.MM.YYYY
+        date[6:8]
+        + "."
+        + date[4:6]
+        + "."
+        + date[:4]
+        + " "
+        + date[8:]
+        + ":00:00"
+        + " UTC"
+    )
+
+    # this line converts a string of given formatting, to a datetimeobject of a different formatting (for title)
+    date_dt = datetime.datetime.strptime(date_nice, "%d.%m.%Y %H:%M:%S %Z").strftime(
+        "%b %d, %Y, %H:%M"
+    )
+
+    print(
+        f"date = {date}, date_ugly = {date_ugly}, date_nice = {date_nice}, datetimeobj = {date_dt}"
+    )
 
     gs_multi = fig.add_gridspec(
         1, 2, wspace=0, width_ratios=[2, 1]
@@ -337,6 +359,21 @@ def create_plot(
         # temp + dewp
         ("742", "745", "746", "747"): {
             "name": "temperature",
+            "which_plot": "--- creating temp+dewp plot",
+            "label": "Temperature",
+            "label_dewp": "Dew point temperature",
+            "xlabel": "Temperature [°C]",
+            "xlabel_color": "b",
+            "line_color": "b-",
+            "line_color_dewp": "b--",
+            "x_axis": df["temp"],
+            "x_axis_2": df["dewp"],
+            "x_min": df["dewp"].min() * 1.1,
+            "x_max": df["temp"].max() * 1.1,
+        },
+        # temp + dewp + winddir + windvel
+        ("742", "743", "745", "746", "747" + "748"): {
+            "name": "temp_dewp_winddir_windvel",
             "which_plot": "--- creating temp+dewp plot",
             "label": "Temperature",
             "label_dewp": "Dew point temperature",
@@ -406,14 +443,8 @@ def create_plot(
                 ax.yaxis.grid(color="black", linestyle="--", linewidth=0.5)
 
             if True:
-                fig.suptitle(f"Radiosounding Data from {station_name} on {date_nice}")
-                name = (
-                    station_name
-                    + "_"
-                    + date_ugly
-                    + "_"
-                    + plot_properties[params]["name"]
-                )
+                fig.suptitle(f"Radiosounding Data @ {station_name}: {date_dt} UTC")
+                name = f"rs_{date_ugly}_{hour}_{plot_properties[params]['name']}_{station_name}"
 
                 save_fig(
                     filename=name,
@@ -476,10 +507,9 @@ def create_plot(
 
         if True:  # save figure
             ax.legend(handles=handles)
-            fig.suptitle(f"Radiosounding Data from {station_name} on {date_nice}")
-            name = (
-                station_name + "_" + date_ugly + "_" + plot_properties[params]["name"]
-            )
+            fig.suptitle(f"Radiosounding Data @ {station_name}: {date_dt} UTC")
+            name = f"rs_{date_ugly}_{hour}_{plot_properties[params]['name']}_{station_name}"
+
             save_fig(
                 filename=name,
                 datatypes=[
@@ -635,8 +665,9 @@ def create_plot(
 
             if True:  # save figure
                 ax[0].legend(handles=handles_left)
-                fig.suptitle(f"Radiosounding Data from {station_name} on {date_nice}")
-                name = station_name + "_" + date_ugly + "_complete"
+
+                fig.suptitle(f"Radiosounding Data @ {station_name}: {date_dt} UTC")
+                name = f"rs_{date_ugly}_{hour}_complete_{station_name}"
                 save_fig(
                     filename=name,
                     datatypes=[
@@ -721,8 +752,8 @@ def create_plot(
 
             if True:  # save figure
                 ax[0].legend(handles=handles_left)
-                fig.suptitle(f"Radiosounding Data from {station_name} on {date_nice}")
-                name = station_name + "_" + date_ugly + "_wind"
+                fig.suptitle(f"Radiosounding Data @ {station_name}: {date_dt} UTC")
+                name = f"rs_{date_ugly}_{hour}_wind_{station_name}"
                 save_fig(
                     filename=name,
                     datatypes=[
