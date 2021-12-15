@@ -9,9 +9,7 @@ Date: 25/11/2021.
 import datetime as dt
 
 # Third-party
-import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import matplotlib.units as munits
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -451,15 +449,24 @@ def create_heatmap(
     leadtime,
     verbose,
 ):
-    plt.tick_params(axis="both", labelsize=8)
+    # the height dataframe is the same for all variables, thus outside of the
+    # for-loop below. it needs some reformatting and type alignement for later use
     df_height = data_dict[
         "height"
     ].to_frame()  # convert pandas series to pandas dataframe
+
     df_height.rename(
         columns={0: "height"}, inplace=True
     )  # rename the first column from '0' to 'height'
 
     # generate new column names for the dataframes
+    # the col-dict links the abbreviated leadtimes (i.e. 00, 02, 04,...) to their
+    # respective datetime equivalents (i.e. start_date + leadtime)
+
+    # lt-dt contains all leadtimes and the first leadtimes on new dates have a different
+    # formatting from the rest
+
+    # lt_dt_2 contains all leadtimes with a uniform format %Y-%m-%d %H:%M (but is not used later)
     lt_dt, col_dict, lt_dt_2 = [], {}, []
     tmp = 0
     start_date = date.date()
@@ -469,36 +476,40 @@ def create_heatmap(
         if (date + dt.timedelta(hours=lt)).date() != start_date:
             start_date = (date + dt.timedelta(hours=lt)).date()
             tmp = 0
-
+        # the first leadtime on the startdate is formatted like: %b %-d, %H:%M
+        # if the simulation covers several days, the first leadtimes on other days
+        # also have this formatting (specified by the tmp variable)
         if tmp == 0:
             col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M")
             lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M"))
             # col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M")
             # lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
             tmp = 1
+        # else the formatting is only HH:MM. These timesteps ultimately are displayed
+        # on the x-axis. It is not desireable to have the date for each x-tick-label.
         else:
             col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%H:%M")
             lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%H:%M"))
-
     lt_dt_series = pd.Series(lt_dt)
 
-    # dates
+    # dates used in the filename / title of heat plots
     init_date = date.strftime("%b %-d, %Y")
     init_hour = date.hour
 
+    # this loop creates the heatmap. for each variable, one separate heatmap is generated
     for variable in variables_list:
         var = vdf[variable]
         print(f"--- creating heatmap for {var.long_name}")
 
         try:
             df_values = data_dict[variable]
-            # df_values['height']=df_height['height']
             df_values.set_index(df_height["height"], inplace=True)
         except KeyError:
             print(f"No plot is generated for {variable}.")
-            return
+            break  # just continue with the next variable - should not break the whole loop
 
-        # rename the column names from leadtimes as int to leadtimes ad datetime objects
+        # rename the column names from leadtimes as int to leadtimes as datetime objects
+        # because the column names are the x-axis ticklabels of the heatmap
         df_values.rename(columns=col_dict, inplace=True)
 
         fig, ax = plt.subplots()
@@ -510,9 +521,8 @@ def create_heatmap(
             cmap=var.colormap,
         )
         cbar = fig.colorbar(im, ax=ax)
-        cbar.ax.set_ylabel(
-            f"{var.long_name} [{var.unit}]"
-        )  # cbar.ax.set_title("placeholder")
+        cbar.ax.set_ylabel(f"{var.long_name} [{var.unit}]")
+        # cbar.ax.set_title("placeholder") # title for the colorbar if necessary
 
         # adjust appearance
         plt.tick_params(axis="both", labelsize=8)
