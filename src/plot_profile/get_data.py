@@ -13,6 +13,9 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
+# Local
+from .utils import slice_top_bottom
+
 
 def reformat_params(params, params_dict):
     """Reformat the input parameters.
@@ -186,6 +189,8 @@ def extract_rows(df, print_steps, alt_bot, alt_top, all_params):
     print("--- extracting relevant rows from dataframe")
 
     station_height = df["elev"].iloc[0]
+
+    # TODO: use slice_top_bottom to return selected rows
     if station_height > alt_bot:
         alt_bot = station_height
 

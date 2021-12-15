@@ -40,10 +40,7 @@ def get_yrange(alt_bot, alt_top, df_height):
     else:
         ymin = alt_bot
 
-    if alt_top is None:
-        ymax = int(df_height.iloc[0])
-    else:
-        ymax = alt_top
+    ymax = alt_top
 
     return ymin, ymax
 
@@ -66,6 +63,7 @@ def str_valid_time(ini, lt):
 
 def plot_single_variable(
     data_dict,
+    variable,
     outpath,
     date,
     alt_bot,
@@ -78,9 +76,8 @@ def plot_single_variable(
     xrange_fix,
     datatypes,
     df_height,
-    variable,
     verbose,
-    grid,
+    show_grid,
     zeroline,
 ):
 
@@ -109,15 +106,17 @@ def plot_single_variable(
     fig, ax = plt.subplots()
 
     # add grid to figure
-    if grid:
+    if show_grid:
         ax.xaxis.grid(color="black", linestyle="--", linewidth=0.5)
         ax.yaxis.grid(color="black", linestyle="--", linewidth=0.5)
 
     # add zero-line to figure
     if zeroline:
-        ax.axvline(linewidth=2, color="k")
+        ax.axvline(linewidth=1.5, color="k")
 
     # define color sequence
+    #  if only 1 leadtime: color from variable dataframe
+    #  if multiple leadtimes: seaborn husl color palette
     lts = df_values.columns  # leadtimes
     if len(lts) == 1:
         colors = [
@@ -137,6 +136,8 @@ def plot_single_variable(
             df_height.values,
             label=str_valid_time(date, lt),
             color=colors[icolor],
+            # marker="o",
+            marker=None,
         )
         icolor = icolor + 1
 
@@ -149,6 +150,10 @@ def plot_single_variable(
     )
 
     # define min and max values for xaxis
+    #  if flag --xrange_fix is set: use values from variable dataframe
+    #  else check whether user has specified min and max
+    #  or just let matplotlib handle the job (default)
+    # TODO: xmin and xmax should now be a list
     if xrange_fix:
         ax.set_xlim(var.min_value, var.max_value)
     else:
@@ -158,9 +163,13 @@ def plot_single_variable(
             if verbose:
                 print("No xrange defined.")
 
+    # add nice legend
     ax.legend(fancybox=True)
 
-    # save figure
+    # define output filename
+    #  if only 1 leadtime: include leadtime in filename
+    #  if multuple leadtimes: no leadtimes specified in filename
+    #  (user can add customised appendix to distinguish situations)
     if len(lts) == 1:
         name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_+{lts[0]}h_{var.short_name}_{loc}'
     else:
@@ -169,8 +178,11 @@ def plot_single_variable(
         )
     if appendix:
         name = name + "_" + appendix
+
+    # make plot tight
     plt.tight_layout()
 
+    # save figure
     save_fig(filename=name, datatypes=datatypes, outpath=outpath)
     return
 
@@ -191,7 +203,7 @@ def plot_two_variables(
     xrange_fix,
     datatypes,
     verbose,
-    grid,
+    show_grid,
     zeroline,
 ):
     print(f"--- creating plot for variables ({variables_list[0]}, {variables_list[1]})")
@@ -243,22 +255,17 @@ def plot_two_variables(
     ax_top = ax_bottom.twiny()  # add shared x-axis
 
     # add grid to figure, if show_grid flag was provided
-    if grid:
-        visibility = 0.5
-        ax_bottom.xaxis.grid(
-            color=var_0.color, linestyle="-", linewidth=0.5, alpha=visibility
-        )
-        ax_bottom.yaxis.grid(
-            color="black", linestyle="-", linewidth=0.5, alpha=visibility
-        )
-        ax_top.xaxis.grid(
-            color=var_1.color, linestyle="-", linewidth=0.5, alpha=visibility
-        )
+    if show_grid:
+        ax_bottom.xaxis.grid(linestyle="-", linewidth=0.5, alpha=0.5)
+        ax_bottom.yaxis.grid(linestyle="-", linewidth=0.5, alpha=0.5)
+        if verbose:
+            print("Grid is only plotted for bottom variable.")
 
     # add zeroline to figure, if zeroline flag was provided
     if zeroline:
-        ax_bottom.axvline(linewidth=2, color=var_0.color)
-        ax_top.axvline(linewidth=2, color=var_1.color)
+        ax_bottom.axvline(color="black", linewidth=1.5)
+        if verbose:
+            print("Zeroline is only plotted for bottom variable.")
 
     ln0, ln1 = list(), list()
     # loop over leadtimes to create one line for each leadtime corresponding to variable 1
@@ -290,17 +297,31 @@ def plot_two_variables(
         tmp += 1
 
     # define min and max values for bottom xaxis
-    if not xmin:
-        xmin_bottom = var_0.min_value
-        xmin_top = var_1.min_value
-    if not xmax:
-        xmax_bottom = var_0.max_value
-        xmax_top = var_1.max_value
+    # TODO: min and max for two variables
+    # if not xmin:
+    #    xmin_bottom = var_0.min_value
+    #    xmin_top = var_1.min_value
+    # if not xmax:
+    #    xmax_bottom = var_0.max_value
+    #    xmax_top = var_1.max_value
+    # define min and max values for xaxis
+    #  if flag --xrange_fix is set: use values from variable dataframe
+    #  else check whether user has specified min and max
+    #  or just let matplotlib handle the job (default)
+    # if xrange_fix:
+    #    ax_bottom.set_xlim(var_0.min_value, var_0.max_value)
+    #    ax_top.set_xlim(var_1.min_value, var_1.max_value)
+    # else:
+    #    try:
+    #        ax_bottom.set_xlim(xmin, xmax)
+    #        ax_top.set_xlim(xmin, xmax)
+    #    except NameError:
+    #        if verbose:
+    #            print("No xrange defined for both variables.")
 
     # adjust appearance
     ax_bottom.set(
         xlabel=f"{var_0.long_name} [{var_0.unit}]",
-        xlim=(xmin_bottom, xmax_bottom),
         ylabel="Altitude [m asl]",
         ylim=(get_yrange(alt_bot, alt_top, df_height)),
         title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
@@ -308,12 +329,12 @@ def plot_two_variables(
 
     ax_top.set(
         xlabel=f"{var_1.long_name} [{var_1.unit}]",
-        xlim=(xmin_top, xmax_top),
         ylabel="Altitude [m asl]",
         ylim=(get_yrange(alt_bot, alt_top, df_height)),
         label=f"{variables_list[1]}",
     )
 
+    # create legend
     lns = ln0 + ln1
     labs = [l.get_label() for l in lns]
     ax_bottom.legend(
@@ -322,54 +343,19 @@ def plot_two_variables(
         # loc=0
     )
 
-    # save figure
+    # filename
     if len(lts) == 1:
         name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_+{lts[0]}h_{var_0.short_name}_{var_1.short_name}_{loc}'
     else:
         name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var_0.short_name}_{var_1.short_name}_{loc}'
     if appendix:
         name = name + "_" + appendix
+
+    # make plot tight
     plt.tight_layout()
 
+    # save figure
     save_fig(filename=name, datatypes=datatypes, outpath=outpath)
-    return
-
-
-def plot_all_variables_individually(
-    df_height,
-    variables_list,
-    data_dict,
-    outpath,
-    date,
-    alt_bot,
-    alt_top,
-    loc,
-    model,
-    appendix,
-    xmin,
-    xmax,
-    xrange_fix,
-    datatypes,
-    verbose,
-):
-    for variable in variables_list:
-        plot_single_variable(
-            data_dict=data_dict,
-            outpath=outpath,
-            date=date,
-            alt_bot=alt_bot,
-            alt_top=alt_top,
-            loc=loc,
-            model=model,
-            appendix=appendix,
-            xmin=xmin,
-            xmax=xmax,
-            xrange_fix=xrange_fix,
-            datatypes=datatypes,
-            df_height=df_height,
-            variable=variable,
-            verbose=verbose,
-        )
     return
 
 
@@ -387,12 +373,11 @@ def create_plot(
     xmax,
     xrange_fix,
     datatypes,
-    leadtime,
     verbose,
-    grid,
+    show_grid,
     zeroline,
 ):
-    """Plot vertical profile of variable.
+    """Plot vertical profile of variable(s).
 
     Args:
         variables_list (list):          List of all variables of interest
@@ -409,41 +394,14 @@ def create_plot(
         xmax (float):                   maximum value of xaxis
         xrange_fix(bool):               take fix xrange from variables.py
         datatypes (tuple):              tuple containig all desired datatypes for the output files
-        leadtime (list):                list of all lead times of interest
         verbose (bool):                 print verbose messages
+        show_grid (bool):               add grid to plot
         zeroline (bool):                add zeroline to plot
-        grid (bool):                    add grid to plot
 
     """
-    # assert (
-    #    len(leadtime) <= 5
-    # ), "It is not possible, to have more than 5 lead-times in one plot."
-
     df_height = data_dict["height"]
 
-    # CASE: one plot, one variable
-    if len(variables_list) == 1:
-        plot_single_variable(
-            data_dict=data_dict,
-            outpath=outpath,
-            date=date,
-            alt_bot=alt_bot,
-            alt_top=alt_top,
-            loc=loc,
-            model=model,
-            appendix=appendix,
-            xmin=xmin,
-            xmax=xmax,
-            xrange_fix=xrange_fix,
-            datatypes=datatypes,
-            df_height=df_height,
-            variable=variables_list[0],
-            verbose=verbose,
-            grid=grid,
-            zeroline=zeroline,
-        )
-
-    # CASE: one plot, two variables
+    # CASE: one plot which comprises two variables
     if len(variables_list) == 2:
         plot_two_variables(
             df_height,
@@ -461,28 +419,32 @@ def create_plot(
             xrange_fix,
             datatypes,
             verbose,
-            grid,
-            zeroline=zeroline,
+            show_grid,
+            zeroline,
         )
+    # CASE: one plot for each variable
+    else:
+        for variable in variables_list:
+            plot_single_variable(
+                data_dict,
+                variable,
+                outpath,
+                date,
+                alt_bot,
+                alt_top,
+                loc,
+                model,
+                appendix,
+                xmin,
+                xmax,
+                xrange_fix,
+                datatypes,
+                df_height,
+                verbose,
+                show_grid,
+                zeroline,
+            )
 
-    if len(variables_list) > 2:
-        plot_all_variables_individually(
-            df_height,
-            variables_list,
-            data_dict,
-            outpath,
-            date,
-            alt_bot,
-            alt_top,
-            loc,
-            model,
-            appendix,
-            xmin,
-            xmax,
-            xrange_fix,
-            datatypes,
-            verbose,
-        )
     return
 
 
@@ -491,8 +453,6 @@ def create_heatmap(
     data_dict,
     outpath,
     date,
-    alt_bot,
-    alt_top,
     loc,
     model,
     appendix,
