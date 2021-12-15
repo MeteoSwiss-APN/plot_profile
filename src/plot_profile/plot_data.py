@@ -443,7 +443,7 @@ def create_plot(
                 ax.yaxis.grid(color="black", linestyle="--", linewidth=0.5)
 
             if True:
-                fig.suptitle(f"Radiosounding Data @ {station_name}: {date_dt} UTC")
+                fig.suptitle(f"Radiosounding @ {station_name}: {date_dt} UTC")
                 name = f"rs_{date_ugly}_{hour}_{plot_properties[params]['name']}_{station_name}"
 
                 save_fig(
@@ -507,7 +507,7 @@ def create_plot(
 
         if True:  # save figure
             ax.legend(handles=handles)
-            fig.suptitle(f"Radiosounding Data @ {station_name}: {date_dt} UTC")
+            fig.suptitle(f"Radiosounding @ {station_name}: {date_dt} UTC")
             name = f"rs_{date_ugly}_{hour}_{plot_properties[params]['name']}_{station_name}"
 
             save_fig(
@@ -666,7 +666,7 @@ def create_plot(
             if True:  # save figure
                 ax[0].legend(handles=handles_left)
 
-                fig.suptitle(f"Radiosounding Data @ {station_name}: {date_dt} UTC")
+                fig.suptitle(f"Radiosounding @ {station_name}: {date_dt} UTC")
                 name = f"rs_{date_ugly}_{hour}_complete_{station_name}"
                 save_fig(
                     filename=name,
@@ -752,7 +752,7 @@ def create_plot(
 
             if True:  # save figure
                 ax[0].legend(handles=handles_left)
-                fig.suptitle(f"Radiosounding Data @ {station_name}: {date_dt} UTC")
+                fig.suptitle(f"Radiosounding @ {station_name}: {date_dt} UTC")
                 name = f"rs_{date_ugly}_{hour}_wind_{station_name}"
                 save_fig(
                     filename=name,
