@@ -21,11 +21,25 @@ from .plot_icon import create_plot
     type=click.DateTime(formats=["%y%m%d%H"]),
     help="MANDATORY: Init date of icon simulation: YYMMDDHH.",
 )
-@click.option("--folder", type=str, help="MANDATORY: Path to folder with icon output.")
+@click.option(
+    "--folder",
+    type=str,
+    help="MANDATORY: Path to main folder with icon output. Here should be a subfolder named after the date containing nc-files.",
+)
 @click.option(
     "--var",
     type=click.Choice(
-        ["temp", "qc", "qv", "clc", "ddt_t_rad_lw", "ddt_t_rad_sw"],
+        [
+            "temp",
+            "qc",
+            "qv",
+            "clc",
+            "ddt_t_rad_lw",
+            "ddt_t_rad_sw",
+            "qc_dia",
+            "qv_dia",
+            "qi_dia",
+        ],
         case_sensitive=True,
     ),
     multiple=True,
@@ -58,7 +72,9 @@ from .plot_icon import create_plot
         case_sensitive=True,
     ),
     multiple=True,
-    default=["png"],
+    default=[
+        "png",
+    ],
     help="Choose data type(s) of final result. Def: png",
 )
 @click.option("--ind", type=int, help="Index of location (known from previous runs).")
@@ -91,7 +107,7 @@ from .plot_icon import create_plot
 @click.option(
     "--show_grid",
     is_flag=True,
-    help="Show grid on plot. Def: False",
+    help="Show grid on plot. Flag, def: False",
 )
 @click.option(
     "--verbose",
@@ -104,13 +120,12 @@ from .plot_icon import create_plot
 @click.option(
     "--xrange_fix",
     is_flag=True,
-    default=False,
-    help="Use fix xrange from variable dataframe. Overwrites specified xmin and xmax.",
+    help="Use fix xrange from variable dataframe. Overwrites specified xmin and xmax. Flag, def: False",
 )
 @click.option(
     "--zeroline",
     is_flag=True,
-    help="Show grid on plot. Def: False",
+    help="Show grid on plot. Flag, def: False",
 )
 def main(
     *,
@@ -142,7 +157,9 @@ def main(
     If 2 variables are given, they will be shown in the same figure.
 
     Example command:
-    plot_icon --date 21111012 --folder /scratch/swester/output_icon/ICON-1/ --var qv --var temp --var qc --leadtime 12 --leadtime 13
+    plot_profiles --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --leadtime 11 --leadtime 12
+
+    Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 
     """
     data_dict = get_icon(
@@ -173,9 +190,8 @@ def main(
         xmax=xmax,
         xrange_fix=xrange_fix,
         datatypes=datatypes,
-        leadtime=leadtime,
         verbose=verbose,
-        grid=show_grid,
+        show_grid=show_grid,
         zeroline=zeroline,
     )
 
