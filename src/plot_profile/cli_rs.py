@@ -4,6 +4,9 @@ Author: Michel Zeller
 
 Date: 05/10/2021.
 """
+# Standard library
+import sys
+
 # Third-party
 import click
 import numpy as np
@@ -11,25 +14,25 @@ import pandas as pd
 
 # Local
 from .get_rs import get_rs
-from .plot_data import create_plot
+from .plot_rs import create_plot
+from .stations import sdf
 
 
 @click.command()
-@click.option("--station_id", default="06610", help="station ID: XXXXX - def: 06610")
+@click.option("--station", default="06610", help="Name or DWH of station. Def: 06610")
 @click.option(
-    "--date", default="2021083100", help="start date: YYYYMMDDHH - def: 2021083100"
+    "--date", default="2021083100", help="start date: YYYYMMDDHH. Def: 2021083100"
 )
 @click.option(
     "--alt_bot",
-    default=0,
     type=int,
-    help="altitude bottom value: int - def: elevation of radiosounding station",
+    help="altitude bottom value: int",
 )
 @click.option(
     "--alt_top",
-    default=40000,
+    default=5000,
     type=int,
-    help="altitude top value: int - def: 10% over max altitude of radiosounding retrieval",
+    help="Altitude top value: int. Def: 5000",
 )
 @click.option(
     "--params",
@@ -48,29 +51,28 @@ from .plot_data import create_plot
     ),
     multiple=True,
     default=("743", "745", "748", "747"),
-    help="Default: all",
+    help="Def: all",
 )
 @click.option(
     "--outpath",
-    default="plots/",
     type=str,
-    help="path to folder where the plots should be saved - def: plots/",
+    help="Path to folder for plots. Def: /scratch/<user>/tmp/",
 )
 @click.option(
     "--grid",
     is_flag=True,
-    help="Show grid on plot - def: False",
+    help="Show grid on plot. Def: False",
 )
 @click.option(
     "--clouds",
     is_flag=True,
-    help="Show clouds on plot - def: False",
+    help="Show clouds on plot. Def: False",
 )
 @click.option(
     "--relhum_thresh",
     default=95,
     type=float,
-    help="Define the relative humidity threshold for clouds - def: 95",
+    help="Relative humidity threshold for clouds. Def: 95",
 )
 @click.option(
     "--print_steps",
@@ -80,7 +82,7 @@ from .plot_data import create_plot
 @click.option(
     "--standard_settings",
     is_flag=True,
-    help="temp_range: -100-30 [°C], windvel_range: 0-50 [km/h]",
+    help="Flag: temp_range: -100-30 [°C], windvel_range: 0-50 [km/h]",
 )
 @click.option(
     "--personal_settings",
@@ -109,7 +111,7 @@ from .plot_data import create_plot
 )
 def main(
     *,
-    station_id: str,
+    station: str,
     date: str,
     params: tuple,
     alt_bot: int,
@@ -126,7 +128,7 @@ def main(
     windvel_min: float,
     windvel_max: float,
 ) -> None:
-    """Plot vertical profiles of variables from Radio Sounding Data.
+    """Plot vertical profiles of balloon radiosounding data.
 
     Available variables are: windvel/winddir/temp/dewp.
 
@@ -142,13 +144,26 @@ def main(
     Otherwise the axes limits will be fitted to the data.
 
     Example command:
-    plot_rs --date 2021111012 --outpath plots/ --grid --clouds --relhum_thresh 85 --params windvel --params winddir --params dewp --params temp
+    plot_rs --date 2021111012 --outpath path/to/plots --grid --clouds --relhum_thresh 99 --params dewp --params temp
 
     """
-    df, station_name, relevant_params = get_rs(
+    # Preparations:
+
+    # get station dataframe
+    if station in ["06610", "pay", "payerne"]:
+        station = sdf["pay"]
+    else:
+        print(f"{station} not defined!")
+        sys.exit(1)
+
+    # define lower altitude if None is specified by user
+    if not alt_bot:
+        alt_bot = station.elevation
+
+    df, relevant_params = get_rs(
         date=date,
         params=params,
-        station_id=station_id,
+        station=station,
         print_steps=print_steps,
         alt_bot=alt_bot,
         alt_top=alt_top,
@@ -160,7 +175,7 @@ def main(
         grid=grid,
         clouds=clouds,
         outpath=outpath,
-        station_name=station_name,
+        station=station,
         date=date,
         alt_top=alt_top,
         alt_bot=alt_bot,

@@ -21,7 +21,10 @@ def count_to_log_level(count: int) -> int:
 
 
 def save_fig(filename, datatypes, outpath, fig=None):
-    """Save current figure at outpath. Create outpath if it doesn't exist or default to /scratch/<user>/tmp/.
+    """Save current figure at outpath.
+
+    Create outpath if it doesn't exist or
+    default to /scratch/<user>/tmp/.
 
     Args:
         filename:       str     Name of File.
