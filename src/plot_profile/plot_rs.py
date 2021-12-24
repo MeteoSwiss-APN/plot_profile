@@ -1,4 +1,4 @@
-"""Purpose: define functions.
+"""Purpose: Plot radiosounding.
 
 Author: Michel Zeller
 
@@ -17,6 +17,8 @@ import pandas as pd
 
 # Local
 from .utils import save_fig
+
+# import ipdb
 
 
 def extract_clouds(df, relhum_thresh, print_steps):
@@ -258,7 +260,7 @@ def create_plot(
     grid,
     clouds,
     outpath,
-    station_name,
+    station,
     date,
     alt_bot,
     alt_top,
@@ -402,6 +404,7 @@ def create_plot(
         ax.set_xlabel(plot_properties[params]["xlabel"])
         ax.xaxis.label.set_color(plot_properties[params]["xlabel_color"])
         ax.set_ylabel("Altitude [m asl]")
+        ax.set_ylim(alt_bot, alt_top)
 
         if params == (
             "742",
@@ -443,8 +446,8 @@ def create_plot(
                 ax.yaxis.grid(color="black", linestyle="--", linewidth=0.5)
 
             if True:
-                fig.suptitle(f"Radiosounding @ {station_name}: {date_dt} UTC")
-                name = f"rs_{date_ugly}_{hour}_{plot_properties[params]['name']}_{station_name}"
+                fig.suptitle(f"Radiosounding @ {station.long_name}: {date_dt} UTC")
+                name = f"rs_{date_ugly}_{hour}_{plot_properties[params]['name']}_{station.short_name}"
 
                 save_fig(
                     filename=name,
@@ -507,8 +510,8 @@ def create_plot(
 
         if True:  # save figure
             ax.legend(handles=handles)
-            fig.suptitle(f"Radiosounding @ {station_name}: {date_dt} UTC")
-            name = f"rs_{date_ugly}_{hour}_{plot_properties[params]['name']}_{station_name}"
+            fig.suptitle(f"Radiosounding @ {station.long_name}: {date_dt} UTC")
+            name = f"rs_{date_ugly}_{hour}_{plot_properties[params]['name']}_{station.short_name}"
 
             save_fig(
                 filename=name,
@@ -609,6 +612,7 @@ def create_plot(
                     x_max_wind = plot_properties[("742", "746", "748")]["x_max"]
 
                 ax[1].set_xlim(x_min_wind, x_max_wind)
+                ax[1].set_ylim(alt_bot, alt_top)  # limit for left y-axis:    altitude
                 ax[1].set_xlabel("Wind Velocity [m/s]")
                 ax[1].xaxis.label.set_color(cyan)
                 ax[1].tick_params(axis="x", colors=cyan, **tkw)
@@ -666,8 +670,8 @@ def create_plot(
             if True:  # save figure
                 ax[0].legend(handles=handles_left)
 
-                fig.suptitle(f"Radiosounding @ {station_name}: {date_dt} UTC")
-                name = f"rs_{date_ugly}_{hour}_complete_{station_name}"
+                fig.suptitle(f"Radiosounding @ {station.long_name}: {date_dt} UTC")
+                name = f"rs_{date_ugly}_{hour}_complete_{station.short_name}"
                 save_fig(
                     filename=name,
                     datatypes=[
@@ -706,6 +710,7 @@ def create_plot(
                     x_max_wind = plot_properties[("742", "746", "748")]["x_max"]
 
                 ax[0].set_xlim(x_min_wind, x_max_wind)
+                ax[0].set_ylim(alt_bot, alt_top)
                 ax[0].set_xlabel("Wind Velocity [m/s]")
                 ax[0].xaxis.label.set_color(cyan)
                 ax[0].tick_params(axis="x", colors=cyan, **tkw)
@@ -752,8 +757,8 @@ def create_plot(
 
             if True:  # save figure
                 ax[0].legend(handles=handles_left)
-                fig.suptitle(f"Radiosounding @ {station_name}: {date_dt} UTC")
-                name = f"rs_{date_ugly}_{hour}_wind_{station_name}"
+                fig.suptitle(f"Radiosounding @ {station.long_name}: {date_dt} UTC")
+                name = f"rs_{date_ugly}_{hour}_wind_{station.short_name}"
                 save_fig(
                     filename=name,
                     datatypes=[

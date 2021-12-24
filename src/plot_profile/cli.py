@@ -27,5 +27,20 @@ def print_version(ctx, param, value: bool) -> None:
     callback=print_version,
 )
 def main() -> None:
-    """Plot model and observation profiles."""
+    """Plot observations and ICON variabels from NWP forecasts.
+
+    Available entry points:
+
+     - plot_rs: Radiosoundings
+
+     - plot_icon_profilse: ICON profiles
+
+     - plot_rs_icon: Compare ICON profiles to radiosoundings
+
+     - plot_icon_heatmap: Heatmap of ICON vertical variables
+
+     - plot_mwr_heatmap: Heatmap of microwave radiometers
+
+
+    """
     pass
