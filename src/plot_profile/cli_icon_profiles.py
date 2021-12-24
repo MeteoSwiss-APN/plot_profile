@@ -120,8 +120,18 @@ from .plot_icon import create_plot
     default=False,
     help="Output details on what is happening.",
 )
-@click.option("--xmin", type=float, help="Minimum value of xaxis. Def: Fits values.")
-@click.option("--xmax", type=float, help="Maximum value of xaxis. Def: Fits values.")
+@click.option(
+    "--xmin",
+    type=float,
+    multiple=True,
+    help="Minimum value of xaxis. Def: Fits values.",
+)
+@click.option(
+    "--xmax",
+    type=float,
+    multiple=True,
+    help="Maximum value of xaxis. Def: Fits values.",
+)
 @click.option(
     "--xrange_fix",
     is_flag=True,
@@ -152,8 +162,8 @@ def main(
     show_grid: bool,
     zeroline: bool,
     verbose: bool,
-    xmin: float,
-    xmax: float,
+    xmin: tuple,
+    xmax: tuple,
     xrange_fix: bool,
 ):
     """Plot vertical profiles of variables from ICON simulation.

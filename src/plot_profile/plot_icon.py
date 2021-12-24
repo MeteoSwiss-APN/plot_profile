@@ -9,9 +9,7 @@ Date: 25/11/2021.
 import datetime as dt
 
 # Third-party
-import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import matplotlib.units as munits
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -158,7 +156,7 @@ def plot_single_variable(
         ax.set_xlim(var.min_value, var.max_value)
     else:
         try:
-            ax.set_xlim(xmin, xmax)
+            ax.set_xlim(xmin[0], xmax[0])
         except NameError:
             if verbose:
                 print("No xrange defined.")
@@ -296,28 +294,19 @@ def plot_two_variables(
         ln1 += ln
         tmp += 1
 
-    # define min and max values for bottom xaxis
-    # TODO: min and max for two variables
-    # if not xmin:
-    #    xmin_bottom = var_0.min_value
-    #    xmin_top = var_1.min_value
-    # if not xmax:
-    #    xmax_bottom = var_0.max_value
-    #    xmax_top = var_1.max_value
     # define min and max values for xaxis
-    #  if flag --xrange_fix is set: use values from variable dataframe
-    #  else check whether user has specified min and max
-    #  or just let matplotlib handle the job (default)
-    # if xrange_fix:
-    #    ax_bottom.set_xlim(var_0.min_value, var_0.max_value)
-    #    ax_top.set_xlim(var_1.min_value, var_1.max_value)
-    # else:
-    #    try:
-    #        ax_bottom.set_xlim(xmin, xmax)
-    #        ax_top.set_xlim(xmin, xmax)
-    #    except NameError:
-    #        if verbose:
-    #            print("No xrange defined for both variables.")
+    # if flag --xrange_fix is set: use values from variable dataframe
+    # else check whether user has specified min and max for BOTH variables
+    # or just let matplotlib handle the job (default)
+    if xrange_fix:
+        ax_bottom.set_xlim(var_0.min_value, var_0.max_value)
+        ax_top.set_xlim(var_1.min_value, var_1.max_value)
+    else:
+        assert len(xmin) == len(
+            variables_list
+        ), f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax})"
+        ax_bottom.set_xlim(xmin[0], xmax[0])
+        ax_top.set_xlim(xmin[1], xmax[1])
 
     # adjust appearance
     ax_bottom.set(
@@ -460,15 +449,24 @@ def create_heatmap(
     leadtime,
     verbose,
 ):
-    plt.tick_params(axis="both", labelsize=8)
+    # the height dataframe is the same for all variables, thus outside of the
+    # for-loop below. it needs some reformatting and type alignement for later use
     df_height = data_dict[
         "height"
     ].to_frame()  # convert pandas series to pandas dataframe
+
     df_height.rename(
         columns={0: "height"}, inplace=True
     )  # rename the first column from '0' to 'height'
 
     # generate new column names for the dataframes
+    # the col-dict links the abbreviated leadtimes (i.e. 00, 02, 04,...) to their
+    # respective datetime equivalents (i.e. start_date + leadtime)
+
+    # lt-dt contains all leadtimes and the first leadtimes on new dates have a different
+    # formatting from the rest
+
+    # lt_dt_2 contains all leadtimes with a uniform format %Y-%m-%d %H:%M (but is not used later)
     lt_dt, col_dict, lt_dt_2 = [], {}, []
     tmp = 0
     start_date = date.date()
@@ -478,36 +476,40 @@ def create_heatmap(
         if (date + dt.timedelta(hours=lt)).date() != start_date:
             start_date = (date + dt.timedelta(hours=lt)).date()
             tmp = 0
-
+        # the first leadtime on the startdate is formatted like: %b %-d, %H:%M
+        # if the simulation covers several days, the first leadtimes on other days
+        # also have this formatting (specified by the tmp variable)
         if tmp == 0:
             col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M")
             lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M"))
             # col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M")
             # lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
             tmp = 1
+        # else the formatting is only HH:MM. These timesteps ultimately are displayed
+        # on the x-axis. It is not desireable to have the date for each x-tick-label.
         else:
             col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%H:%M")
             lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%H:%M"))
-
     lt_dt_series = pd.Series(lt_dt)
 
-    # dates
+    # dates used in the filename / title of heat plots
     init_date = date.strftime("%b %-d, %Y")
     init_hour = date.hour
 
+    # this loop creates the heatmap. for each variable, one separate heatmap is generated
     for variable in variables_list:
         var = vdf[variable]
         print(f"--- creating heatmap for {var.long_name}")
 
         try:
             df_values = data_dict[variable]
-            # df_values['height']=df_height['height']
             df_values.set_index(df_height["height"], inplace=True)
         except KeyError:
             print(f"No plot is generated for {variable}.")
-            return
+            break  # just continue with the next variable - should not break the whole loop
 
-        # rename the column names from leadtimes as int to leadtimes ad datetime objects
+        # rename the column names from leadtimes as int to leadtimes as datetime objects
+        # because the column names are the x-axis ticklabels of the heatmap
         df_values.rename(columns=col_dict, inplace=True)
 
         fig, ax = plt.subplots()
@@ -519,9 +521,8 @@ def create_heatmap(
             cmap=var.colormap,
         )
         cbar = fig.colorbar(im, ax=ax)
-        cbar.ax.set_ylabel(
-            f"{var.long_name} [{var.unit}]"
-        )  # cbar.ax.set_title("placeholder")
+        cbar.ax.set_ylabel(f"{var.long_name} [{var.unit}]")
+        # cbar.ax.set_title("placeholder") # title for the colorbar if necessary
 
         # adjust appearance
         plt.tick_params(axis="both", labelsize=8)

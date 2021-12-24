@@ -106,28 +106,10 @@ from .plot_icon import create_heatmap
     help="Path to folder where the plots should be saved. Def: /scratch/USER/tmp",
 )
 @click.option(
-    "--show_grid",
-    is_flag=True,
-    help="Show grid on plot. Def: False",
-)
-@click.option(
     "--verbose",
     is_flag=True,
     default=False,
     help="Output details on what is happening.",
-)
-@click.option("--xmin", type=float, help="Minimum value of xaxis. Def: Fits values.")
-@click.option("--xmax", type=float, help="Maximum value of xaxis. Def: Fits values.")
-@click.option(
-    "--xrange_fix",
-    is_flag=True,
-    default=False,
-    help="Use fix xrange from variable dataframe. Overwrites specified xmin and xmax.",
-)
-@click.option(
-    "--zeroline",
-    is_flag=True,
-    help="Show zero line on plot. Def: False",
 )
 def main(
     *,
@@ -148,12 +130,7 @@ def main(
     loc: str,
     model: str,
     outpath: str,
-    show_grid: bool,
-    zeroline: bool,
     verbose: bool,
-    xmin: float,
-    xmax: float,
-    xrange_fix: bool,
 ):
     """Plot heatmap (time-height crosssection) of variable from ICON simulation.
 
