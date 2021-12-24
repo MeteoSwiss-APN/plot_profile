@@ -6,9 +6,11 @@ Date: 05/10/2021.
 """
 # Third-party
 import click
+import numpy as np
+import pandas as pd
 
 # Local
-from .get_data import get_data
+from .get_rs import get_rs
 from .plot_data import create_plot
 
 
@@ -143,7 +145,7 @@ def main(
     plot_rs --date 2021111012 --outpath plots/ --grid --clouds --relhum_thresh 85 --params windvel --params winddir --params dewp --params temp
 
     """
-    df, station_name, relevant_params = get_data(
+    df, station_name, relevant_params = get_rs(
         date=date,
         params=params,
         station_id=station_id,

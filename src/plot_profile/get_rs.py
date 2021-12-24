@@ -219,7 +219,7 @@ def extract_rows(df, print_steps, alt_bot, alt_top, all_params):
     return params_df
 
 
-def get_data(date, params, station_id, print_steps, alt_bot, alt_top):
+def get_rs(date, params, station_id, print_steps, alt_bot, alt_top):
     """Retrieve and parse the relevant data from the server and return a complete dataframe containing the data.
 
     Args:
