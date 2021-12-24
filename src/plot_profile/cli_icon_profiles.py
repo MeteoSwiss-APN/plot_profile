@@ -160,6 +160,7 @@ def main(
     model: str,
     outpath: str,
     show_grid: bool,
+    show_marker: bool,
     zeroline: bool,
     verbose: bool,
     xmin: tuple,
@@ -172,7 +173,7 @@ def main(
     If 2 variables are given, they will be shown in the same figure.
 
     Example command:
-    plot_profiles --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --leadtime 11 --leadtime 12
+    plot_icon_profiles --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --leadtime 11 --leadtime 12
 
     Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 
@@ -207,6 +208,7 @@ def main(
         datatypes=datatypes,
         verbose=verbose,
         show_grid=show_grid,
+        show_marker=show_marker,
         zeroline=zeroline,
     )
 

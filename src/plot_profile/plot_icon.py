@@ -76,6 +76,7 @@ def plot_single_variable(
     df_height,
     verbose,
     show_grid,
+    show_marker,
     zeroline,
 ):
 
@@ -112,6 +113,12 @@ def plot_single_variable(
     if zeroline:
         ax.axvline(linewidth=1.5, color="k")
 
+    # specify marker
+    if show_marker:
+        marker = "o"
+    else:
+        marker = None
+
     # define color sequence
     #  if only 1 leadtime: color from variable dataframe
     #  if multiple leadtimes: seaborn husl color palette
@@ -134,8 +141,7 @@ def plot_single_variable(
             df_height.values,
             label=str_valid_time(date, lt),
             color=colors[icolor],
-            # marker="o",
-            marker=None,
+            marker=marker,
         )
         icolor = icolor + 1
 
@@ -151,15 +157,15 @@ def plot_single_variable(
     #  if flag --xrange_fix is set: use values from variable dataframe
     #  else check whether user has specified min and max
     #  or just let matplotlib handle the job (default)
-    # TODO: xmin and xmax should now be a list
     if xrange_fix:
         ax.set_xlim(var.min_value, var.max_value)
-    else:
-        try:
-            ax.set_xlim(xmin[0], xmax[0])
-        except NameError:
-            if verbose:
-                print("No xrange defined.")
+    # TODO: does not work yet if nothing is specified
+    # else:
+    #    try:
+    #        ax.set_xlim(xmin[0], xmax[0])
+    #    except NameError or IndexError:
+    #        if verbose:
+    #            print("No xrange defined.")
 
     # add nice legend
     ax.legend(fancybox=True)
@@ -202,6 +208,7 @@ def plot_two_variables(
     datatypes,
     verbose,
     show_grid,
+    show_marker,
     zeroline,
 ):
     print(f"--- creating plot for variables ({variables_list[0]}, {variables_list[1]})")
@@ -265,8 +272,14 @@ def plot_two_variables(
         if verbose:
             print("Zeroline is only plotted for bottom variable.")
 
+    # specify marker
+    if show_marker:
+        marker = "o"
+    else:
+        marker = None
+
     ln0, ln1 = list(), list()
-    # loop over leadtimes to create one line for each leadtime corresponding to variable 1
+    # loop over leadtimes to create one line for each leadtime corresponding to variable 0
     tmp = 0
     for (lt, values) in df_values_0.iteritems():
         print(f"--- adding leadtime: {lt}")
@@ -276,6 +289,7 @@ def plot_two_variables(
             label=f"{str_valid_time(date, lt)}: {variables_list[0]}",
             color=var_0.color,
             linestyle=linestyle_dict[tmp],
+            marker=marker,
         )
         ln0 += ln
         tmp += 1
@@ -290,6 +304,7 @@ def plot_two_variables(
             label=f"{str_valid_time(date, lt)}: {variables_list[1]}",
             color=var_1.color,
             linestyle=linestyle_dict[tmp],
+            marker=marker,
         )
         ln1 += ln
         tmp += 1
@@ -301,12 +316,13 @@ def plot_two_variables(
     if xrange_fix:
         ax_bottom.set_xlim(var_0.min_value, var_0.max_value)
         ax_top.set_xlim(var_1.min_value, var_1.max_value)
-    else:
-        assert len(xmin) == len(
-            variables_list
-        ), f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax})"
-        ax_bottom.set_xlim(xmin[0], xmax[0])
-        ax_top.set_xlim(xmin[1], xmax[1])
+    # TODO: this does not work if nothing is specified
+    # else:
+    #    assert len(xmin) == len(
+    #        variables_list
+    #    ), f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax})"
+    #    ax_bottom.set_xlim(xmin[0], xmax[0])
+    #    ax_top.set_xlim(xmin[1], xmax[1])
 
     # adjust appearance
     ax_bottom.set(
@@ -364,6 +380,7 @@ def create_plot(
     datatypes,
     verbose,
     show_grid,
+    show_marker,
     zeroline,
 ):
     """Plot vertical profile of variable(s).
@@ -385,6 +402,7 @@ def create_plot(
         datatypes (tuple):              tuple containig all desired datatypes for the output files
         verbose (bool):                 print verbose messages
         show_grid (bool):               add grid to plot
+        show_marker (bool):             add marker to vertical lines
         zeroline (bool):                add zeroline to plot
 
     """
@@ -409,6 +427,7 @@ def create_plot(
             datatypes,
             verbose,
             show_grid,
+            show_marker,
             zeroline,
         )
     # CASE: one plot for each variable
@@ -431,6 +450,7 @@ def create_plot(
                 df_height,
                 verbose,
                 show_grid,
+                show_marker,
                 zeroline,
             )
 
