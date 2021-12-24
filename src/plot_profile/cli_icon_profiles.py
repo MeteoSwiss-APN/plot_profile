@@ -110,6 +110,11 @@ from .plot_icon import create_plot
     help="Show grid on plot. Flag, def: False",
 )
 @click.option(
+    "--show_marker",
+    is_flag=True,
+    help="Add markers (o). Flag, def: False",
+)
+@click.option(
     "--verbose",
     is_flag=True,
     default=False,
