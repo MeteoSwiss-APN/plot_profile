@@ -9,8 +9,6 @@ import sys
 
 # Third-party
 import click
-import numpy as np
-import pandas as pd
 
 # Local
 from .get_rs import get_rs
