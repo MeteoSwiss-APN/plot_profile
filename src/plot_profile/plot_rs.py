@@ -7,7 +7,6 @@ Date: 05/10/2021.
 
 # Standard library
 import datetime
-import os
 from mmap import ACCESS_DEFAULT
 
 # Third-party
@@ -238,6 +237,13 @@ def check_settings(
             else:  # if the x-axis displays the (dew point) temperature
                 x_min = temp_min  # [°C]
                 x_max = temp_max  # [°C]
+
+        if (not standard_settings) and (
+            not personal_settings
+        ):  # scale the x-axis according to the measurements (+- 10% on either side)
+            x_min = plot_properties[params]["x_min"]
+            x_max = plot_properties[params]["x_max"]
+
         return x_min, x_max
     else:
         x_min_wind, x_max_wind, x_min_temp, x_max_temp = 0, 0, 0, 0
@@ -302,13 +308,10 @@ def create_plot(
         "%b %d, %Y, %H:%M"
     )
 
-    print(
-        f"date = {date}, date_ugly = {date_ugly}, date_nice = {date_nice}, datetimeobj = {date_dt}"
-    )
+    # 2 horizontally aligned subplots on figure
+    gs_multi = fig.add_gridspec(1, 2, wspace=0, width_ratios=[2, 1])
 
-    gs_multi = fig.add_gridspec(
-        1, 2, wspace=0, width_ratios=[2, 1]
-    )  # 2 horizontally aligned subplots
+    # only one centred plot in figures
     gs_single = fig.add_gridspec(1, 1, wspace=0)
 
     # properties dict for single plot cases
@@ -397,10 +400,10 @@ def create_plot(
         tkw = dict(size=4, width=1.5)
         handles = []
 
-        print(
-            plot_properties[params]["which_plot"]
-        )  # print, which plot is being created
+        # print, which plot is being created
+        print(plot_properties[params]["which_plot"])
 
+        # set label properties
         ax.set_xlabel(plot_properties[params]["xlabel"])
         ax.xaxis.label.set_color(plot_properties[params]["xlabel_color"])
         ax.set_ylabel("Altitude [m asl]")
@@ -484,12 +487,6 @@ def create_plot(
             temp_max=temp_max,
             plot_properties=plot_properties,
         )
-
-        if (not standard_settings) and (
-            not personal_settings
-        ):  # scale the x-axis according to the measurements (+- 10% on either side)
-            x_min = plot_properties[params]["x_min"]
-            x_max = plot_properties[params]["x_max"]
 
         ax.set_xlim(x_min, x_max)
         ax.tick_params(axis="x", colors=plot_properties[params]["xlabel_color"], **tkw)
