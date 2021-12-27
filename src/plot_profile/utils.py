@@ -6,6 +6,9 @@ from pathlib import Path
 
 # Third-party
 import matplotlib.pyplot as plt
+import pandas as pd
+
+# from numpy import NaN
 
 
 def count_to_log_level(count: int) -> int:
@@ -56,34 +59,39 @@ def slice_top_bottom(df_height, alt_top, alt_bot, verbose):
     """Criteria to cut away top and bottom of dataframe.
 
     Args:
-        df_height (pandas dataframe):   height variable
+        df_height (pandas series):      height variable
         alt_top (int):                  top
         alt_bot (int):                  bottom
 
     Returns:
-        list of booleans
+        list of booleans; rows containing True are to be kept in the original dataframe
 
     """
-    # exclude rows above specified altitude (alt_top)
-    crit_upper = df_height < alt_top
-    # set last False to True
-    last_false = crit_upper[crit_upper == False]
-    if len(last_false) > 0:
-        crit_upper[last_false.index.max()] = True
+    # create pandas series of len(df_height) full of NaN values
+    crit = pd.Series(
+        len(df_height) * [False]
+    )  # change False to NaN if so desired (other changes necessary as well!)
 
-    # exclude rows below specified altitude (alt_bot)
-    if alt_bot is None:
-        crit = crit_upper
-        if verbose:
-            print("No bottom specified, use minimal height.")
-    else:
-        crit_lower = df_height > alt_bot
-        last_false = crit_lower[crit_lower == False]
-        # include first False
-        if len(last_false) > 0:
-            crit_lower[last_false.index.max()] = True
+    # get index values to slice the dataframe
+    tmp = True
+    for i, height in enumerate(df_height):
+        if alt_bot:  # if a bottom altitude has been specified
+            if height > alt_bot:
+                if tmp:
+                    lower_cut_off_index = (
+                        i - 1
+                    )  # include first value below bottom altitude as well
+                    tmp = False
+        else:
+            if verbose:
+                print("No bottom specified, use minimal height.")
+            lower_cut_off_index = 0
 
-        # combine selection criteria
-        crit = crit_upper & crit_lower
+        if height > alt_top:
+            upper_cut_off_index = i  # include first value above top altitude
+            break
+
+    # assign True to the relevant rows of crit
+    crit.iloc[lower_cut_off_index:upper_cut_off_index] = True
 
     return crit
