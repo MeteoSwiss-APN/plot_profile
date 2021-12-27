@@ -211,7 +211,9 @@ def extract_rows(df, print_steps, alt_bot, alt_top, all_params):
         print(params_df.head())
 
     # select rows: cut away top and bottom
-    crit = slice_top_bottom(params_df["altitude"], alt_top, alt_bot, print_steps)
+    crit = slice_top_bottom(
+        params_df["altitude"], alt_top, alt_bot, verbose=print_steps
+    )
 
     # return sliced dataframe and drop lines with nan-values
     return params_df[crit].dropna()
@@ -268,7 +270,6 @@ def get_rs(date, params, station, print_steps, alt_bot, alt_top):
     )
 
     # extract altitude range from dataframe & re-assign keys
-
     df = extract_rows(
         df=df,
         print_steps=print_steps,
