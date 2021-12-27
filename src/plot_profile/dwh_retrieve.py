@@ -13,6 +13,8 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
+# import ipdb
+
 # from .variables import vdf
 # from .stations import sdf
 
@@ -40,60 +42,59 @@ def dwh_surface(vars, start, end, station_name, verbose):
         + " --use-limitation 50"
     )
     print("--- calling: " + cmd)
-    # proc = subprocess.Popen(
-    #    cmd,
-    #    stdout=subprocess.PIPE,
-    #    stderr=subprocess.PIPE,
-    #    universal_newlines=True,
-    #    shell=True,
-    # )
-    # try:
-    #    out, err = proc.communicate(timeout=120)
-    # except subprocess.TimeoutExpired:
-    #    proc.kill()
-    #    out, err = proc.communicate()
-    #    raise SystemExit("--- ERROR: timeout expired for process " + cmd)
-    # if proc.returncode != 0:
-    #    raise SystemExit(err)
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+        shell=True,
+    )
+    try:
+        out, err = proc.communicate(timeout=120)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        out, err = proc.communicate()
+        raise SystemExit("--- ERROR: timeout expired for process " + cmd)
+    if proc.returncode != 0:
+        raise SystemExit(err)
 
-    ## load DWH retrieve output into pandas DataFrame
-    # header_line = pd.read_csv(
-    #    StringIO(out), skiprows=0, nrows=1, sep="\s+", header=None, engine="c"
-    # )
+    # load DWH retrieve output into pandas DataFrame
+    header_line = pd.read_csv(
+        StringIO(out), skiprows=0, nrows=1, sep="\s+", header=None, engine="c"
+    )
 
-    ## parse the command line output
-    # data = pd.read_csv(
-    #    StringIO(out),
-    #    skiprows=2,
-    #    skipfooter=2,
-    #    sep="|",
-    #    header=None,
-    #    names=header_line.values.astype(str)[0, :],
-    #    engine="python",
-    #    parse_dates=["termin"],
-    # )
+    # parse the command line output
+    data = pd.read_csv(
+        StringIO(out),
+        skiprows=2,
+        skipfooter=2,
+        sep="|",
+        header=None,
+        names=header_line.values.astype(str)[0, :],
+        engine="python",
+        parse_dates=["termin"],
+    )
 
-    ## clean up the dataframe a bit
-    # data.replace(1e7, np.nan, inplace=True)
+    # clean up the dataframe: replae "10000000" with NaN
+    data.replace(1e7, np.nan, inplace=True)
 
-    ## check if no data is available for the time period
-    # if data.empty:
-    #    raise SystemExit("--- WARN: no data available for " + date + ".")
-    # else:
-    #    if print_steps:
-    #        with pd.option_context(
-    #            "display.max_rows",
-    #            None,
-    #            "display.max_columns",
-    #            None,
-    #            "display.width",
-    #            1000,
-    #        ):
-    #            print(data.head())
-    #    if print_steps:
-    #        print("--- data retrieved into dataframe")
-    #    return data
-    return
+    # check if no data is available for the time period
+    if data.empty:
+        raise SystemExit("--- WARN: no data available.")
+    else:
+        if verbose:
+            with pd.option_context(
+                "display.max_rows",
+                None,
+                "display.max_columns",
+                None,
+                "display.width",
+                1000,
+            ):
+                print(data.head())
+        if verbose:
+            print("--- data retrieved into dataframe")
+    return data
 
 
 def dwh_profile(vars, date, station_id, verbose):
