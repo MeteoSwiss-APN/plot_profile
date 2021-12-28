@@ -159,13 +159,12 @@ def plot_single_variable(
     #  or just let matplotlib handle the job (default)
     if xrange_fix:
         ax.set_xlim(var.min_value, var.max_value)
-    # TODO: does not work yet if nothing is specified
-    # else:
-    #    try:
-    #        ax.set_xlim(xmin[0], xmax[0])
-    #    except NameError or IndexError:
-    #        if verbose:
-    #            print("No xrange defined.")
+    if xmin and xmax:
+        try:
+            ax.set_xlim(xmin[0], xmax[0])
+        except NameError or IndexError:
+            if verbose:
+                print("No xrange defined.")
 
     # add nice legend
     ax.legend(fancybox=True)
@@ -316,13 +315,13 @@ def plot_two_variables(
     if xrange_fix:
         ax_bottom.set_xlim(var_0.min_value, var_0.max_value)
         ax_top.set_xlim(var_1.min_value, var_1.max_value)
-    # TODO: this does not work if nothing is specified
-    # else:
-    #    assert len(xmin) == len(
-    #        variables_list
-    #    ), f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax})"
-    #    ax_bottom.set_xlim(xmin[0], xmax[0])
-    #    ax_top.set_xlim(xmin[1], xmax[1])
+
+    if xmin and xmax:
+        assert len(xmin) == len(
+            variables_list
+        ), f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax})"
+        ax_bottom.set_xlim(xmin[0], xmax[0])
+        ax_top.set_xlim(xmin[1], xmax[1])
 
     # adjust appearance
     ax_bottom.set(
