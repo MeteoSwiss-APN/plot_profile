@@ -217,7 +217,14 @@ def get_icon(
             try:
                 values = ds.isel(ncells=ind)[var.icon_name].values * var.mult + var.plus
             except ValueError:
-                print(f'no dimensions called "cells_1" or "ncells" for {var.icon_name}')
+                try:
+                    values = (
+                        ds.isel(cells=ind)[var.icon_name].values * var.mult + var.plus
+                    )
+                except ValueError:
+                    print(
+                        f'! no dimensions called "cells_1", "ncells" or "cells" for {var.icon_name}'
+                    )
                 continue
         except KeyError:
             print(f"{var.icon_name} cannot be found in forecast file")
