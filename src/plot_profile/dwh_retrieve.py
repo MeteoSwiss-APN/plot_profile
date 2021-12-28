@@ -7,6 +7,7 @@ Date: 27/12/2022.
 
 # Standard library
 import subprocess  # use: run command line commands from python
+import sys
 from io import StringIO
 
 # Third-party
@@ -103,6 +104,31 @@ def dwh_profile(station_id, vars, date, verbose):
     return
 
 
+def check_timestamps_profile(timestamps):
+    """Check timestamps user input for profile-based data.
+
+    Timestamps should either be a single string or a list of strings
+    with only one entry.
+
+    Input:
+        timestamps
+
+    Return:
+        timestamp
+
+    """
+    if isinstance(timestamps, list):
+        if len(timestamps) == 1:
+            return timestamps[0]
+        else:
+            print("! only one timestamp allowed for profile data")
+            sys.exit(1)
+    elif isinstance(timestamps, str):
+        return timestamps
+    else:
+        print(f"! timestamps input is nonsense: {timestamps}")
+
+
 def dwh_retrieve(device, station, vars, timestamps, verbose):
     """Retrieve observational data from DWH.
 
@@ -127,16 +153,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
 
         # check timestamps input:
         #  must be either string or one string in a list
-        if isinstance(timestamps, list):
-            if len(timestamps) == 1:
-                timestamp = timestamps
-            else:
-                print("! only one timestamp allowed for profile data")
-                sys.exit(1)
-        elif isinstance(timestamps, str):
-            timestamp = timestamps
-        else:
-            print(f"! timestamps input is nonsense: {timestamps}")
+        timestamp = check_timestamps_profile(timestamps)
 
         # call dwh retrieve for profile-based data
         dwh_profile(

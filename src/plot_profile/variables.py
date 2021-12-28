@@ -70,6 +70,7 @@ vdf["temp"].linestyle = "-"
 vdf["temp"].mult = 1
 vdf["temp"].plus = -273
 vdf["temp"].avg = False
+vdf["temp"].dwh_id = {"rs": 745}
 
 # specific humidity
 vdf["qv"].short_name = "qv"
