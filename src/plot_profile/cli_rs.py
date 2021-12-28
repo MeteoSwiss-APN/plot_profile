@@ -36,19 +36,19 @@ from .stations import sdf
     "--params",
     type=click.Choice(
         [
-            "743",
+            # "743",
             "winddir",
-            "745",
+            # "745",
             "temp",
-            "747",
+            # "747",
             "dewp",
-            "748",
+            # "748",
             "windvel",
         ],
         case_sensitive=False,
     ),
     multiple=True,
-    default=("743", "745", "748", "747"),
+    default=("temp", "dewp", "windvel", "winddir"),
     help="Def: all",
 )
 @click.option(
@@ -158,7 +158,7 @@ def main(
     if not alt_bot:
         alt_bot = station.elevation
 
-    df, relevant_params = get_rs(
+    df, _ = get_rs(
         date=date,
         params=params,
         station=station,
@@ -177,7 +177,7 @@ def main(
         date=date,
         alt_top=alt_top,
         alt_bot=alt_bot,
-        params=relevant_params,
+        params=params,
         print_steps=print_steps,
         standard_settings=standard_settings,
         personal_settings=personal_settings,
