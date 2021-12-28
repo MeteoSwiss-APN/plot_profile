@@ -97,18 +97,19 @@ def dwh_surface(vars, start, end, station_name, verbose):
     return data
 
 
-def dwh_profile(vars, date, station_id, verbose):
+def dwh_profile(station_id, vars, date, verbose):
     """Retrieve profile-based data from DWH."""
     print(f"Retrieve profile-based data from DWH")
     return
 
 
-def dwh_retrieve(vars, station, timestamps, verbose):
+def dwh_retrieve(device, station, vars, timestamps, verbose):
     """Retrieve observational data from DWH.
 
     Input:
-        vars        list of strings     variables
+        device      string              measurement device: 'rs', 'mwr', 'cm', ...
         station     string              station short or longname
+        vars        list of strings     variables
         timestamps  list of strings     either 1 or 2 timestamps YYYYMMDDHHMM
 
     Output:
@@ -116,7 +117,34 @@ def dwh_retrieve(vars, station, timestamps, verbose):
     """
     # Either call profile or surface retrieve command
     if verbose:
-        print(f"Calling dwh retrieve command ...")
+        print(f"Calling dwh retrieve command:")
+        print(f"  device: {device}")
+        print(f"  device: {station}")
+        print(f"  device: {vars}")
+        print(f"  device: {timestamps}")
+
+    if device in ["rs", "mwr"]:
+
+        # check timestamps input:
+        #  must be either string or one string in a list
+        if isinstance(timestamps, list):
+            if len(timestamps) == 1:
+                timestamp = timestamps
+            else:
+                print("! only one timestamp allowed for profile data")
+                sys.exit(1)
+        elif isinstance(timestamps, str):
+            timestamp = timestamps
+        else:
+            print(f"! timestamps input is nonsense: {timestamps}")
+
+        # call dwh retrieve for profile-based data
+        dwh_profile(
+            station_id=sdf[station].dwh_id,
+            vars=[vdf[var].dwh_id[device] for var in vars],
+            date=timestamp,
+            verbose=verbose,
+        )
 
 
 if __name__ == "__main__":
