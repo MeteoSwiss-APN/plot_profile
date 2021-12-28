@@ -20,6 +20,9 @@ vdf = pd.DataFrame(
         "qc_dia",
         "qv_dia",
         "qi_dia",
+        "hor_vis",
+        "ver_vis",
+        "cbh",
     ],
     # attributes
     index=[
@@ -43,6 +46,7 @@ vdf = pd.DataFrame(
 )
 
 # set default values for certain attributes
+vdf.loc["icon_name"] = None
 vdf.loc["color"] = "black"
 vdf.loc["marker"][:] = "o"
 vdf.loc["linestyle"] = "solid"
@@ -70,7 +74,7 @@ vdf["temp"].linestyle = "-"
 vdf["temp"].mult = 1
 vdf["temp"].plus = -273
 vdf["temp"].avg = False
-vdf["temp"].dwh_id = {"rs": 745}
+vdf["temp"].dwh_id = {"rs": "745", "2m": "91"}
 
 # specific humidity
 vdf["qv"].short_name = "qv"
@@ -154,6 +158,32 @@ vdf["qi_dia"].min_value = -0.01
 vdf["qi_dia"].max_value = 0.07
 vdf["qi_dia"].color = "darkblue"
 vdf["qi_dia"].mult = 1000
+
+# hor_vis
+vdf["hor_vis"].short_name = "hor_vis"
+vdf["hor_vis"].long_name = "Horizontal visibility"
+vdf["hor_vis"].unit = "m"
+vdf["hor_vis"].min_value = 0
+vdf["hor_vis"].max_value = 5000
+vdf["hor_vis"].dwh_id = {"2m": "1547"}
+
+# ver_vis
+vdf["ver_vis"].short_name = "ver_vis"
+vdf["ver_vis"].long_name = "Vertical visibility"
+vdf["ver_vis"].unit = "m"
+vdf["ver_vis"].min_value = 0
+vdf["ver_vis"].max_value = 1000
+vdf["ver_vis"].mult = 0.3048
+vdf["ver_vis"].dwh_id = {"2m": "6199"}
+
+# cbh
+vdf["cbh"].short_name = "cbh"
+vdf["cbh"].long_name = "Cloud base height"
+vdf["cbh"].unit = "m"
+vdf["cbh"].min_value = 0
+vdf["cbh"].max_value = 2000
+vdf["cbh"].mult = 0.3048
+vdf["cbh"].dwh_id = {"2m": "1541"}
 
 # if adding new variable: don't forget to add at the top and in cli-file!!!
 
