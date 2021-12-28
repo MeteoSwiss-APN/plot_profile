@@ -225,7 +225,7 @@ def get_icon(
                     print(
                         f'! no dimensions called "cells_1", "ncells" or "cells" for {var.icon_name}'
                     )
-                continue
+                    continue
         except KeyError:
             print(f"{var.icon_name} cannot be found in forecast file")
             continue
@@ -235,7 +235,6 @@ def get_icon(
             columns=leadtime,
             data=values.transpose(),
         )
-
         # add to dictionary
         data_dict[variable] = df_values[crit]
 
