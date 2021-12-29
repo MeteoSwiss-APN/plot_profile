@@ -12,6 +12,7 @@ vdf = pd.DataFrame(
     # variables
     columns=[
         "temp",
+        "dewp_temp",
         "qc",
         "qv",
         "clc",
@@ -20,13 +21,22 @@ vdf = pd.DataFrame(
         "qc_dia",
         "qv_dia",
         "qi_dia",
+        "hor_vis",
+        "ver_vis",
+        "cbh",
+        "wind_dir",
+        "wind_vel",
+        "rel_hum",
+        "altitude",
     ],
     # attributes
     index=[
-        "icon_name",
+        # mandatory entries
         "long_name",
         "short_name",
         "unit",
+        # general
+        "icon_name",
         "min_value",
         "max_value",
         "dwh_id",
@@ -43,6 +53,10 @@ vdf = pd.DataFrame(
 )
 
 # set default values for certain attributes
+vdf.loc["icon_name"] = None
+vdf.loc["min_value"][:] = None
+vdf.loc["max_value"][:] = None
+vdf.loc["dwh_id"][:] = None
 vdf.loc["color"] = "black"
 vdf.loc["marker"][:] = "o"
 vdf.loc["linestyle"] = "solid"
@@ -50,9 +64,6 @@ vdf.loc["colormap"] = sns.color_palette("viridis", as_cmap=True)
 vdf.loc["mult"][:] = 1
 vdf.loc["plus"][:] = 0
 vdf.loc["avg"][:] = False
-vdf.loc["min_value"][:] = None
-vdf.loc["max_value"][:] = None
-vdf.loc["dwh_id"][:] = None
 
 
 # fill variable dataframe with specific values
@@ -70,6 +81,15 @@ vdf["temp"].linestyle = "-"
 vdf["temp"].mult = 1
 vdf["temp"].plus = -273
 vdf["temp"].avg = False
+vdf["temp"].dwh_id = {"rs": "745", "2m": "91"}
+
+# dewp_temp
+vdf["dewp_temp"].short_name = "dewp_temp"
+vdf["dewp_temp"].long_name = "Dewpoint temperature"
+vdf["dewp_temp"].unit = "°C"
+vdf["dewp_temp"].min_value = -5
+vdf["dewp_temp"].max_value = 15
+vdf["dewp_temp"].dwh_id = {"rs": "747"}
 
 # specific humidity
 vdf["qv"].short_name = "qv"
@@ -153,6 +173,64 @@ vdf["qi_dia"].min_value = -0.01
 vdf["qi_dia"].max_value = 0.07
 vdf["qi_dia"].color = "darkblue"
 vdf["qi_dia"].mult = 1000
+
+# hor_vis
+vdf["hor_vis"].short_name = "hor_vis"
+vdf["hor_vis"].long_name = "Horizontal visibility"
+vdf["hor_vis"].unit = "m"
+vdf["hor_vis"].min_value = 0
+vdf["hor_vis"].max_value = 5000
+vdf["hor_vis"].dwh_id = {"2m": "1547"}
+
+# ver_vis
+vdf["ver_vis"].short_name = "ver_vis"
+vdf["ver_vis"].long_name = "Vertical visibility"
+vdf["ver_vis"].unit = "m"
+vdf["ver_vis"].min_value = 0
+vdf["ver_vis"].max_value = 1000
+vdf["ver_vis"].mult = 0.3048
+vdf["ver_vis"].dwh_id = {"2m": "6199"}
+
+# cbh
+vdf["cbh"].short_name = "cbh"
+vdf["cbh"].long_name = "Cloud base height"
+vdf["cbh"].unit = "m"
+vdf["cbh"].min_value = 0
+vdf["cbh"].max_value = 2000
+vdf["cbh"].mult = 0.3048
+vdf["cbh"].dwh_id = {"2m": "1541"}
+
+# wind_dir
+vdf["wind_dir"].short_name = "wind_dir"
+vdf["wind_dir"].long_name = "Wind direction"
+vdf["wind_dir"].unit = "°"
+vdf["wind_dir"].min_value = 0
+vdf["wind_dir"].max_value = 360
+vdf["wind_dir"].dwh_id = {"rs": "742"}
+
+# wind_vel
+vdf["wind_vel"].short_name = "wind_vel"
+vdf["wind_vel"].long_name = "Wind velocity"
+vdf["wind_vel"].unit = "m/s"
+vdf["wind_vel"].min_value = 0
+vdf["wind_vel"].max_value = 30
+vdf["wind_vel"].dwh_id = {"rs": "748"}
+
+# rel_hum
+vdf["rel_hum"].short_name = "rel_hum"
+vdf["rel_hum"].long_name = "Relative humidity"
+vdf["rel_hum"].unit = "%"
+vdf["rel_hum"].min_value = 0
+vdf["rel_hum"].max_value = 100
+vdf["rel_hum"].dwh_id = {"rs": "746"}
+
+# altitude
+vdf["altitude"].short_name = "altitude"
+vdf["altitude"].long_name = "Altitude"
+vdf["altitude"].unit = "m asl"
+vdf["altitude"].min_value = 0
+vdf["altitude"].max_value = 5000
+vdf["altitude"].dwh_id = {"rs": "742"}
 
 # if adding new variable: don't forget to add at the top and in cli-file!!!
 

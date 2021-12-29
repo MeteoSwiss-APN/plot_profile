@@ -27,6 +27,7 @@ sdf = pd.DataFrame(
 sdf["pay"].short_name = "pay"
 sdf["pay"].long_name = "Payerne"
 sdf["pay"].dwh_id = "06610"
+sdf["pay"].dwh_name = "PAY"
 sdf["pay"].lat = 46.81291
 sdf["pay"].lon = 6.94418
 sdf["pay"].elevation = 490.0
