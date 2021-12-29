@@ -8,7 +8,9 @@ Date: 27/12/2022.
 # Standard library
 import subprocess  # use: run command line commands from python
 import sys
+from datetime import time
 from io import StringIO
+from os import stat
 
 # Third-party
 import numpy as np
@@ -53,32 +55,19 @@ def check_vars(vars, device):
         print("! nonsense variable list !")
         sys.exit(1)
 
+    # add altitude for radiosounding retrieves
+    if device == "rs":
+        vars_str += f",{vdf['altitude'].dwh_id['rs']}"
+
     return vars_str
 
 
-def dwh_surface(station_name, vars_str, start, end, verbose):
-    """Retrieve surface-based data from DWH."""
+def dwh2pandas(cmd, verbose):
+    """Run retrieve_cscs command in terminal, create pandas dataframe."""
     if verbose:
-        print(f"Retrieving surface-based data for:")
-        print(f"  {vars_str}")
-        print(f"  from {start} to {end}")
-        print(f"  at {station_name}.")
+        print("--- calling: " + cmd)
 
-    # retrieve_cscs command:
-    cmd = (
-        "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
-        + " -s surface "
-        + " -i nat_abr,"
-        + station_name
-        + " -p "
-        + vars_str
-        + " -t "
-        + start
-        + "-"
-        + end
-        + " --use-limitation 50"
-    )
-    print("--- calling: " + cmd)
+    # run command in terminal
     proc = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
@@ -95,12 +84,12 @@ def dwh_surface(station_name, vars_str, start, end, verbose):
     if proc.returncode != 0:
         raise SystemExit(err)
 
-    # load DWH retrieve output into pandas DataFrame
+    # load DWH retrieve output
     header_line = pd.read_csv(
         StringIO(out), skiprows=0, nrows=1, sep="\s+", header=None, engine="c"
     )
 
-    # parse the command line output
+    # parse the command line output into pandas dataframe
     data = pd.read_csv(
         StringIO(out),
         skiprows=2,
@@ -129,15 +118,87 @@ def dwh_surface(station_name, vars_str, start, end, verbose):
                 1000,
             ):
                 print(data.head())
-        if verbose:
             print("--- data retrieved into dataframe")
     return data
 
 
-def dwh_profile(station_id, vars, date, verbose):
-    """Retrieve profile-based data from DWH."""
-    print(f"Retrieve profile-based data from DWH")
-    return
+def dwh_surface(station_name, vars_str, start, end, verbose):
+    """Retrieve surface-based data from DWH.
+
+    Args:
+        station_name    (str):  DWH station name
+        vars_str        (str):  comma-separated list of DWH IDs of variables
+        start           (str):  YYYYMMDDHHmm
+        end             (str):  YYYYMMDDHHmm (same or later as <start>)
+        verbose         (bool): verbose statements
+
+    Returns:
+        pandas dataframe:   DWH surface data
+
+    """
+    if verbose:
+        print(f"Retrieving surface-based data for:")
+        print(f"  {vars_str}")
+        print(f"  from {start} to {end}")
+        print(f"  at {station_name}.")
+
+    # retrieve_cscs command:
+    cmd = (
+        "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
+        + " -s surface "
+        + " -i nat_abr,"
+        + station_name
+        + " -p "
+        + vars_str
+        + " -t "
+        + start
+        + "-"
+        + end
+        + " --use-limitation 50"
+    )
+
+    # run command
+    data = dwh2pandas(cmd, verbose)
+
+    return data
+
+
+def dwh_profile(station_id, vars_str, date, verbose):
+    """Retrieve profile-based data from DWH.
+
+    Args:
+        station_id  (str):  DWH ID of station (number as string!)
+        vars_str    (str):  comma-separated list of DWH IDs of variables
+        date        (str):  YYYYMMDDHHmm
+        verbose     (bool): verbose statements
+
+    Returns:
+        pandas dataframe:   DWH profile data
+
+    """
+    if verbose:
+        print(f"Retrieving profile-based data for:")
+        print(f"  {vars_str}")
+        print(f"  on {date}")
+        print(f"  at {station_id}.")
+
+    cmd = (
+        "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,elev,name,wmo_ind"
+        + " -w 22 -s profile -p "
+        + vars_str
+        + " -i int_ind,"
+        + station_id
+        + " -t "
+        + date
+        + "-"
+        + date
+        + " -C 34"
+    )
+
+    # run command
+    data = dwh2pandas(cmd, verbose)
+
+    return data
 
 
 def check_timestamps_surface(timestamps):
@@ -147,10 +208,10 @@ def check_timestamps_surface(timestamps):
     with two entries.
 
     Input:
-        timestamps
+        timestamps  (str or list of strings)
 
     Return:
-        t1, t2
+        string tuple:   t1, t2
 
     """
     if isinstance(timestamps, list):
@@ -174,10 +235,10 @@ def check_timestamps_profile(timestamps):
     Timestamps should either be a single string or a list of strings
     with only one entry.
 
-    Input:
+    Args:
         timestamps
 
-    Return:
+    Returns:
         timestamp
 
     """
@@ -196,6 +257,10 @@ def check_timestamps_profile(timestamps):
 def dwh_retrieve(device, station, vars, timestamps, verbose):
     """Retrieve observational data from DWH.
 
+    The retrieve_cscs command works for two different observational types:
+        a) surface-based data (2m stations including ceilometers & scintillometers)
+        b) profile-based data (radiosoundings - 'rs', radiometers - 'mwr')
+
     Input:
         device      string              measurement device: 'rs', 'mwr', 'cm', ...
         station     string              station short or longname
@@ -205,7 +270,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
     Output:
         pandas dataframe
     """
-    # Either call profile or surface retrieve command
     if verbose:
         print(f"Calling dwh retrieve command:")
         print(f"  device: {device}")
@@ -216,6 +280,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
     # prepare string of DWH IDs for variable(s)
     vars_str = check_vars(vars, device)
 
+    # profile-based data
     if device in ["rs", "mwr"]:
 
         # check timestamps input:
@@ -223,13 +288,30 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
         timestamp = check_timestamps_profile(timestamps)
 
         # call dwh retrieve for profile-based data
-        dwh_profile(
+        raw_data = dwh_profile(
             station_id=sdf[station].dwh_id,
             vars_str=vars_str,
             date=timestamp,
             verbose=verbose,
         )
 
+        # rename column names to nice short names and
+        #  make list of relevant columns
+        raw_data.rename(columns={"termin": "timestamp"}, inplace=True)
+        relevant_vars = ["timestamp", "altitude"]
+        for var in vars:
+            dwh_id = vdf[var].dwh_id[device]
+            short_name = vdf[var].short_name
+            raw_data.rename(columns={dwh_id: short_name}, inplace=True)
+            relevant_vars.append(short_name)
+        if device == "rs":
+            raw_data.rename(columns={"742": "altitude"}, inplace=True)
+        else:
+            raw_data.rename(columns={"level": "altitude"}, inplace=True)
+
+        data = raw_data[relevant_vars]
+
+    # surface-based data
     elif device in ["2m"]:
 
         # check timestamp input:
@@ -237,7 +319,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
         t1, t2 = check_timestamps_surface(timestamps)
 
         # call dwh retrieve for surface-based data
-        dwh_surface(
+        raw_data = dwh_surface(
             station_name=sdf[station].dwh_name,
             vars_str=vars_str,
             start=t1,
@@ -245,15 +327,54 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
             verbose=verbose,
         )
 
+        # rename column names to nice short names and
+        #  make list of relevant columns
+        raw_data.rename(columns={"termin": "timestamp"}, inplace=True)
+        relevant_vars = [
+            "timestamp",
+        ]
+        for var in vars:
+            dwh_id = vdf[var].dwh_id[device]
+            short_name = vdf[var].short_name
+            raw_data.rename(columns={dwh_id: short_name}, inplace=True)
+            relevant_vars.append(short_name)
+
+        data = raw_data[relevant_vars]
+
+    else:
+        print("! unknown device!")
+        sys.exit(1)
+
+    return data
+
 
 if __name__ == "__main__":
-    dwh_retrieve(
-        "2m",
-        "pay",
-        [
-            "ver_vis",
-            "cbh",
-        ],
-        ["202111190000", "202111190800"],
-        True,
-    )
+
+    test_profile = False
+    test_surface = True
+
+    if test_profile:
+        data = dwh_retrieve(
+            device="rs",
+            station="pay",
+            vars=[
+                "temp",
+            ],
+            timestamps=[
+                "202111190000",
+            ],
+            verbose=True,
+        )
+
+    if test_surface:
+        data = dwh_retrieve(
+            device="2m",
+            station="pay",
+            vars=[
+                "temp",
+            ],
+            timestamps=["202111190000", "202111190300"],
+            verbose=True,
+        )
+
+    print(data)
