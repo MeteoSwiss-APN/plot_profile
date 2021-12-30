@@ -206,7 +206,7 @@ vdf["wind_dir"].long_name = "Wind direction"
 vdf["wind_dir"].unit = "°"
 vdf["wind_dir"].min_value = 0
 vdf["wind_dir"].max_value = 360
-vdf["wind_dir"].dwh_id = {"rs": "742"}
+vdf["wind_dir"].dwh_id = {"rs": "743"}
 
 # wind_vel
 vdf["wind_vel"].short_name = "wind_vel"

@@ -83,8 +83,8 @@ def map_degrees(avg_winddir_array):
         avg_winddir_array:  array       direction of wind in degrees
 
     Returns:
-        x_dir:              array        x-coordinate of winddir array
-        y_dir:              array        y-coordinate of winddir array
+        x_dir:              array        x-coordinate of wind_dir array
+        y_dir:              array        y-coordinate of wind_dir array
 
     """
     x_dir, y_dir, i = [], [], 0
@@ -157,13 +157,13 @@ def get_axis_limits(df, params, user_inputs_dict):
         if "temp" in params:
             temp_min = df["temp"].min() - 0.5
             temp_max = df["temp"].max() + 0.5
-        if "dewp" in params:
-            temp_min = df["dewp"].min() - 0.5
+        if "dewp_temp" in params:
+            temp_min = df["dewp_temp"].min() - 0.5
             if "temp" not in params:  # otherwise 'temp' should define the maximum value
-                temp_max = df["dewp"].max() + 0.5
-        if "windvel" in params:
-            windvel_min = df["windvel"].min() - 0.10 * df["windvel"].max()
-            windvel_max = df["windvel"].max() + 0.10 * df["windvel"].max()
+                temp_max = df["dewp_temp"].max() + 0.5
+        if "wind_vel" in params:
+            windvel_min = df["wind_vel"].min() - 0.10 * df["wind_vel"].max()
+            windvel_max = df["wind_vel"].max() + 0.10 * df["wind_vel"].max()
 
         return windvel_min, windvel_max, temp_min, temp_max
 
@@ -221,11 +221,11 @@ def plot_grid(ax, params, case=None):
 
     """
     if case == "single":
-        if "temp" or "dewp" in params:
+        if "temp" or "dewp_temp" in params:
             color = "blue"
-        if "winddir" in params:
+        if "wind_dir" in params:
             color = "magenta"
-        if "windvel" in params:
+        if "wind_vel" in params:
             color = "cyan"
 
         ax.xaxis.grid(color=color, linestyle="--", linewidth=0.5)
@@ -256,7 +256,7 @@ def plot_winddir(df, fig, ax, case=None):
     # TODO: add docstring
     if case == "single":
         adjustFigAspect(fig, aspect=0.5)
-    winddir_df = df["winddir"].groupby(pd.qcut(df.index, 10)).mean()
+    winddir_df = df["wind_dir"].groupby(pd.qcut(df.index, 10)).mean()
     altitude_df = df["altitude"].groupby(pd.qcut(df.index, 10)).mean()
     # 2) pd.df --> np.array
     avg_winddir_array = winddir_df.to_numpy().round()
@@ -336,7 +336,7 @@ def create_plot(
     # TODO: this should be implemented in get_rs.py & the relevant params list is no longer necessary
     relevant_df_columns = [
         "altitude",
-        "relhum",
+        "rel_hum",
     ]  # keep altitude for yaxis & relhum for cloud layers
     parameter_string = str()
     for param in params:
@@ -359,17 +359,17 @@ def create_plot(
             "x_min": temp_min,
             "x_max": temp_max,
         },
-        "dewp": {
+        "dewp_temp": {
             "label": "Dew Point Temperature ",
             "xlabel": "Temperature [°C]",
             "x_min": temp_min,
             "x_max": temp_max,
         },
-        "winddir": {
+        "wind_dir": {
             "label": "Wind Direction",
             "xlabel": "Wind Direction [°]",
         },
-        "windvel": {
+        "wind_vel": {
             "label": "Wind Velocity",
             "xlabel": "Wind Velocity [m/s]",
             "x_min": windvel_min,
@@ -383,15 +383,14 @@ def create_plot(
     tkw = dict(size=4, width=1.5)
     yaxis = df["altitude"]
 
-    # case 1: one centred plot on figure --> temp / dewp / temp+dewp / winddir / windvel
+    # case 1: one centred plot on figure --> temp / dewp_temp / temp+dewp_temp / wind_dir / wind_vel
     only_one_param = len(params) == 1
-    only_temp_params = params == ("temp", "dewp",) or params == (
-        "dewp",
+    only_temp_params = params == ("temp", "dewp_temp",) or params == (
+        "dewp_temp",
         "temp",
     )
     single_plot_case = only_one_param or only_temp_params
     if single_plot_case:
-        print("case 1")
         print(f"--- creating plot for: {params}")
 
         # various
@@ -405,11 +404,11 @@ def create_plot(
         ax.set_xlabel(plot_properties[params[0]]["xlabel"])
 
         # case 1.1: only plot wind direction
-        if "winddir" in params:
+        if "wind_dir" in params:
             plot_winddir(df, fig, ax, case="single")
 
         # case 1.2: only plot a temperature, dew point temperature or wind velocity
-        if len(params) == 1 and ("winddir" not in params):
+        if len(params) == 1 and ("wind_dir" not in params):
             ax, handles = add_plot(
                 xaxis=df[params[0]],
                 yaxis=yaxis,
@@ -419,7 +418,7 @@ def create_plot(
                 linestyle="k-",
             )
 
-        # case 1.3: plot temp & dewp together in one plot
+        # case 1.3: plot temp & dewp_temp together in one plot
         if len(params) == 2:
             ax, handles = add_plot(
                 xaxis=df["temp"],
@@ -430,9 +429,9 @@ def create_plot(
                 linestyle="b-",
             )
             ax, handles = add_plot(
-                xaxis=df["dewp"],
+                xaxis=df["dewp_temp"],
                 yaxis=yaxis,
-                plot_properties=plot_properties["dewp"],
+                plot_properties=plot_properties["dewp_temp"],
                 ax=ax,
                 handles=handles,
                 linestyle="c-",
@@ -450,8 +449,8 @@ def create_plot(
         if grid:
             plot_grid(ax=ax, params=params, case="single")
 
-        # fix x-limits or legend (not necessary for winddir plot)
-        if "winddir" not in params:
+        # fix x-limits or legend (not necessary for wind_dir plot)
+        if "wind_dir" not in params:
             ax.set_xlim(
                 plot_properties[params[0]]["x_min"], plot_properties[params[0]]["x_max"]
             )
@@ -467,9 +466,8 @@ def create_plot(
 
         return
 
-    # case 2: two horizontally aligned subplots on figure --> all possible parameter combinations apart from temp+dewp
+    # case 2: two horizontally aligned subplots on figure --> all possible parameter combinations apart from temp+dewp_temp
     else:
-        print("case 2")
         print(f"--- creating plot for: {params}")
 
         # various
@@ -481,8 +479,8 @@ def create_plot(
         ax[0].set_ylim(alt_bot, alt_top)
         ax[0].set_ylabel("Altitude [m asl]")
 
-        # case 2.1: multi-plot case w/o temp/dewp
-        if ("temp" not in params) and ("dewp" not in params):
+        # case 2.1: multi-plot case w/o temp/dewp_temp
+        if ("temp" not in params) and ("dewp_temp" not in params):
             # axis limits and labels
             ax[0].set_xlim(windvel_min, windvel_max)
             ax[0].set_xlabel("Wind Velocity [m/s]")
@@ -490,9 +488,9 @@ def create_plot(
 
             # plot wind velocity on the left plot
             _, _ = add_plot(
-                xaxis=df["windvel"],
+                xaxis=df["wind_vel"],
                 yaxis=yaxis,
-                plot_properties=plot_properties["windvel"],
+                plot_properties=plot_properties["wind_vel"],
                 ax=ax[0],
                 handles=handles_left,
                 linestyle="k-",
@@ -505,7 +503,7 @@ def create_plot(
         else:
             ax[0].set_xlim(temp_min, temp_max)
             ax[0].set_xlabel("Temperature [°C]")
-            if "windvel" in params:
+            if "wind_vel" in params:
                 ax[1].set_xlim(windvel_min, windvel_max)
                 ax[1].set_xlabel("Wind Velocity [m/s]")
             else:
@@ -521,28 +519,28 @@ def create_plot(
                     linestyle="b-",
                 )
 
-            if "dewp" in params:
+            if "dewp_temp" in params:
                 ax[0], handles_left = add_plot(
-                    xaxis=df["dewp"],
+                    xaxis=df["dewp_temp"],
                     yaxis=yaxis,
-                    plot_properties=plot_properties["dewp"],
+                    plot_properties=plot_properties["dewp_temp"],
                     ax=ax[0],
                     handles=handles_left,
                     linestyle="c-",
                 )
 
-            if "windvel" in params:
+            if "wind_vel" in params:
                 ax[1], handles_right = add_plot(
-                    xaxis=df["windvel"],
+                    xaxis=df["wind_vel"],
                     yaxis=yaxis,
-                    plot_properties=plot_properties["windvel"],
+                    plot_properties=plot_properties["wind_vel"],
                     ax=ax[1],
                     handles=handles_right,
                     linestyle="m-",
                 )
                 ax[1].legend(handles=handles_right)
 
-            if "winddir" in params:
+            if "wind_dir" in params:
                 plot_winddir(df=df, fig=fig, ax=ax[1])
 
         if clouds:
@@ -571,26 +569,26 @@ def create_plot(
     if False:
         # properties dict for various plots
         plot_properties = {
-            # winddir only
+            # wind_dir only
             ("742", "743", "746"): {
-                "name": "winddir",
-                "which_plot": "--- creating winddir plot",
+                "name": "wind_dir",
+                "which_plot": "--- creating wind_dir plot",
                 "label": "Wind Direction",
                 "xlabel": "Wind Direction [°]",
                 "xlabel_color": "m",
                 "line_color": "m",
             },
-            # windvel only
+            # wind_vel only
             ("742", "746", "748"): {
-                "name": "windvel",
-                "which_plot": "--- creating windvel plot",
+                "name": "wind_vel",
+                "which_plot": "--- creating wind_vel plot",
                 "label": "Wind Velocity",
                 "xlabel": "Wind Velocity [m/s]",
                 "xlabel_color": "c",
                 "line_color": "c-",
-                "x_axis": df["windvel"],
-                "x_min": df["windvel"].min() * 0.9,
-                "x_max": df["windvel"].max() * 1.1,
+                "x_axis": df["wind_vel"],
+                "x_min": df["wind_vel"].min() * 0.9,
+                "x_max": df["wind_vel"].max() * 1.1,
             },
             # temp only
             ("742", "745", "746"): {
@@ -604,22 +602,22 @@ def create_plot(
                 "x_min": df["temp"].min() - 0.5,
                 "x_max": df["temp"].max() + 0.5,
             },
-            # dewp only
+            # dewp_temp only
             ("742", "746", "747"): {
-                "name": "dewp",
-                "which_plot": "--- creating dewp plot",
+                "name": "dewp_temp",
+                "which_plot": "--- creating dewp_temp plot",
                 "label": "Dew point temperature ",
                 "xlabel": "Temperature [°C]",
                 "xlabel_color": "b",
                 "line_color": "b--",
-                "x_axis": df["dewp"],
-                "x_min": df["dewp"].min() - 0.5,
-                "x_max": df["dewp"].max() + 0.5,
+                "x_axis": df["dewp_temp"],
+                "x_min": df["dewp_temp"].min() - 0.5,
+                "x_max": df["dewp_temp"].max() + 0.5,
             },
-            # temp + dewp
+            # temp + dewp_temp
             ("742", "745", "746", "747"): {
                 "name": "temperature",
-                "which_plot": "--- creating temp+dewp plot",
+                "which_plot": "--- creating temp+dewp_temp plot",
                 "label": "Temperature",
                 "label_dewp": "Dew point temperature",
                 "xlabel": "Temperature [°C]",
@@ -627,14 +625,14 @@ def create_plot(
                 "line_color": "b-",
                 "line_color_dewp": "b--",
                 "x_axis": df["temp"],
-                "x_axis_2": df["dewp"],
-                "x_min": df["dewp"].min() - 0.5,
+                "x_axis_2": df["dewp_temp"],
+                "x_min": df["dewp_temp"].min() - 0.5,
                 "x_max": df["temp"].max() + 0.5,
             },
-            # temp + dewp + winddir + windvel
+            # temp + dewp_temp + wind_dir + wind_vel
             ("742", "743", "745", "746", "747", "748"): {
                 "name": "temp_dewp_winddir_windvel",
-                "which_plot": "--- creating temp+dewp plot",
+                "which_plot": "--- creating temp+dewp_temp plot",
                 "label": "Temperature",
                 "label_dewp": "Dew point temperature",
                 "xlabel": "Temperature [°C]",
@@ -642,8 +640,8 @@ def create_plot(
                 "line_color": "b-",
                 "line_color_dewp": "b--",
                 "x_axis": df["temp"],
-                "x_axis_2": df["dewp"],
-                "x_min": df["dewp"].min() - 0.5,
+                "x_axis_2": df["dewp_temp"],
+                "x_min": df["dewp_temp"].min() - 0.5,
                 "x_max": df["temp"].max() + 0.5,
             },
         }
@@ -729,8 +727,8 @@ def create_plot(
 
                     handles_left.append(temp)
 
-                if "747" in params:  # add dewp to subplot
-                    (dewp,) = ax[0].plot(
+                if "747" in params:  # add dewp_temp to subplot
+                    (dewp_temp,) = ax[0].plot(
                         plot_properties[("742", "746", "747")]["x_axis"],
                         df["altitude"],
                         plot_properties[("742", "746", "747")]["line_color"],
@@ -739,14 +737,14 @@ def create_plot(
 
                     if (not standard_settings) and (not personal_settings):
                         x_min_temp = (
-                            df["dewp"].min() + 0.5
-                        )  # if dewp is in params, this is the lower x-axis boundary
+                            df["dewp_temp"].min() + 0.5
+                        )  # if dewp_temp is in params, this is the lower x-axis boundary
                         if (
                             "745" not in params
-                        ):  # if temp is in params as well, upper x-axis boundary is defined by temp instead of dewp
-                            x_max_temp = df["dewp"].max() + 0.5
+                        ):  # if temp is in params as well, upper x-axis boundary is defined by temp instead of dewp_temp
+                            x_max_temp = df["dewp_temp"].max() + 0.5
 
-                    handles_left.append(dewp)
+                    handles_left.append(dewp_temp)
 
                     ax[0].set_xlim(x_min_temp, x_max_temp)
                     ax[0].set_xlabel("Temperature [°C]")
@@ -755,7 +753,7 @@ def create_plot(
                     ax[0].tick_params(axis="x", colors=blue, **tkw)
 
                 if "748" in params:  # add windvelocity to subplot
-                    (windvel,) = ax[1].plot(
+                    (wind_vel,) = ax[1].plot(
                         plot_properties[("742", "746", "748")]["x_axis"],
                         df["altitude"],
                         plot_properties[("742", "746", "748")]["line_color"],
@@ -783,10 +781,10 @@ def create_plot(
                     ax[1].set_xlabel("Wind Velocity [m/s]")
                     ax[1].xaxis.label.set_color(cyan)
                     ax[1].tick_params(axis="x", colors=cyan, **tkw)
-                    handles_right.append(windvel)
+                    handles_right.append(wind_vel)
 
                 if "743" in params:  # add winddirection to subplot
-                    winddir_df = df["winddir"].groupby(pd.qcut(df.index, 10)).mean()
+                    winddir_df = df["wind_dir"].groupby(pd.qcut(df.index, 10)).mean()
                     altitude_df = df["altitude"].groupby(pd.qcut(df.index, 10)).mean()
                     # 2) pd.df --> np.array
                     avg_winddir_array = (
@@ -799,7 +797,7 @@ def create_plot(
                         if standard_settings or personal_settings:
                             arrow_anchor = [x_max_wind - 10] * len(avg_altitude_array)
                         else:
-                            arrow_anchor = [df["windvel"].max() * 0.9] * len(
+                            arrow_anchor = [df["wind_vel"].max() * 0.9] * len(
                                 avg_altitude_array
                             )
                     else:  # if only the wind direction is plottet alongside the temp. curves remove the x-axis for ax[1]
@@ -848,11 +846,11 @@ def create_plot(
                     )
                     return
 
-            if "743" in params and "748" in params:  # plot windvel & winddir
+            if "743" in params and "748" in params:  # plot wind_vel & wind_dir
                 print("--- creating complete wind plot")
 
-                if True:  # windvel properties (left subplot)
-                    (windvel,) = ax[0].plot(
+                if True:  # wind_vel properties (left subplot)
+                    (wind_vel,) = ax[0].plot(
                         plot_properties[("742", "746", "748")]["x_axis"],
                         df["altitude"],
                         plot_properties[("742", "746", "748")]["line_color"],
@@ -880,10 +878,10 @@ def create_plot(
                     ax[0].set_xlabel("Wind Velocity [m/s]")
                     ax[0].xaxis.label.set_color(cyan)
                     ax[0].tick_params(axis="x", colors=cyan, **tkw)
-                    handles_left.append(windvel)
+                    handles_left.append(wind_vel)
 
-                if True:  # winddir properties (right subplot)
-                    winddir_df = df["winddir"].groupby(pd.qcut(df.index, 10)).mean()
+                if True:  # wind_dir properties (right subplot)
+                    winddir_df = df["wind_dir"].groupby(pd.qcut(df.index, 10)).mean()
                     altitude_df = df["altitude"].groupby(pd.qcut(df.index, 10)).mean()
                     # 2) pd.df --> np.array
                     avg_winddir_array = (

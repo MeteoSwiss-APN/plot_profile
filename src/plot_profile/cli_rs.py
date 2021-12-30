@@ -19,36 +19,21 @@ from .stations import sdf
 @click.command()
 @click.option("--station", default="06610", help="Name or DWH of station. Def: 06610")
 @click.option(
-    "--date", default="2021083100", help="start date: YYYYMMDDHH. Def: 2021083100"
-)
-@click.option(
-    "--alt_bot",
-    type=int,
-    help="altitude bottom value: int",
-)
-@click.option(
-    "--alt_top",
-    default=5000,
-    type=int,
-    help="Altitude top value: int. Def: 5000",
+    "--date", default="202108310000", help="start date: YYYYMMDDHH00. Def: 2021083100"
 )
 @click.option(
     "--params",
     type=click.Choice(
         [
-            # "743",
-            "winddir",
-            # "745",
+            "wind_dir",
             "temp",
-            # "747",
-            "dewp",
-            # "748",
-            "windvel",
+            "dewp_temp",
+            "wind_vel",
         ],
         case_sensitive=False,
     ),
     multiple=True,
-    default=("temp", "dewp", "windvel", "winddir"),
+    default=("temp", "dewp_temp", "wind_vel", "wind_dir"),
     help="Def: all",
 )
 @click.option(
@@ -56,6 +41,12 @@ from .stations import sdf
     type=str,
     help="Path to folder for plots. Def: /scratch/<user>/tmp/",
 )
+@click.option(
+    "--print_steps",
+    is_flag=True,
+    help="Add this flag to display intermediate steps.",
+)
+# command line inputs for
 @click.option(
     "--grid",
     is_flag=True,
@@ -72,10 +63,17 @@ from .stations import sdf
     type=float,
     help="Relative humidity threshold for clouds. Def: 95",
 )
+# command line inputs for axes limit settings
 @click.option(
-    "--print_steps",
-    is_flag=True,
-    help="Add this flag to display intermediate steps.",
+    "--alt_bot",
+    type=int,
+    help="altitude bottom value: int",
+)
+@click.option(
+    "--alt_top",
+    default=5000,
+    type=int,
+    help="Altitude top value: int. Def: 5000",
 )
 @click.option(
     "--standard_settings",
@@ -158,7 +156,7 @@ def main(
     if not alt_bot:
         alt_bot = station.elevation
 
-    df, _ = get_rs(
+    df = get_rs(
         date=date,
         params=params,
         station=station,

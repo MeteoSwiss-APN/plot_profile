@@ -15,8 +15,11 @@ from os import stat
 # Third-party
 import numpy as np
 import pandas as pd
-from stations import sdf
-from variables import vdf
+
+# Local
+# remove leading '.' if this script should be used on its own
+from .stations import sdf
+from .variables import vdf
 
 # import ipdb
 
@@ -56,8 +59,10 @@ def check_vars(vars, device):
         sys.exit(1)
 
     # add altitude for radiosounding retrieves
+    # NEW: also add relative humidity for radiosounding retrieves
     if device == "rs":
         vars_str += f",{vdf['altitude'].dwh_id['rs']}"
+        vars_str += f",{vdf['rel_hum'].dwh_id['rs']}"
 
     return vars_str
 
@@ -298,7 +303,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
         # rename column names to nice short names and
         #  make list of relevant columns
         raw_data.rename(columns={"termin": "timestamp"}, inplace=True)
-        relevant_vars = ["timestamp", "altitude"]
+        relevant_vars = ["timestamp", "altitude", "rel_hum"]
         for var in vars:
             dwh_id = vdf[var].dwh_id[device]
             short_name = vdf[var].short_name
@@ -306,6 +311,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
             relevant_vars.append(short_name)
         if device == "rs":
             raw_data.rename(columns={"742": "altitude"}, inplace=True)
+            raw_data.rename(columns={"746": "rel_hum"}, inplace=True)
         else:
             raw_data.rename(columns={"level": "altitude"}, inplace=True)
 
@@ -350,21 +356,20 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
 
 if __name__ == "__main__":
 
-    test_profile = False
-    test_surface = True
+    test_profile = True
+    test_surface = False
 
     if test_profile:
         data = dwh_retrieve(
             device="rs",
             station="pay",
-            vars=[
-                "temp",
-            ],
+            vars=["temp", "dewp_temp"],
             timestamps=[
                 "202111190000",
             ],
-            verbose=True,
+            verbose=False,
         )
+        print(f"Radio Sounding dataframe looks like:\n{data}")
 
     if test_surface:
         data = dwh_retrieve(
@@ -376,5 +381,4 @@ if __name__ == "__main__":
             timestamps=["202111190000", "202111190300"],
             verbose=True,
         )
-
-    print(data)
+        print(f"\nSurface Station dataframe looks like:\n{data}")
