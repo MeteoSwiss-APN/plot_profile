@@ -4,6 +4,9 @@ Author: Stephanie Westerhuis
 
 Date: 10/11/2021.
 """
+# Standard library
+import sys
+
 # Third-party
 import click
 
@@ -46,6 +49,12 @@ from .plot_icon import create_plot
     help="MANDATORY: Variable name(s).",
 )
 # options with default value
+@click.option(
+    "--add_rs",
+    type=int,
+    multiple=True,
+    help="Add radiosounding for specified leadtime. Def: None",
+)
 @click.option("--alt_bot", type=int, help="Altitude bottom. Def: surface.")
 @click.option("--alt_top", default=2000, type=int, help="Altitude top. Def: 2000")
 @click.option(
@@ -147,6 +156,7 @@ def main(
     date: str,
     folder: str,
     var: str,
+    add_rs: int,
     alt_bot: int,
     alt_top: int,
     appendix: str,
@@ -192,9 +202,19 @@ def main(
         verbose=verbose,
     )
 
+    if isinstance(add_rs, list):
+        if len(var) == 2:
+            print(f"! --add_rs does not work for 2-variable-plot!")
+            sys.exit(1)
+        # ipdb.set_trace()
+
+    else:
+        obs_dict = None
+
     create_plot(
         variables_list=var,
         data_dict=data_dict,
+        obs_dict=obs_dict,
         outpath=outpath,
         date=date,
         alt_bot=alt_bot,
