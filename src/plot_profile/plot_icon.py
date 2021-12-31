@@ -61,6 +61,7 @@ def str_valid_time(ini, lt):
 
 def plot_single_variable(
     data_dict,
+    obs_dict,
     variable,
     outpath,
     date,
@@ -366,6 +367,7 @@ def plot_two_variables(
 def create_plot(
     variables_list,
     data_dict,
+    obs_dict,
     outpath,
     date,
     alt_bot,
@@ -388,8 +390,10 @@ def create_plot(
         variables_list (list):          List of all variables of interest
         data_dict (dict):               Dictionary w/ keys for each variable. Each key contains the
                                         dataframe corresponding to this variable.
+        obs_dict (dict):                additional obs: radiosoundings
         outpath (str):                  path where figure should be stored
         date (datetime obj):            init date of simulation
+        add_rs (list of int)            add radiosoundings for specified leadtimes
         alt_bot (int):                  lower boundary of altitude
         alt_top (int):                  upper boundary of altitude
         loc (str):                      location string
@@ -434,6 +438,7 @@ def create_plot(
         for variable in variables_list:
             plot_single_variable(
                 data_dict,
+                obs_dict,
                 variable,
                 outpath,
                 date,
