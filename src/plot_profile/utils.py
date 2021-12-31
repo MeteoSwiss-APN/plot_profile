@@ -1,5 +1,6 @@
 """Utils for various functions."""
 # Standard library
+import datetime as dt
 import getpass
 import logging
 from pathlib import Path
@@ -95,3 +96,27 @@ def slice_top_bottom(df_height, alt_top, alt_bot, verbose):
     crit.iloc[lower_cut_off_index:upper_cut_off_index] = True
 
     return crit
+
+
+def validtime_from_leadtime(date, leadtime, verbose):
+    """Calculate validtime from leadtime.
+
+    Args:
+        date (str):         start of simulation (YYMMDDHH)
+        leadtime (int):     leadtime in hours
+        verbose (bool):     print details
+
+    Returns:
+        datetime object
+
+    """
+    ini = dt.datetime.strptime(date, "%y%m%d%H")
+
+    # TODO: make function more generic so input date could also be
+    #       datetime object or YYYYMMDDHH
+    validtime = ini + dt.timedelta(hours=leadtime)
+
+    if verbose:
+        print(f"{date} + {leadtime}h = {validtime.strftime('%y%m%d%H')}")
+
+    return validtime
