@@ -11,8 +11,10 @@ import sys
 import click
 
 # Local
+from .dwh_retrieve import dwh_retrieve
 from .get_icon import get_icon
 from .plot_icon import create_plot
+from .utils import validtime_from_leadtime
 
 # import ipdb
 
@@ -188,6 +190,8 @@ def main(
     Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 
     """
+    # A) retrieve data from ICON forecasts
+    ######################################
     data_dict = get_icon(
         folder=folder,
         date=date,
@@ -202,15 +206,38 @@ def main(
         verbose=verbose,
     )
 
-    if isinstance(add_rs, list):
+    # B) retrieve observational data
+    ################################
+    if add_rs:
         if len(var) == 2:
             print(f"! --add_rs does not work for 2-variable-plot!")
             sys.exit(1)
-        # ipdb.set_trace()
+
+        else:
+            if verbose:
+                print("retrieve RS")
+
+            # list of timestamps for which radiosounding is retrieved
+            rs_timestamps = [validtime_from_leadtime(date, lt) for lt in add_rs]
+
+            # create obs_dict (like data_dict)
+            obs_dict = {"rs": {tt: None for tt in rs_timestamps}}
+
+            # loop over timestamps and fill data_dict
+            for timestamp in rs_timestamps:
+                obs_dict["rs"][timestamp] = dwh_retrieve(
+                    device="rs",
+                    station="pay",
+                    vars=var,
+                    timestamps=timestamp.strftime("%Y%m%d%H%M"),
+                    verbose=verbose,
+                )
 
     else:
         obs_dict = None
 
+    # C) create plot
+    ################
     create_plot(
         variables_list=var,
         data_dict=data_dict,

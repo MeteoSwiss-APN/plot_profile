@@ -9,16 +9,16 @@ Date: 25/11/2021.
 import datetime as dt
 
 # Third-party
+# import ipdb
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
 # Local
+from .utils import linestyle_dict
 from .utils import save_fig
 from .variables import vdf
-
-# import ipdb
 
 
 def get_yrange(alt_bot, alt_top, df_height):
@@ -146,6 +146,25 @@ def plot_single_variable(
         )
         icolor = icolor + 1
 
+    # --add_rs
+    try:
+        rs_data = obs_dict["rs"]
+
+        for i, (timestamp, sounding) in enumerate(rs_data.items()):
+            values = sounding[var.short_name]
+            alt = sounding["altitude"]
+            ax.plot(
+                values,
+                alt,
+                label=f"RaSo: {timestamp.strftime('%b %d, %H')} UTC",
+                color="black",
+                linestyle=linestyle_dict[i],
+            )
+
+    except (TypeError, KeyError) as e:
+        if verbose:
+            print("no radiosounding obs added")
+
     # adjust appearance
     ax.set(
         xlabel=f"{var.long_name} [{var.unit}]",
@@ -240,16 +259,6 @@ def plot_two_variables(
     # figure settings
     plt.rcParams["figure.figsize"] = (4.5, 6)
     # plt.rcParams["figure.subplot.left"] = 0.15
-
-    # linestyles for several lead times
-    linestyle_dict = {
-        0: "solid",
-        1: "dotted",
-        2: "dashed",
-        3: (0, (1, 10)),  # loosely dotted
-        4: (0, (5, 10)),  # loosely dashed
-        5: (0, (3, 10, 1, 10)),  # loosely dashdotted
-    }
 
     # dates
     init_date = date.strftime("%b %-d, %Y")
