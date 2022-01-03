@@ -90,7 +90,7 @@ def slice_top_bottom(df_height, alt_top, alt_bot, verbose):
             lower_cut_off_index = 0
 
         if height > alt_top:
-            upper_cut_off_index = i  # include first value above top altitude
+            upper_cut_off_index = i + 1  # include first value above top altitude
             break
 
     # assign True to the relevant rows of crit
