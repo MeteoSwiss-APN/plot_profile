@@ -173,7 +173,9 @@ def get_icon(
     crit = slice_top_bottom(df_height, alt_top, alt_bot, verbose)
 
     # fill HEIGHT as sliced pandas series into dictionary
-    data_dict["height"] = df_height[crit]
+    # TODO: crit does not work
+    # data_dict["height"] = df_height[crit]
+    data_dict["height"] = df_height
 
     ### B) ICON forecast files
     ##########################
@@ -185,6 +187,11 @@ def get_icon(
         print(f"Looking for files in {str(Path(folder, date_str))}")
 
     files = [Path(folder, date_str, lfff_name(lt)) for lt in leadtime]
+
+    if verbose:
+        print("files:")
+        for f in files:
+            print(f"  {f}")
 
     # load as xarray dataset
     if verbose:
@@ -198,7 +205,10 @@ def get_icon(
     # lons = ds.clon_1.values
 
     if verbose:
-        print("Assuming that variable's grid corresponds to clat_1 and clon_1.")
+        print(
+            "Assuming that variable's grid corresponds to clat_1 and clon_1 from grid-file"
+        )
+        print(" with uuid FC046F09-ED97-850E-1E31-8927421B2B60.")
 
     # convert from radians to degrees if given in radians
     # if lats.max() < 2.0 and lons.max() < 2.0:
@@ -236,6 +246,8 @@ def get_icon(
             data=values.transpose(),
         )
         # add to dictionary
-        data_dict[variable] = df_values[crit]
+        # TODO: crit does not work
+        # data_dict[variable] = df_values[crit]
+        data_dict[variable] = df_values
 
     return data_dict

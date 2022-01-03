@@ -3,6 +3,7 @@
 import datetime as dt
 import getpass
 import logging
+import sys
 from pathlib import Path
 
 # Third-party
@@ -98,25 +99,45 @@ def slice_top_bottom(df_height, alt_top, alt_bot, verbose):
     return crit
 
 
-def validtime_from_leadtime(date, leadtime, verbose):
+def validtime_from_leadtime(date, leadtime, verbose=False):
     """Calculate validtime from leadtime.
 
     Args:
-        date (str):         start of simulation (YYMMDDHH)
-        leadtime (int):     leadtime in hours
-        verbose (bool):     print details
+        date (str or datetime obj): start of simulation (YYmmddHH or YYYYmmddHH)
+        leadtime (int):             leadtime in hours
+        verbose (bool):             print details
 
     Returns:
         datetime object
 
     """
-    ini = dt.datetime.strptime(date, "%y%m%d%H")
+    if isinstance(date, dt.datetime):
+        ini = date
+    else:
+        try:
+            ini = dt.datetime.strptime(date, "%y%m%d%H")
+        except ValueError:
+            try:
+                ini = dt.datetime.strptime(date, "%Y%m%d%H")
+            except ValueError:
+                print(f"! problem in validtime_from_leadtime in utils.py!")
+                print(f"  -> {date} does not match any known format")
+                sys.exit()
 
-    # TODO: make function more generic so input date could also be
-    #       datetime object or YYYYMMDDHH
     validtime = ini + dt.timedelta(hours=leadtime)
 
     if verbose:
         print(f"{date} + {leadtime}h = {validtime.strftime('%y%m%d%H')}")
 
     return validtime
+
+
+# linestyles for several lead times
+linestyle_dict = {
+    0: "solid",
+    1: "dotted",
+    2: "dashed",
+    3: (0, (1, 10)),  # loosely dotted
+    4: (0, (5, 10)),  # loosely dashed
+    5: (0, (3, 10, 1, 10)),  # loosely dashdotted
+}
