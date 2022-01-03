@@ -125,7 +125,7 @@ vdf["ddt_t_rad_sw"].colormap = sns.light_palette("goldenrod", as_cmap=True)
 
 # dewpoint temperature: dewp_temp
 vdf["dewp_temp"].short_name = "dewp_temp"
-vdf["dewp_temp"].long_name = "Dewpoint temperature"
+vdf["dewp_temp"].long_name = "Dew point temperature"
 vdf["dewp_temp"].unit = "°C"
 vdf["dewp_temp"].min_value = -5
 vdf["dewp_temp"].max_value = 15

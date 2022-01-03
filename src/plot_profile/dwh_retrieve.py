@@ -21,6 +21,9 @@ import pandas as pd
 from .stations import sdf
 from .variables import vdf
 
+# import ipdb
+
+
 def check_vars(vars, device):
     """Create comma-separated strings of DWH IDs from one or more variables."""
     # single string

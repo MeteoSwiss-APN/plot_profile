@@ -33,9 +33,9 @@ def extract_clouds(df, relhum_thresh, print_steps):
         cloud_end:          array       array containing cloud layer end altitudes
 
     """
-    cloud_df = df[["altitude", "relhum"]]  # extract the altitude & relhum columns
+    cloud_df = df[["altitude", "rel_hum"]]  # extract the altitude & relhum columns
     cloud_df = cloud_df[
-        cloud_df["relhum"] >= relhum_thresh
+        cloud_df["rel_hum"] >= relhum_thresh
     ]  # remove rows where no clouds are present
     cloud_df = cloud_df[["altitude"]]  # remove the relhum column
     cloud_list = list(cloud_df.index.values)  # index list of cloud layers
@@ -334,10 +334,15 @@ def create_plot(
 
     # remove unnecessary columns from dataframe
     # TODO: this should be implemented in get_rs.py & the relevant params list is no longer necessary
-    relevant_df_columns = [
-        "altitude",
-        "rel_hum",
-    ]  # keep altitude for yaxis & relhum for cloud layers
+    if clouds:
+        relevant_df_columns = [
+            "altitude",
+            "rel_hum",
+        ]  # keep altitude for yaxis & relhum for cloud layers
+    else:
+        relevant_df_columns = [
+            "altitude",
+        ]  # keep altitude for yaxis
     parameter_string = str()
     for param in params:
         relevant_df_columns.append(param)
@@ -360,18 +365,18 @@ def create_plot(
             "x_max": temp_max,
         },
         "dewp_temp": {
-            "label": "Dew Point Temperature ",
+            "label": "Dew point temperature ",
             "xlabel": "Temperature [°C]",
             "x_min": temp_min,
             "x_max": temp_max,
         },
         "wind_dir": {
-            "label": "Wind Direction",
-            "xlabel": "Wind Direction [°]",
+            "label": "Wind direction",
+            "xlabel": "Wind direction [°]",
         },
         "wind_vel": {
-            "label": "Wind Velocity",
-            "xlabel": "Wind Velocity [m/s]",
+            "label": "Wind velocity",
+            "xlabel": "Wind velocity [m/s]",
             "x_min": windvel_min,
             "x_max": windvel_max,
         },

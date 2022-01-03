@@ -59,9 +59,9 @@ from .stations import sdf
 )
 @click.option(
     "--relhum_thresh",
-    default=95,
+    default=98,
     type=float,
-    help="Relative humidity threshold for clouds. Def: 95",
+    help="Relative humidity threshold for clouds. Def: 98",
 )
 # command line inputs for axes limit settings
 @click.option(
@@ -126,10 +126,10 @@ def main(
 ) -> None:
     """Plot vertical profiles of balloon radiosounding data.
 
-    Available variables are: windvel/winddir/temp/dewp.
+    Available variables are: windvel/winddir/temp/dewp_temp.
 
-    If (wind or windvel) AND (temp or dewp) are plottet, two plots side by side will be created.
-    Otherwise one plot containing up to two variables (wind/windvel or temp/dewp).
+    If (wind or windvel) AND (temp or dewp_temp) are plottet, two plots side by side will be created.
+    Otherwise one plot containing up to two variables (wind/windvel or temp/dewp_temp).
 
     Personal axis limits can be specified by using the '--personal_settings' flag in conjunction with the
     axis limits one wants to define.
@@ -140,7 +140,7 @@ def main(
     Otherwise the axes limits will be fitted to the data.
 
     Example command:
-    plot_rs --date 2021111012 --outpath path/to/plots --grid --clouds --relhum_thresh 99 --params dewp --params temp
+    plot_rs --date 2021111012 --outpath path/to/plots --grid --clouds --relhum_thresh 99 --params dewp_temp --params temp
 
     """
     # Preparations:
@@ -159,6 +159,7 @@ def main(
     df = get_rs(
         date=date,
         params=params,
+        clouds=clouds,
         station=station,
         print_steps=print_steps,
         alt_bot=alt_bot,
