@@ -140,7 +140,7 @@ def plot_single_variable(
         ax.plot(
             values,
             df_height.values,
-            label=str_valid_time(date, lt),
+            label=f"{str_valid_time(date, lt)} (+{lt:02}h)",
             color=colors[icolor],
             marker=marker,
         )
