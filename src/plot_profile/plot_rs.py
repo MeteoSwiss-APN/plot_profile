@@ -196,7 +196,7 @@ def plot_clouds(df, relhum_thresh, print_steps, ax, case=None):
                     ymax=cloud_end[i],
                     color="grey",
                     linestyle="-",
-                    alpha=0.5,
+                    alpha=0.3,
                 )
             else:
                 ax[0].axhspan(
@@ -204,7 +204,7 @@ def plot_clouds(df, relhum_thresh, print_steps, ax, case=None):
                     ymax=cloud_end[i],
                     color="grey",
                     linestyle="-",
-                    alpha=0.5,
+                    alpha=0.3,
                 )
             i += 1
 
