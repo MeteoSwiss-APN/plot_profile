@@ -17,9 +17,13 @@ import numpy as np
 import pandas as pd
 
 # Local
-# remove leading '.' if this script should be used on its own
 from .stations import sdf
 from .variables import vdf
+
+# remove leading '.' if this script should be used on its own
+# from .stations import sdf
+# from .variables import vdf
+
 
 # import ipdb
 
@@ -356,8 +360,8 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
 
 if __name__ == "__main__":
 
-    test_profile = True
-    test_surface = False
+    test_profile = False
+    test_surface = True
 
     if test_profile:
         data = dwh_retrieve(
@@ -375,9 +379,7 @@ if __name__ == "__main__":
         data = dwh_retrieve(
             device="2m",
             station="pay",
-            vars=[
-                "temp",
-            ],
+            vars=["temp", "cbh", "ver_vis"],
             timestamps=["202111190000", "202111190300"],
             verbose=True,
         )
