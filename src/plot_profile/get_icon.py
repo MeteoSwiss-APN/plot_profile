@@ -170,7 +170,7 @@ def get_icon(
     df_height = pd.Series(data=calc_hhl(height))
 
     # reverse order of df_height s.t. it is from bottom to top
-    df_height = df_height.iloc[::-1]
+    df_height = df_height.iloc[::-1].reset_index(drop=True)
 
     # get criteria to cut away top and bottom
     crit = slice_top_bottom(
@@ -240,6 +240,13 @@ def get_icon(
             columns=leadtime,
             data=values.transpose(),
         )
+
+        # reverse order of df_values as well. --> now it should be corresonding to the reversed height column
+        df_values = df_values.iloc[::-1].reset_index(drop=True)
+
+        # only extract the relevant altitude levels (encoded in the crit series; True --> relevant)
+        df_values = df_values[crit]
+
         # add to dictionary
         data_dict[variable] = df_values[crit]
 
