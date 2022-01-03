@@ -169,8 +169,13 @@ def get_icon(
     # create pandas objects of height values
     df_height = pd.Series(data=calc_hhl(height))
 
+    # reverse order of df_height s.t. it is from bottom to top
+    df_height = df_height.iloc[::-1]
+
     # get criteria to cut away top and bottom
-    crit = slice_top_bottom(df_height, alt_top, alt_bot, verbose)
+    crit = slice_top_bottom(
+        df_height=df_height, alt_top=alt_top, alt_bot=alt_bot, verbose=verbose
+    )
 
     # fill HEIGHT as sliced pandas series into dictionary
     data_dict["height"] = df_height[crit]
