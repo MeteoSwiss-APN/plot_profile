@@ -57,7 +57,6 @@ with open("requirements/requirements.in") as f:
 scripts = [
     "plot_profile=plot_profile.cli:main",  # main, no plotting routines attached
     "plot_rs=plot_profile.cli_rs:main",
-    "plot_rs_icon=plot_profile.cli_rs_icon:main",
     "plot_icon_profiles=plot_profile.cli_icon_profiles:main",
     "plot_icon_heatmap=plot_profile.cli_icon_heatmap:main",
     "plot_mwr_heatmap=plot_profile.cli_mwr_heatmap:main",

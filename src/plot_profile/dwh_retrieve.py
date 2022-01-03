@@ -13,20 +13,13 @@ from io import StringIO
 from os import stat
 
 # Third-party
+# import ipdb
 import numpy as np
 import pandas as pd
 
 # Local
 from .stations import sdf
 from .variables import vdf
-
-# remove leading '.' if this script should be used on its own
-# from .stations import sdf
-# from .variables import vdf
-
-
-# import ipdb
-
 
 def check_vars(vars, device):
     """Create comma-separated strings of DWH IDs from one or more variables."""
@@ -38,8 +31,8 @@ def check_vars(vars, device):
             print(f"! Device {device} not available for {vars}!")
             sys.exit(1)
 
-    # list containing string(s)
-    elif isinstance(vars, list):
+    # tuple containing string(s)
+    elif isinstance(vars, tuple):
 
         # only one string
         if len(vars) == 1:
@@ -59,14 +52,13 @@ def check_vars(vars, device):
                 print(f"! Device not available for {vars}!")
 
     else:
-        print("! nonsense variable list !")
+        print("! nonsense variable tuple !")
         sys.exit(1)
 
     # add altitude for radiosounding retrieves
     # NEW: also add relative humidity for radiosounding retrieves
     if device == "rs":
         vars_str += f",{vdf['altitude'].dwh_id['rs']}"
-        vars_str += f",{vdf['rel_hum'].dwh_id['rs']}"
 
     return vars_str
 
@@ -131,14 +123,14 @@ def dwh2pandas(cmd, verbose):
     return data
 
 
-def dwh_surface(station_name, vars_str, start, end, verbose):
+def dwh_surface(station_name, vars_str, start, end, verbose=False):
     """Retrieve surface-based data from DWH.
 
     Args:
         station_name    (str):  DWH station name
-        vars_str        (str):  comma-separated list of DWH IDs of variables
-        start           (str):  YYYYMMDDHHmm
-        end             (str):  YYYYMMDDHHmm (same or later as <start>)
+        vars_str        (str):  DWH IDs of variables, separated by comma
+        start           (str):  YYYYmmddHHMM
+        end             (str):  YYYYmmddHHMM (same or later as <start>)
         verbose         (bool): verbose statements
 
     Returns:
@@ -172,13 +164,13 @@ def dwh_surface(station_name, vars_str, start, end, verbose):
     return data
 
 
-def dwh_profile(station_id, vars_str, date, verbose):
+def dwh_profile(station_id, vars_str, date, verbose=False):
     """Retrieve profile-based data from DWH.
 
     Args:
         station_id  (str):  DWH ID of station (number as string!)
-        vars_str    (str):  comma-separated list of DWH IDs of variables
-        date        (str):  YYYYMMDDHHmm
+        vars_str    (str):  DWH IDs of variables, separated by comma
+        date        (str):  YYYYmmddHHMM
         verbose     (bool): verbose statements
 
     Returns:
@@ -263,7 +255,7 @@ def check_timestamps_profile(timestamps):
         print(f"! timestamps input is nonsense: {timestamps}")
 
 
-def dwh_retrieve(device, station, vars, timestamps, verbose):
+def dwh_retrieve(device, station, vars, timestamps, verbose=False):
     """Retrieve observational data from DWH.
 
     The retrieve_cscs command works for two different observational types:
@@ -274,7 +266,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
         device      string              measurement device: 'rs', 'mwr', 'cm', ...
         station     string              station short or longname
         vars        list of strings     variables
-        timestamps  list of strings     either 1 or 2 timestamps YYYYMMDDHHMM
+        timestamps  list of strings     either 1 or 2 timestamps YYYYmmddHHMM
 
     Output:
         pandas dataframe
@@ -307,7 +299,10 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
         # rename column names to nice short names and
         #  make list of relevant columns
         raw_data.rename(columns={"termin": "timestamp"}, inplace=True)
-        relevant_vars = ["timestamp", "altitude", "rel_hum"]
+        relevant_vars = [
+            "timestamp",
+            "altitude",
+        ]
         for var in vars:
             dwh_id = vdf[var].dwh_id[device]
             short_name = vdf[var].short_name
@@ -315,7 +310,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose):
             relevant_vars.append(short_name)
         if device == "rs":
             raw_data.rename(columns={"742": "altitude"}, inplace=True)
-            raw_data.rename(columns={"746": "rel_hum"}, inplace=True)
         else:
             raw_data.rename(columns={"level": "altitude"}, inplace=True)
 

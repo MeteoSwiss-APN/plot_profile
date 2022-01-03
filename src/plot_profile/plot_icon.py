@@ -9,12 +9,15 @@ Date: 25/11/2021.
 import datetime as dt
 
 # Third-party
+# import ipdb
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
 # Local
+from .plot_rs import plot_clouds
+from .utils import linestyle_dict
 from .utils import save_fig
 from .variables import vdf
 
@@ -61,9 +64,12 @@ def str_valid_time(ini, lt):
 
 def plot_single_variable(
     data_dict,
+    obs_dict,
     variable,
     outpath,
     date,
+    add_clouds,
+    relhum_thresh,
     alt_bot,
     alt_top,
     loc,
@@ -141,11 +147,42 @@ def plot_single_variable(
         ax.plot(
             values,
             df_height.values,
-            label=str_valid_time(date, lt),
+            label=f"{str_valid_time(date, lt)} (+{lt:02}h)",
             color=colors[icolor],
             marker=marker,
         )
         icolor = icolor + 1
+
+    # --add_rs
+    try:
+        rs_data = obs_dict["rs"]
+
+        # loop over timestamps
+        for i, (timestamp, sounding) in enumerate(rs_data.items()):
+            values = sounding[var.short_name]
+            alt = sounding["altitude"]
+            ax.plot(
+                values,
+                alt,
+                label=f"RaSo: {timestamp.strftime('%b %d, %H')} UTC",
+                color="black",
+                linestyle=linestyle_dict[i],
+            )
+
+            # add cloud shading
+            # ipdb.set_trace()
+            if add_clouds:
+                plot_clouds(
+                    df=sounding,
+                    relhum_thresh=relhum_thresh,
+                    print_steps=verbose,
+                    ax=ax,
+                    case="single",
+                )
+
+    except (TypeError, KeyError) as e:
+        if verbose:
+            print("no radiosounding obs added")
 
     # adjust appearance
     ax.set(
@@ -241,16 +278,6 @@ def plot_two_variables(
     # figure settings
     plt.rcParams["figure.figsize"] = (4.5, 6)
     # plt.rcParams["figure.subplot.left"] = 0.15
-
-    # linestyles for several lead times
-    linestyle_dict = {
-        0: "solid",
-        1: "dotted",
-        2: "dashed",
-        3: (0, (1, 10)),  # loosely dotted
-        4: (0, (5, 10)),  # loosely dashed
-        5: (0, (3, 10, 1, 10)),  # loosely dashdotted
-    }
 
     # dates
     init_date = date.strftime("%b %-d, %Y")
@@ -368,8 +395,11 @@ def plot_two_variables(
 def create_plot(
     variables_list,
     data_dict,
+    obs_dict,
     outpath,
     date,
+    add_clouds,
+    relhum_thresh,
     alt_bot,
     alt_top,
     loc,
@@ -390,8 +420,12 @@ def create_plot(
         variables_list (list):          List of all variables of interest
         data_dict (dict):               Dictionary w/ keys for each variable. Each key contains the
                                         dataframe corresponding to this variable.
+        obs_dict (dict):                additional obs: radiosoundings
         outpath (str):                  path where figure should be stored
         date (datetime obj):            init date of simulation
+        add_clouds (bool):              add cloud shading
+        relhum_thresh (float):          threshold for cloud shading [%]
+        add_rs (list of int)            add radiosoundings for specified leadtimes
         alt_bot (int):                  lower boundary of altitude
         alt_top (int):                  upper boundary of altitude
         loc (str):                      location string
@@ -436,9 +470,12 @@ def create_plot(
         for variable in variables_list:
             plot_single_variable(
                 data_dict,
+                obs_dict,
                 variable,
                 outpath,
                 date,
+                add_clouds,
+                relhum_thresh,
                 alt_bot,
                 alt_top,
                 loc,
