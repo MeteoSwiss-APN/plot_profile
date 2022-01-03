@@ -135,9 +135,10 @@ def validtime_from_leadtime(date, leadtime, verbose=False):
 # linestyles for several lead times
 linestyle_dict = {
     0: "solid",
-    1: "dotted",
-    2: "dashed",
-    3: (0, (1, 10)),  # loosely dotted
-    4: (0, (5, 10)),  # loosely dashed
-    5: (0, (3, 10, 1, 10)),  # loosely dashdotted
+    1: "dashed",
+    2: "dotted",
+    3: "dashdot",
+    4: (0, (1, 10)),  # loosely dotted
+    5: (0, (5, 10)),  # loosely dashed
+    6: (0, (3, 10, 1, 10)),  # loosely dashdotted
 }

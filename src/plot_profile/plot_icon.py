@@ -16,9 +16,12 @@ import pandas as pd
 import seaborn as sns
 
 # Local
+from .plot_rs import plot_clouds
 from .utils import linestyle_dict
 from .utils import save_fig
 from .variables import vdf
+
+# import ipdb
 
 
 def get_yrange(alt_bot, alt_top, df_height):
@@ -65,6 +68,8 @@ def plot_single_variable(
     variable,
     outpath,
     date,
+    add_clouds,
+    relhum_thresh,
     alt_bot,
     alt_top,
     loc,
@@ -140,7 +145,7 @@ def plot_single_variable(
         ax.plot(
             values,
             df_height.values,
-            label=str_valid_time(date, lt),
+            label=f"{str_valid_time(date, lt)} (+{lt:02}h)",
             color=colors[icolor],
             marker=marker,
         )
@@ -150,6 +155,7 @@ def plot_single_variable(
     try:
         rs_data = obs_dict["rs"]
 
+        # loop over timestamps
         for i, (timestamp, sounding) in enumerate(rs_data.items()):
             values = sounding[var.short_name]
             alt = sounding["altitude"]
@@ -160,6 +166,17 @@ def plot_single_variable(
                 color="black",
                 linestyle=linestyle_dict[i],
             )
+
+            # add cloud shading
+            # ipdb.set_trace()
+            if add_clouds:
+                plot_clouds(
+                    df=sounding,
+                    relhum_thresh=relhum_thresh,
+                    print_steps=verbose,
+                    ax=ax,
+                    case="single",
+                )
 
     except (TypeError, KeyError) as e:
         if verbose:
@@ -379,6 +396,8 @@ def create_plot(
     obs_dict,
     outpath,
     date,
+    add_clouds,
+    relhum_thresh,
     alt_bot,
     alt_top,
     loc,
@@ -402,6 +421,8 @@ def create_plot(
         obs_dict (dict):                additional obs: radiosoundings
         outpath (str):                  path where figure should be stored
         date (datetime obj):            init date of simulation
+        add_clouds (bool):              add cloud shading
+        relhum_thresh (float):          threshold for cloud shading [%]
         add_rs (list of int)            add radiosoundings for specified leadtimes
         alt_bot (int):                  lower boundary of altitude
         alt_top (int):                  upper boundary of altitude
@@ -451,6 +472,8 @@ def create_plot(
                 variable,
                 outpath,
                 date,
+                add_clouds,
+                relhum_thresh,
                 alt_bot,
                 alt_top,
                 loc,
