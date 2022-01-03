@@ -52,6 +52,17 @@ from .utils import validtime_from_leadtime
 )
 # options with default value
 @click.option(
+    "--add_clouds",
+    is_flag=True,
+    help="Show clouds on plot. Def: False",
+)
+@click.option(
+    "--relhum_thresh",
+    default=98,
+    type=float,
+    help="Relative humidity threshold for clouds. Def: 98",
+)
+@click.option(
     "--add_rs",
     type=int,
     multiple=True,
@@ -158,6 +169,8 @@ def main(
     date: str,
     folder: str,
     var: str,
+    add_clouds: bool,
+    relhum_thresh: float,
     add_rs: int,
     alt_bot: int,
     alt_top: int,
@@ -208,14 +221,14 @@ def main(
 
     # B) retrieve observational data
     ################################
-    if add_rs:
+    if add_rs or add_clouds:
         if len(var) == 2:
             print(f"! --add_rs does not work for 2-variable-plot!")
             sys.exit(1)
 
         else:
             if verbose:
-                print("retrieve RS")
+                print("Retrieving radiosounding from DWH.")
 
             # list of timestamps for which radiosounding is retrieved
             rs_timestamps = [validtime_from_leadtime(date, lt) for lt in add_rs]
@@ -223,12 +236,23 @@ def main(
             # create obs_dict (like data_dict)
             obs_dict = {"rs": {tt: None for tt in rs_timestamps}}
 
+            # determine variables which should be retrieved
+            if var[0] in ["temp", "dewp_temp", "wind_dir", "wind_vel"] and add_clouds:
+                rs_var = (var[0], "rel_hum")
+            elif var[0] == "rel_hum" or add_clouds:
+                rs_var = ("rel_hum",)
+            elif var[0] in ["temp", "dewp_temp", "wind_dir", "wind_vel"]:
+                rs_var = (var[0],)
+            else:
+                print(f"--add_rs specified but no matching 1st variable: {var[0]}")
+                sys.exit(1)
+
             # loop over timestamps and fill data_dict
             for timestamp in rs_timestamps:
                 obs_dict["rs"][timestamp] = dwh_retrieve(
                     device="rs",
                     station="pay",
-                    vars=var,
+                    vars=rs_var,
                     timestamps=timestamp.strftime("%Y%m%d%H%M"),
                     verbose=verbose,
                 )
@@ -244,6 +268,8 @@ def main(
         obs_dict=obs_dict,
         outpath=outpath,
         date=date,
+        add_clouds=add_clouds,
+        relhum_thresh=relhum_thresh,
         alt_bot=alt_bot,
         alt_top=alt_top,
         loc=loc,

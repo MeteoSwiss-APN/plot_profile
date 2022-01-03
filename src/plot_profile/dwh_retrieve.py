@@ -61,9 +61,6 @@ def check_vars(vars, device):
     # NEW: also add relative humidity for radiosounding retrieves
     if device == "rs":
         vars_str += f",{vdf['altitude'].dwh_id['rs']}"
-        # add rel_hum for cloud shading
-        if "rel_hum" not in vars:
-            vars_str += f",{vdf['rel_hum'].dwh_id['rs']}"
 
     return vars_str
 
@@ -304,7 +301,10 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
         # rename column names to nice short names and
         #  make list of relevant columns
         raw_data.rename(columns={"termin": "timestamp"}, inplace=True)
-        relevant_vars = ["timestamp", "altitude", "rel_hum"]
+        relevant_vars = [
+            "timestamp",
+            "altitude",
+        ]
         for var in vars:
             dwh_id = vdf[var].dwh_id[device]
             short_name = vdf[var].short_name
@@ -312,7 +312,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             relevant_vars.append(short_name)
         if device == "rs":
             raw_data.rename(columns={"742": "altitude"}, inplace=True)
-            raw_data.rename(columns={"746": "rel_hum"}, inplace=True)
         else:
             raw_data.rename(columns={"level": "altitude"}, inplace=True)
 
