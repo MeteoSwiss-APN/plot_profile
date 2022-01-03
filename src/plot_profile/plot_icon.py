@@ -34,7 +34,7 @@ def get_yrange(alt_bot, alt_top, df_height):
 
     """
     if alt_bot is None:
-        ymin = int(df_height.iloc[-1])
+        ymin = int(df_height.values.min())
     else:
         ymin = alt_bot
 
@@ -79,8 +79,10 @@ def plot_single_variable(
     show_marker,
     zeroline,
 ):
-
     print(f"--- creating plot for variable {variable}")
+
+    # check if data dictionary looks reasonable
+    # print(f"data_dict =\n{data_dict}")
 
     # load values from dictionary
     # test whether variable is even available
