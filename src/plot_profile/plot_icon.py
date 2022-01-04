@@ -79,6 +79,7 @@ def add_obs(ax, obs_dict, var, add_clouds, relhum_thresh, verbose=False):
                     color="black",
                     linestyle=linestyle_dict[i],
                 )
+                ax.legend()
 
             # add cloud shading
             if add_clouds:
@@ -189,7 +190,7 @@ def plot_single_variable(
         icolor = icolor + 1
 
     # add observational data: radiosounding variables or cloud shading
-    add_obs(ax, obs_dict, var, add_clouds, relhum_thresh, verbose)
+    ax = add_obs(ax, obs_dict, var, add_clouds, relhum_thresh, verbose)
 
     # adjust appearance
     ax.set(
@@ -324,7 +325,7 @@ def plot_two_variables(
         ln = ax_bottom.plot(
             values,
             df_height.values,
-            label=f"{str_valid_time(date, lt)}: {variables_list[0]}",
+            label=f"{str_valid_time(date, lt)}: {variables_list[0].upper()}",
             color=var_0.color,
             linestyle=linestyle_dict[tmp],
             marker=marker,
@@ -339,7 +340,7 @@ def plot_two_variables(
         ln = ax_top.plot(
             values,
             df_height.values,
-            label=f"{str_valid_time(date, lt)}: {variables_list[1]}",
+            label=f"{str_valid_time(date, lt)}: {variables_list[1].upper()}",
             color=var_1.color,
             linestyle=linestyle_dict[tmp],
             marker=marker,
