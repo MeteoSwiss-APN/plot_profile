@@ -75,7 +75,7 @@ def add_obs(ax, obs_dict, var, add_clouds, relhum_thresh, verbose=False):
                 ax.plot(
                     values,
                     alt,
-                    label=f"RaSo: {timestamp.strftime('%b %d, %H')} UTC",
+                    label=f"RS: {timestamp.strftime('%b %d, %H')}",
                     color="black",
                     linestyle=linestyle_dict[i],
                 )
@@ -138,7 +138,7 @@ def plot_single_variable(
     var = vdf[variable]
 
     # figure settings
-    plt.rcParams["figure.figsize"] = (4.5, 6)
+    plt.rcParams["figure.figsize"] = (5, 6)
     # plt.rcParams["figure.subplot.left"] = 0.15
 
     # dates
