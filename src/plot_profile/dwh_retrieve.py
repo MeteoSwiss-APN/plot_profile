@@ -13,7 +13,6 @@ from io import StringIO
 from os import stat
 
 # Third-party
-# import ipdb
 import numpy as np
 import pandas as pd
 
@@ -167,13 +166,14 @@ def dwh_surface(station_name, vars_str, start, end, verbose=False):
     return data
 
 
-def dwh_profile(device, station_id, vars_str, date, verbose=False):
+def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
     """Retrieve profile-based data from DWH.
 
     Args:
         station_id  (str):  DWH ID of station (number as string!)
         vars_str    (str):  DWH IDs of variables, separated by comma
-        date        (str):  YYYYmmddHHMM
+        start       (str):  YYYYmmddHHMM
+        end         (str):  YYYYmmddHHMM (same or later as <start>)
         verbose     (bool): verbose statements
 
     Returns:
@@ -183,23 +183,24 @@ def dwh_profile(device, station_id, vars_str, date, verbose=False):
     if verbose:
         print(f"Retrieving profile-based data for:")
         print(f"  {vars_str}")
-        print(f"  on {date}")
+        print(f"  from {start}")
+        print(f"  to   {end}")
         print(f"  at {station_id}.")
 
     cmd = (
         "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,elev,name,wmo_ind"
-        + " -w 22 -s profile -p "
+        + " -s profile -p "
         + vars_str
         + " -i int_ind,"
         + station_id
         + " -t "
-        + date
+        + start
         + "-"
-        + date
+        + end
     )
 
     if device == "rs":
-        cmd = cmd + " -C 34"
+        cmd = cmd + " -C 34 -w 22"
     elif device == "mwr":
         cmd = cmd + " -C 38 -w 31"
     else:
@@ -296,14 +297,17 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
         # check timestamps input:
         #  must be either string or one string in a list
-        timestamp = check_timestamps_profile(timestamps)
+        # timestamp = check_timestamps_profile(timestamps)
+        t1, t2 = check_timestamps_surface(timestamps)
 
         # call dwh retrieve for profile-based data
         raw_data = dwh_profile(
             device=device,
             station_id=sdf[station].dwh_id,
             vars_str=vars_str,
-            date=timestamp,
+            # date=timestamp,
+            start=t1,
+            end=t2,
             verbose=verbose,
         )
 
@@ -333,6 +337,35 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             raw_data.rename(columns={"level": "altitude"}, inplace=True)
 
         data = raw_data[relevant_vars]
+
+        if t1 == t2:
+            return data
+
+        else:
+            if len(vars) > 1:
+                print(
+                    f"! Profile retrieve not yet supported for multiple times AND multiple variables!"
+                )
+                sys.exit(1)
+            else:
+
+                # extract unique timestamps
+                unique_ts = data.timestamp.unique()
+
+                # create new dataframe with timestamps as columns
+                new_df = pd.DataFrame(columns=unique_ts)
+
+                # loop over timestamps to fill new dataframe
+                for ts in unique_ts:
+                    print(ts)
+                    new_df[ts] = data[data.timestamp == ts][var].values
+
+                # use altitude as index
+                new_df.index = data[data.timestamp == ts]["altitude"]
+
+                print("! Assuming that all profile data have same altitude levels!")
+
+                return new_df
 
     # surface-based data
     elif device in ["2m"]:
@@ -364,11 +397,11 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
         data = raw_data[relevant_vars]
 
+        return data
+
     else:
         print("! unknown device!")
         sys.exit(1)
-
-    return data
 
 
 if __name__ == "__main__":
@@ -383,6 +416,7 @@ if __name__ == "__main__":
             vars="temp",
             timestamps=[
                 "202111190000",
+                "202111190200",
             ],
             verbose=True,
         )
