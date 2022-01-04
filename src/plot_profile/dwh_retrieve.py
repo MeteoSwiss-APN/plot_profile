@@ -167,7 +167,7 @@ def dwh_surface(station_name, vars_str, start, end, verbose=False):
     return data
 
 
-def dwh_profile(station_id, vars_str, date, verbose=False):
+def dwh_profile(device, station_id, vars_str, date, verbose=False):
     """Retrieve profile-based data from DWH.
 
     Args:
@@ -196,8 +196,15 @@ def dwh_profile(station_id, vars_str, date, verbose=False):
         + date
         + "-"
         + date
-        + " -C 34"
     )
+
+    if device == "rs":
+        cmd = cmd + " -C 34"
+    elif device == "mwr":
+        cmd = cmd + " -C 38 -w 31"
+    else:
+        print(f"Unknown profile obs device: {device}.")
+        sys.exit(1)
 
     # run command
     data = dwh2pandas(cmd, verbose)
@@ -293,6 +300,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
         # call dwh retrieve for profile-based data
         raw_data = dwh_profile(
+            device=device,
             station_id=sdf[station].dwh_id,
             vars_str=vars_str,
             date=timestamp,
@@ -306,11 +314,19 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             "timestamp",
             "altitude",
         ]
+
+        # create tuple if only 1 variable is given
+        if isinstance(vars, str):
+            vars = (vars,)
+
+        # renaming columns of variable(s)
         for var in vars:
             dwh_id = vdf[var].dwh_id[device]
             short_name = vdf[var].short_name
             raw_data.rename(columns={dwh_id: short_name}, inplace=True)
             relevant_vars.append(short_name)
+
+        # rename altitude-column
         if device == "rs":
             raw_data.rename(columns={"742": "altitude"}, inplace=True)
         else:
@@ -357,26 +373,26 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
 if __name__ == "__main__":
 
-    test_profile = False
-    test_surface = True
+    test_profile = True
+    test_surface = False
 
     if test_profile:
         data = dwh_retrieve(
-            device="rs",
+            device="mwr",
             station="pay",
-            vars=["temp", "dewp_temp"],
+            vars="temp",
             timestamps=[
                 "202111190000",
             ],
-            verbose=False,
+            verbose=True,
         )
-        print(f"Radio Sounding dataframe looks like:\n{data}")
+        print(f"Sounding dataframe looks like:\n{data}")
 
     if test_surface:
         data = dwh_retrieve(
             device="2m",
             station="pay",
-            vars=["temp", "cbh", "ver_vis"],
+            vars=("temp", "cbh", "ver_vis"),
             timestamps=["202111190000", "202111190300"],
             verbose=True,
         )
