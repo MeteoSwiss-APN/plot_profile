@@ -94,6 +94,7 @@ vdf["clc"].unit = ""
 vdf["clc"].min_value = -0.05
 vdf["clc"].max_value = 1.05
 vdf["clc"].color = "yellowgreen"
+vdf["clc"].colormap = "bone"
 
 # temperature tendency due to longwave radiative heating
 #  ddt_t_rad_lw
@@ -147,6 +148,7 @@ vdf["qc"].unit = "g/kg"
 vdf["qc"].min_value = -0.01
 vdf["qc"].max_value = 0.07
 vdf["qc"].color = "darkblue"
+vdf["qc"].colormap = "YlGn"
 vdf["qc"].mult = 1000
 
 # diagnostic cloud water: qc_dia
@@ -177,6 +179,7 @@ vdf["qv"].unit = "g/kg"
 vdf["qv"].min_value = 0
 vdf["qv"].max_value = 6
 vdf["qv"].color = "skyblue"
+vdf["qv"].colormap = "PuBu"
 vdf["qv"].mult = 1000
 
 # diagnostic humidity: qv_dia
@@ -210,7 +213,7 @@ vdf["temp"].linestyle = "-"
 vdf["temp"].mult = 1
 vdf["temp"].plus = -273
 vdf["temp"].avg = False
-vdf["temp"].dwh_id = {"rs": "745", "2m": "91"}
+vdf["temp"].dwh_id = {"rs": "745", "2m": "91", "mwr": "3147"}
 
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"
