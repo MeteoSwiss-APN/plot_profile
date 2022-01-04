@@ -9,7 +9,6 @@ Date: 25/11/2021.
 import datetime as dt
 
 # Third-party
-# import ipdb
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -60,6 +59,43 @@ def str_valid_time(ini, lt):
     valid = ini + dt.timedelta(hours=lt)
 
     return valid.strftime("%H:%M")
+
+
+def add_obs(ax, obs_dict, var, add_clouds, relhum_thresh, verbose=False):
+    """Add obs data to ax."""
+    try:
+        rs_data = obs_dict["rs"]
+
+        # loop over timestamps
+        for i, (timestamp, sounding) in enumerate(rs_data.items()):
+
+            if var.short_name in ["temp", "dewp_temp", "wind_vel", "wind_dir"]:
+                values = sounding[var.short_name]
+                alt = sounding["altitude"]
+                ax.plot(
+                    values,
+                    alt,
+                    label=f"RaSo: {timestamp.strftime('%b %d, %H')} UTC",
+                    color="black",
+                    linestyle=linestyle_dict[i],
+                )
+                ax.legend()
+
+            # add cloud shading
+            if add_clouds:
+                plot_clouds(
+                    df=sounding,
+                    relhum_thresh=relhum_thresh,
+                    print_steps=verbose,
+                    ax=ax,
+                    case="single",
+                )
+
+    except (TypeError, KeyError) as e:
+        if verbose:
+            print("No radiosounding obs added.")
+
+    return ax
 
 
 def plot_single_variable(
@@ -153,36 +189,8 @@ def plot_single_variable(
         )
         icolor = icolor + 1
 
-    # --add_rs
-    try:
-        rs_data = obs_dict["rs"]
-
-        # loop over timestamps
-        for i, (timestamp, sounding) in enumerate(rs_data.items()):
-            values = sounding[var.short_name]
-            alt = sounding["altitude"]
-            ax.plot(
-                values,
-                alt,
-                label=f"RaSo: {timestamp.strftime('%b %d, %H')} UTC",
-                color="black",
-                linestyle=linestyle_dict[i],
-            )
-
-            # add cloud shading
-            # ipdb.set_trace()
-            if add_clouds:
-                plot_clouds(
-                    df=sounding,
-                    relhum_thresh=relhum_thresh,
-                    print_steps=verbose,
-                    ax=ax,
-                    case="single",
-                )
-
-    except (TypeError, KeyError) as e:
-        if verbose:
-            print("no radiosounding obs added")
+    # add observational data: radiosounding variables or cloud shading
+    ax = add_obs(ax, obs_dict, var, add_clouds, relhum_thresh, verbose)
 
     # adjust appearance
     ax.set(
@@ -233,8 +241,11 @@ def plot_two_variables(
     df_height,
     variables_list,
     data_dict,
+    obs_dict,
     outpath,
     date,
+    add_clouds,
+    relhum_thresh,
     alt_bot,
     alt_top,
     loc,
@@ -314,7 +325,7 @@ def plot_two_variables(
         ln = ax_bottom.plot(
             values,
             df_height.values,
-            label=f"{str_valid_time(date, lt)}: {variables_list[0]}",
+            label=f"{str_valid_time(date, lt)}: {variables_list[0].upper()}",
             color=var_0.color,
             linestyle=linestyle_dict[tmp],
             marker=marker,
@@ -329,13 +340,15 @@ def plot_two_variables(
         ln = ax_top.plot(
             values,
             df_height.values,
-            label=f"{str_valid_time(date, lt)}: {variables_list[1]}",
+            label=f"{str_valid_time(date, lt)}: {variables_list[1].upper()}",
             color=var_1.color,
             linestyle=linestyle_dict[tmp],
             marker=marker,
         )
         ln1 += ln
         tmp += 1
+
+    add_obs(ax_bottom, obs_dict, var_0, add_clouds, relhum_thresh, verbose)
 
     # define min and max values for xaxis
     # if flag --xrange_fix is set: use values from variable dataframe
@@ -449,8 +462,11 @@ def create_plot(
             df_height,
             variables_list,
             data_dict,
+            obs_dict,
             outpath,
             date,
+            add_clouds,
+            relhum_thresh,
             alt_bot,
             alt_top,
             loc,

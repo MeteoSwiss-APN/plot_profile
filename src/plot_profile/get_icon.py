@@ -178,9 +178,7 @@ def get_icon(
     )
 
     # fill HEIGHT as sliced pandas series into dictionary
-    # TODO: crit does not work
-    # data_dict["height"] = df_height[crit]
-    data_dict["height"] = df_height
+    data_dict["height"] = df_height[crit]
 
     ### B) ICON forecast files
     ##########################
@@ -258,8 +256,6 @@ def get_icon(
         df_values = df_values[crit]
 
         # add to dictionary
-        # TODO: crit does not work
-        # data_dict[variable] = df_values[crit]
-        data_dict[variable] = df_values
+        data_dict[variable] = df_values[crit]
 
     return data_dict

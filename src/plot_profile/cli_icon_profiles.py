@@ -222,40 +222,35 @@ def main(
     # B) retrieve observational data
     ################################
     if add_rs or add_clouds:
-        if len(var) == 2:
-            print(f"! --add_rs does not work for 2-variable-plot!")
+        if verbose:
+            print("Retrieving radiosounding from DWH.")
+
+        # list of timestamps for which radiosounding is retrieved
+        rs_timestamps = [validtime_from_leadtime(date, lt) for lt in add_rs]
+
+        # create obs_dict (like data_dict)
+        obs_dict = {"rs": {tt: None for tt in rs_timestamps}}
+
+        # determine variables which should be retrieved
+        if var[0] in ["temp", "dewp_temp", "wind_dir", "wind_vel"] and add_clouds:
+            rs_var = (var[0], "rel_hum")
+        elif var[0] == "rel_hum" or add_clouds:
+            rs_var = ("rel_hum",)
+        elif var[0] in ["temp", "dewp_temp", "wind_dir", "wind_vel"]:
+            rs_var = (var[0],)
+        else:
+            print(f"--add_rs specified but no matching 1st variable: {var[0]}")
             sys.exit(1)
 
-        else:
-            if verbose:
-                print("Retrieving radiosounding from DWH.")
-
-            # list of timestamps for which radiosounding is retrieved
-            rs_timestamps = [validtime_from_leadtime(date, lt) for lt in add_rs]
-
-            # create obs_dict (like data_dict)
-            obs_dict = {"rs": {tt: None for tt in rs_timestamps}}
-
-            # determine variables which should be retrieved
-            if var[0] in ["temp", "dewp_temp", "wind_dir", "wind_vel"] and add_clouds:
-                rs_var = (var[0], "rel_hum")
-            elif var[0] == "rel_hum" or add_clouds:
-                rs_var = ("rel_hum",)
-            elif var[0] in ["temp", "dewp_temp", "wind_dir", "wind_vel"]:
-                rs_var = (var[0],)
-            else:
-                print(f"--add_rs specified but no matching 1st variable: {var[0]}")
-                sys.exit(1)
-
-            # loop over timestamps and fill data_dict
-            for timestamp in rs_timestamps:
-                obs_dict["rs"][timestamp] = dwh_retrieve(
-                    device="rs",
-                    station="pay",
-                    vars=rs_var,
-                    timestamps=timestamp.strftime("%Y%m%d%H%M"),
-                    verbose=verbose,
-                )
+        # loop over timestamps and fill data_dict
+        for timestamp in rs_timestamps:
+            obs_dict["rs"][timestamp] = dwh_retrieve(
+                device="rs",
+                station="pay",
+                vars=rs_var,
+                timestamps=timestamp.strftime("%Y%m%d%H%M"),
+                verbose=verbose,
+            )
 
     else:
         obs_dict = None
