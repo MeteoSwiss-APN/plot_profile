@@ -29,9 +29,16 @@ from .plot_icon import create_heatmap
         ["temp", "qc", "qv", "clc", "ddt_t_rad_lw", "ddt_t_rad_sw"],
         case_sensitive=True,
     ),
-    multiple=True,  # TODO: change to true later, s.t. several 'heatmaps' can be created at once!
+    multiple=True,
     help="MANDATORY: Variable name(s).",
-)  # for the
+)
+@click.option(
+    "--var_min", type=float, help="Lower Limit for Colorbar/Variable. No default."
+)
+@click.option(
+    "--var_max", type=float, help="Upper Limit for Colorbar/Variable. No default."
+)
+
 # options with default value
 @click.option("--alt_bot", type=int, help="Altitude bottom. Def: surface.")
 @click.option("--alt_top", default=2000, type=int, help="Altitude top. Def: 2000")
@@ -131,11 +138,13 @@ def main(
     model: str,
     outpath: str,
     verbose: bool,
+    var_min: float,
+    var_max: float,
 ):
     """Plot heatmap (time-height crosssection) of variable from ICON simulation.
 
     Example command:
-    TODO
+    plot_icon_heatmap --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --alt_top 2000 --start_leadtime 0 --end_leadtime 12 --outpath plots --verbose
 
     """
     leadtimes = list(range(start_leadtime, end_leadtime + 1, step))
@@ -152,20 +161,19 @@ def main(
         alt_top=alt_top,
         verbose=verbose,
     )
-
     create_heatmap(
         variables_list=var,
         data_dict=data_dict,
         outpath=outpath,
         date=date,
-        alt_bot=alt_bot,
-        alt_top=alt_top,
         loc=loc,
         model=model,
         appendix=appendix,
         datatypes=datatypes,
         leadtime=leadtimes,
         verbose=verbose,
+        var_min=var_min,
+        var_max=var_max,
     )
 
     print("--- done")

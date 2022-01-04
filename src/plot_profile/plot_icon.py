@@ -522,6 +522,8 @@ def create_heatmap(
     datatypes,
     leadtime,
     verbose,
+    var_min,
+    var_max,
 ):
     # the height dataframe is the same for all variables, thus outside of the
     # for-loop below. it needs some reformatting and type alignement for later use
@@ -596,6 +598,10 @@ def create_heatmap(
         )
         cbar = fig.colorbar(im, ax=ax)
         cbar.ax.set_ylabel(f"{var.long_name} [{var.unit}]")
+
+        if var_min:
+            im.set_clim(var_min, var_max)
+
         # cbar.ax.set_title("placeholder") # title for the colorbar if necessary
 
         # adjust appearance
