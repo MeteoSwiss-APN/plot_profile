@@ -75,7 +75,7 @@ def add_obs(ax, obs_dict, var, add_clouds, relhum_thresh, verbose=False):
                 ax.plot(
                     values,
                     alt,
-                    label=f"RaSo: {timestamp.strftime('%b %d, %H')} UTC",
+                    label=f"RS: {timestamp.strftime('%b %d, %H')}",
                     color="black",
                     linestyle=linestyle_dict[i],
                 )
@@ -138,7 +138,7 @@ def plot_single_variable(
     var = vdf[variable]
 
     # figure settings
-    plt.rcParams["figure.figsize"] = (4.5, 6)
+    plt.rcParams["figure.figsize"] = (5, 6)
     # plt.rcParams["figure.subplot.left"] = 0.15
 
     # dates
@@ -287,7 +287,7 @@ def plot_two_variables(
     lts = df_values_0.columns
 
     # figure settings
-    plt.rcParams["figure.figsize"] = (4.5, 6)
+    plt.rcParams["figure.figsize"] = (5, 6)
     # plt.rcParams["figure.subplot.left"] = 0.15
 
     # dates
@@ -589,6 +589,7 @@ def create_heatmap(
         # because the column names are the x-axis ticklabels of the heatmap
         df_values.rename(columns=col_dict, inplace=True)
 
+        plt.rcParams["figure.figsize"] = (7.5, 4.5)
         fig, ax = plt.subplots()
         im = ax.pcolormesh(
             lt_dt_series,
@@ -611,9 +612,7 @@ def create_heatmap(
         ax.set_title(f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC")
         ax.set_ylabel(f"Altitude [m asl]")
         # save figure
-        name = (
-            f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
-        )
+        name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}_heatmap'
         if appendix:
             name = name + "_" + appendix
         plt.tight_layout()
