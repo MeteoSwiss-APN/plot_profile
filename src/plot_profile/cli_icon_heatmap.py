@@ -156,7 +156,6 @@ def main(
 
     """
     leadtimes = list(range(start_leadtime, end_leadtime + 1, step))
-    print(leadtimes)
     data_dict = get_icon(
         folder=folder,
         date=date,
@@ -181,6 +180,7 @@ def main(
             timestamps=[timestamp_1, timestamp_2],
             verbose=verbose,
         )
+        print(f"Surface Data:\n{surface_data}")
     else:
         surface_data = None
 
