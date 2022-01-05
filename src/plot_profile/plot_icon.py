@@ -524,6 +524,7 @@ def create_heatmap(
     verbose,
     var_min,
     var_max,
+    surface_data=None,
 ):
     # the height dataframe is the same for all variables, thus outside of the
     # for-loop below. it needs some reformatting and type alignement for later use
