@@ -54,7 +54,7 @@ def check_vars(vars, device):
                 print(f"! Device not available for {vars}!")
 
     else:
-        print("! nonsense variable tuple !")
+        print(f"! vars is of type {type(vars)}; should be of type: tuple !")
         sys.exit(1)
 
     # add altitude for radiosounding retrieves
