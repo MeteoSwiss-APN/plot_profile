@@ -180,7 +180,6 @@ def main(
             timestamps=[timestamp_1, timestamp_2],
             verbose=verbose,
         )
-        print(f"Surface Data:\n{surface_data}")
     else:
         surface_data = None
 
