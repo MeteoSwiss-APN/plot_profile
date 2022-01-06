@@ -6,11 +6,10 @@ Date: 27/12/2022.
 """
 
 # Standard library
+import datetime as dt
 import subprocess  # use: run command line commands from python
 import sys
-from datetime import time
 from io import StringIO
-from os import stat
 
 # Third-party
 import numpy as np
@@ -23,43 +22,125 @@ from .variables import vdf
 # import ipdb
 
 
-def check_vars(vars, device):
-    """Create comma-separated strings of DWH IDs from one or more variables."""
-    # single string
-    if isinstance(vars, str):
-        try:
-            vars_str = vdf[vars].dwh_id[device]
-        except KeyError:
-            print(f"! Device {device} not available for {vars}!")
+def yy2yyyy(yy):
+    """Add '20' to timestamp.
+
+    E.g. '21081812' will become '2021081812'
+
+    Args:
+        yy (string)
+
+    Returns:
+        yyyy (string)
+
+    """
+    return f"20{yy}"
+
+
+def parse_timestamps(timestamps):
+    """Parse different formats of timestamps.
+
+    Args:
+    timestamps  (str, datetime-obj or list of one of those)
+
+    Returns:
+    t1, t2      (YYYYmmddHH)
+
+    """
+    # if list
+    if isinstance(timestamps, list):
+
+        # only 1 element in list
+        if len(timestamps) == 1:
+            ts0 = timestamps[0]
+
+            # if string
+            if isinstance(ts0, str):
+                if len(ts0) == 10:
+                    return ts0, ts0
+                elif len(ts0) == 8:
+                    ts0_20 = yy2yyyy(ts0)
+                    return ts0_20, ts0_20
+
+            # if datetime object
+            elif isinstance(ts0, dt.datetime):
+                ts0_str = ts0.strftime("%Y%m%d%H")
+                return ts0_str, ts0_str
+
+        # 2 elements in list
+        elif len(timestamps) == 2:
+            ts0 = timestamps[0]
+            ts1 = timestamps[1]
+
+            # if string
+            if isinstance(ts0, str):
+                if len(ts0) == 10:
+                    return ts0, ts1
+                elif len(ts0) == 8:
+                    ts0_20 = yy2yyyy(ts0)
+                    ts1_20 = yy2yyyy(ts1)
+                    return ts0_20, ts1_20
+
+            # if datetime-obj
+            elif isinstance(ts0, dt.datetime):
+                ts0_str = ts0.strftime("%Y%m%d%H")
+                ts1_str = ts1.strftime("%Y%m%d%H")
+                return ts0_str, ts1_str
+
+        else:
+            print("! too many timestamps")
             sys.exit(1)
 
-    # tuple containing string(s)
-    elif isinstance(vars, tuple):
+    # if only 1 string is given
+    elif isinstance(timestamps, str):
+        if len(timestamps) == 10:
+            return timestamps, timestamps
+        elif len(timestamps) == 8:
+            ts_20 = yy2yyyy(timestamps)
+            return ts_20, ts_20
 
-        # only one string
-        if len(vars) == 1:
-            try:
-                vars_str = vdf[vars[0]].dwh_id[device]
-            except KeyError:
-                print(f"! Device {device} not available for {vars[0]}!")
-                sys.exit(1)
-
-        # multiple strings
-        else:
-            try:
-                vars_str = vdf[vars[0]].dwh_id[device]
-                for var in vars[1:]:
-                    vars_str += f",{vdf[var].dwh_id[device]}"
-            except KeyError:
-                print(f"! Device not available for {vars}!")
+    # if only 1 datetime object is given
+    elif isinstance(timestamps, dt.datetime):
+        ts_str = timestamps.strftime("%Y%m%d%H")
+        return ts_str, ts_str
 
     else:
-        print("! nonsense variable tuple !")
+        print("! timestamps input is nonsense!")
         sys.exit(1)
 
+
+def parse_vars(vars, device):
+    """Create comma-separated strings of DWH IDs from tuple with one or more variables.
+
+    Args:
+    vars        (tuple)     variables
+    device      (str)       measurement device: rs, mwr, 2m
+
+    Returns:
+    str         E.g. 'temp' or 'temp,dewp_temp'
+
+    """
+    # only one string in tuple
+    if len(vars) == 1:
+        try:
+            vars_str = vdf[vars[0]].dwh_id[device]
+        except KeyError:
+            print(f"! Device {device} not available for {vars[0]}!")
+            sys.exit(1)
+
+    # multiple strings
+    else:
+        try:
+            vars_str = vdf[vars[0]].dwh_id[device]
+            for var in vars[1:]:
+                # add variable separated by comma
+                vars_str += f",{vdf[var].dwh_id[device]}"
+        except KeyError:
+            print(f"! Device not available for {vars}!")
+
     # add altitude for radiosounding retrieves
-    # NEW: also add relative humidity for radiosounding retrieves
     if device == "rs":
+        # add altitude separated by comma
         vars_str += f",{vdf['altitude'].dwh_id['rs']}"
 
     return vars_str
@@ -68,7 +149,7 @@ def check_vars(vars, device):
 def dwh2pandas(cmd, verbose):
     """Run retrieve_cscs command in terminal, create pandas dataframe."""
     if verbose:
-        print("--- calling: " + cmd)
+        print("Calling: " + cmd)
 
     # run command in terminal
     proc = subprocess.Popen(
@@ -109,6 +190,7 @@ def dwh2pandas(cmd, verbose):
 
     # check if no data is available for the time period
     if data.empty:
+        # TODO: Code should not break but return empty dataframe
         raise SystemExit("--- WARN: no data available.")
     else:
         if verbose:
@@ -121,7 +203,7 @@ def dwh2pandas(cmd, verbose):
                 1000,
             ):
                 print(data.head())
-            print("--- data retrieved into dataframe")
+            print("Finished data retrieve from DWH into dataframe.")
     return data
 
 
@@ -131,8 +213,8 @@ def dwh_surface(station_name, vars_str, start, end, verbose=False):
     Args:
         station_name    (str):  DWH station name
         vars_str        (str):  DWH IDs of variables, separated by comma
-        start           (str):  YYYYmmddHHMM
-        end             (str):  YYYYmmddHHMM (same or later as <start>)
+        start           (str):  YYYYmmddHH
+        end             (str):  YYYYmmddHH (same or later as <start>)
         verbose         (bool): verbose statements
 
     Returns:
@@ -172,8 +254,8 @@ def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
     Args:
         station_id  (str):  DWH ID of station (number as string!)
         vars_str    (str):  DWH IDs of variables, separated by comma
-        start       (str):  YYYYmmddHHMM
-        end         (str):  YYYYmmddHHMM (same or later as <start>)
+        start       (str):  YYYYmmddHH
+        end         (str):  YYYYmmddHH (same or later as <start>)
         verbose     (bool): verbose statements
 
     Returns:
@@ -213,59 +295,6 @@ def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
     return data
 
 
-def check_timestamps_surface(timestamps):
-    """Check timestamps user input for surface-based data.
-
-    Timestamps should either be a single string or a list of strings
-    with two entries.
-
-    Input:
-        timestamps  (str or list of strings)
-
-    Return:
-        string tuple:   t1, t2
-
-    """
-    if isinstance(timestamps, list):
-        if len(timestamps) == 1:
-            return timestamps[0], timestamps[0]
-        elif len(timestamps) == 2:
-            return timestamps[0], timestamps[1]
-        else:
-            print("! too many timestamps")
-            sys.exit(1)
-    elif isinstance(timestamps, str):
-        return timestamps, timestamps
-    else:
-        print("! timestamps input is nonsense!")
-        sys.exit(1)
-
-
-def check_timestamps_profile(timestamps):
-    """Check timestamps user input for profile-based data.
-
-    Timestamps should either be a single string or a list of strings
-    with only one entry.
-
-    Args:
-        timestamps
-
-    Returns:
-        timestamp
-
-    """
-    if isinstance(timestamps, list):
-        if len(timestamps) == 1:
-            return timestamps[0]
-        else:
-            print("! only one timestamp allowed for profile data")
-            sys.exit(1)
-    elif isinstance(timestamps, str):
-        return timestamps
-    else:
-        print(f"! timestamps input is nonsense: {timestamps}")
-
-
 def dwh_retrieve(device, station, vars, timestamps, verbose=False):
     """Retrieve observational data from DWH.
 
@@ -275,37 +304,38 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
     Input:
         device      string              measurement device: 'rs', 'mwr', 'cm', ...
-        station     string              station short or longname
+        station     string              station short name
         vars        list of strings     variables
-        timestamps  list of strings     either 1 or 2 timestamps YYYYmmddHHMM
+        timestamps  list of strings     either 1 or 2 timestamps YYYYmmddHH
 
     Output:
         pandas dataframe
     """
+    # parse timestamp input to 2 string of format YYYYmmddHH
+    t1, t2 = parse_timestamps(timestamps)
+
+    # create tuple of variables if only 1 variable is given
+    if isinstance(vars, str):
+        vars = (vars,)
+
+    # prepare string of DWH IDs for variable(s)
+    vars_str = parse_vars(vars, device)
+
     if verbose:
         print(f"Calling dwh retrieve command:")
         print(f"  device: {device}")
         print(f"  station: {station}")
         print(f"  variables: {vars}")
-        print(f"  timestamps: {timestamps}")
-
-    # prepare string of DWH IDs for variable(s)
-    vars_str = check_vars(vars, device)
+        print(f"  timestamps: {t1}, {t2}")
 
     # profile-based data
     if device in ["rs", "mwr"]:
-
-        # check timestamps input:
-        #  must be either string or one string in a list
-        # timestamp = check_timestamps_profile(timestamps)
-        t1, t2 = check_timestamps_surface(timestamps)
 
         # call dwh retrieve for profile-based data
         raw_data = dwh_profile(
             device=device,
             station_id=sdf[station].dwh_id,
             vars_str=vars_str,
-            # date=timestamp,
             start=t1,
             end=t2,
             verbose=verbose,
@@ -318,10 +348,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             "timestamp",
             "altitude",
         ]
-
-        # create tuple if only 1 variable is given
-        if isinstance(vars, str):
-            vars = (vars,)
 
         # renaming columns of variable(s)
         for var in vars:
@@ -338,9 +364,11 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
         data = raw_data[relevant_vars]
 
+        # case A) only 1 timestamp specified for profile data
         if t1 == t2:
             return data
 
+        # case B) 2 timestamps specified for profile data -> rearrange dataframe
         else:
             if len(vars) > 1:
                 print(
@@ -348,6 +376,11 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 )
                 sys.exit(1)
             else:
+
+                # print warning
+                print(
+                    "! Assuming that retrieved profiles all have same altitude levels !"
+                )
 
                 # extract unique timestamps
                 unique_ts = data.timestamp.unique()
@@ -369,10 +402,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
     # surface-based data
     elif device in ["2m"]:
-
-        # check timestamp input:
-        #  must be two strings
-        t1, t2 = check_timestamps_surface(timestamps)
 
         # call dwh retrieve for surface-based data
         raw_data = dwh_surface(
