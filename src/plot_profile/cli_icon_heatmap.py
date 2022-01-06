@@ -5,10 +5,14 @@ Author: Michel Zeller
 Date: 08/12/2021.
 """
 
+# Standard library
+from datetime import timedelta
+
 # Third-party
 import click
 
 # Local
+from .dwh_retrieve import dwh_retrieve
 from .get_icon import get_icon
 from .plot_icon import create_heatmap
 
@@ -76,7 +80,6 @@ from .plot_icon import create_heatmap
     default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
     help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
 )
-# ~~~~~~~~~NEW~~~~~~~~~ #
 @click.option(
     "--start_leadtime",
     type=int,
@@ -97,8 +100,6 @@ from .plot_icon import create_heatmap
     default=1,
     help="Leadtime(s) to be shown in one plot. Def: 1.",
 )
-
-# ~~~~~~~~~NEW~~~~~~~~~ #
 @click.option(
     "--lat", default=46.81281, type=float, help="Latitude of location. Def: 46.81 (PAY)"
 )
@@ -117,6 +118,12 @@ from .plot_icon import create_heatmap
     is_flag=True,
     default=False,
     help="Output details on what is happening.",
+)
+@click.option(
+    "--surface_station",
+    is_flag=True,
+    default=False,
+    help="Add cloud base height & vertical visibility scatter plots to heat map.",
 )
 def main(
     *,
@@ -140,6 +147,7 @@ def main(
     verbose: bool,
     var_min: float,
     var_max: float,
+    surface_station: bool,
 ):
     """Plot heatmap (time-height crosssection) of variable from ICON simulation.
 
@@ -161,19 +169,35 @@ def main(
         alt_top=alt_top,
         verbose=verbose,
     )
-    create_heatmap(
-        variables_list=var,
-        data_dict=data_dict,
-        outpath=outpath,
-        date=date,
-        loc=loc,
-        model=model,
-        appendix=appendix,
-        datatypes=datatypes,
-        leadtime=leadtimes,
-        verbose=verbose,
-        var_min=var_min,
-        var_max=var_max,
-    )
+
+    if surface_station:
+        timestamp_1 = (date + timedelta(hours=start_leadtime)).strftime("%Y%m%d%H%M")
+        timestamp_2 = (date + timedelta(hours=end_leadtime)).strftime("%Y%m%d%H%M")
+        surface_data = dwh_retrieve(
+            device="2m",  # hardcoded
+            station=loc,  # "pay",
+            vars=("cbh", "ver_vis"),
+            timestamps=[timestamp_1, timestamp_2],
+            verbose=verbose,
+        )
+    else:
+        surface_data = None
+
+    if True:
+        create_heatmap(
+            variables_list=var,
+            data_dict=data_dict,
+            outpath=outpath,
+            date=date,
+            loc=loc,
+            model=model,
+            appendix=appendix,
+            datatypes=datatypes,
+            leadtime=leadtimes,
+            verbose=verbose,
+            var_min=var_min,
+            var_max=var_max,
+            surface_data=surface_data,
+        )
 
     print("--- done")
