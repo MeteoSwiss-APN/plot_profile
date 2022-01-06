@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 # Local
 from .plot_rs import plot_clouds
@@ -620,15 +622,6 @@ def create_heatmap(
         if surface_data is not None:
             ax_scatter = ax.twiny()  # add axis for surface data
             ax_scatter.axis("off")  # & hide it
-            # ax_scatter.scatter(
-            #    x=surface_timestamp,
-            #    y=surface_cbh,
-            #    marker="^",
-            #    color=None,
-            #    facecolor=None,
-            #    alpha=1,
-            #    edgecolor="red",
-            # )
             ax_scatter.plot(
                 surface_timestamp,
                 surface_cbh,
@@ -645,17 +638,34 @@ def create_heatmap(
                 markerfacecolor="None",
                 markeredgecolor="indianred",
             )
-            # ax_scatter.scatter(
-            #    x=surface_timestamp,
-            #    y=surface_ver_vis,
-            #    marker="^",
-            #    color=None,
-            #    facecolor=None,
-            #    alpha=1,
-            #    edgecolor="red",
-            # )
 
-        # cbar.ax.set_title("placeholder") # title for the colorbar if necessary
+        # add customised legend
+        legend_elements = [
+            Patch(color="white", label=f"{var.long_name} (FCST)"),
+            Line2D(
+                [0],
+                [0],
+                marker="^",
+                markerfacecolor="None",
+                markeredgecolor="indianred",
+                markersize=10,
+                linestyle="None",
+                label="Cloud base (OBS)",
+            ),
+        ]
+        ax_scatter.legend(handles=legend_elements)
+
+        # if combining automatic and manual legend elemnts
+        ### where some data has already been plotted to ax
+        ###handles, labels = ax.get_legend_handles_labels()
+
+        ### manually define a new patch
+        ###patch = mpatches.Patch(color='grey', label='Manual Label')
+
+        ### handles is a list, so append manual patch
+        ###handles.append(patch)
+
+        ### cbar.ax.set_title("placeholder") # title for the colorbar if necessary
 
         # adjust appearance
         plt.tick_params(axis="both", labelsize=8)
