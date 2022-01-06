@@ -620,10 +620,40 @@ def create_heatmap(
         if surface_data is not None:
             ax_scatter = ax.twiny()  # add axis for surface data
             ax_scatter.axis("off")  # & hide it
-            ax_scatter.scatter(x=surface_timestamp, y=surface_cbh, c="blue", marker="o")
-            ax_scatter.scatter(
-                x=surface_timestamp, y=surface_ver_vis, c="red", marker="o"
+            # ax_scatter.scatter(
+            #    x=surface_timestamp,
+            #    y=surface_cbh,
+            #    marker="^",
+            #    color=None,
+            #    facecolor=None,
+            #    alpha=1,
+            #    edgecolor="red",
+            # )
+            ax_scatter.plot(
+                surface_timestamp,
+                surface_cbh,
+                linestyle="None",
+                marker="^",
+                markerfacecolor="none",
+                markeredgecolor="lightcoral",
             )
+            ax_scatter.plot(
+                surface_timestamp,
+                surface_ver_vis,
+                linestyle="None",
+                marker="^",
+                markerfacecolor="None",
+                markeredgecolor="indianred",
+            )
+            # ax_scatter.scatter(
+            #    x=surface_timestamp,
+            #    y=surface_ver_vis,
+            #    marker="^",
+            #    color=None,
+            #    facecolor=None,
+            #    alpha=1,
+            #    edgecolor="red",
+            # )
 
         # cbar.ax.set_title("placeholder") # title for the colorbar if necessary
 
