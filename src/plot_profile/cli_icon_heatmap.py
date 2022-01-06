@@ -120,7 +120,7 @@ from .plot_icon import create_heatmap
     help="Output details on what is happening.",
 )
 @click.option(
-    "--surface_station",
+    "--add_cbh",
     is_flag=True,
     default=False,
     help="Add cloud base height & vertical visibility scatter plots to heat map.",
@@ -147,7 +147,7 @@ def main(
     verbose: bool,
     var_min: float,
     var_max: float,
-    surface_station: bool,
+    add_cbh: bool,
 ):
     """Plot heatmap (time-height crosssection) of variable from ICON simulation.
 
@@ -170,14 +170,14 @@ def main(
         verbose=verbose,
     )
 
-    if surface_station:
-        timestamp_1 = (date + timedelta(hours=start_leadtime)).strftime("%Y%m%d%H%M")
-        timestamp_2 = (date + timedelta(hours=end_leadtime)).strftime("%Y%m%d%H%M")
+    if add_cbh:
+        t1 = date + timedelta(hours=start_leadtime)
+        t2 = date + timedelta(hours=end_leadtime)
         surface_data = dwh_retrieve(
             device="2m",  # hardcoded
             station=loc,  # "pay",
             vars=("cbh", "ver_vis"),
-            timestamps=[timestamp_1, timestamp_2],
+            timestamps=[t1, t2],
             verbose=verbose,
         )
     else:
