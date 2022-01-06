@@ -16,6 +16,7 @@ import seaborn as sns
 
 # Local
 from .plot_rs import plot_clouds
+from .stations import sdf
 from .utils import linestyle_dict
 from .utils import save_fig
 from .variables import vdf
@@ -526,6 +527,14 @@ def create_heatmap(
     var_max,
     surface_data=None,
 ):
+    if surface_data is not None:
+        # shift the values of the cbh & ver_vis columns by the elevation of the station (loc)
+        surface_data.loc[surface_data["cbh"] != np.NaN, ["cbh"]] += sdf[loc].elevation
+        surface_data.loc[surface_data["ver_vis"] > 0, ["ver_vis"]] = sdf[loc].elevation
+        surface_timestamp = surface_data.timestamp.values
+        surface_cbh = surface_data.cbh.values
+        surface_ver_vis = surface_data.ver_vis.values
+
     # the height dataframe is the same for all variables, thus outside of the
     # for-loop below. it needs some reformatting and type alignement for later use
     df_height = data_dict[
@@ -591,6 +600,9 @@ def create_heatmap(
 
         plt.rcParams["figure.figsize"] = (7.5, 4.5)
         fig, ax = plt.subplots()
+
+        # REMARK: it is important, that the heatmap gets plotted before the scatter plot - don't change this order!
+        # plot heatmap
         im = ax.pcolormesh(
             lt_dt_series,
             np.round(df_values.index.to_list()),
@@ -603,6 +615,15 @@ def create_heatmap(
 
         if var_min:
             im.set_clim(var_min, var_max)
+
+        # scatter plot cloud base height & vertical visibility
+        if surface_data is not None:
+            ax_scatter = ax.twiny()  # add axis for surface data
+            ax_scatter.axis("off")  # & hide it
+            ax_scatter.scatter(x=surface_timestamp, y=surface_cbh, c="blue", marker="o")
+            ax_scatter.scatter(
+                x=surface_timestamp, y=surface_ver_vis, c="red", marker="o"
+            )
 
         # cbar.ax.set_title("placeholder") # title for the colorbar if necessary
 
