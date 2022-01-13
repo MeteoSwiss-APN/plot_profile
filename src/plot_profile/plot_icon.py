@@ -639,21 +639,21 @@ def create_heatmap(
                 markeredgecolor="indianred",
             )
 
-        # add customised legend
-        legend_elements = [
-            Patch(color="white", label=f"{var.long_name} (FCST)"),
-            Line2D(
-                [0],
-                [0],
-                marker="^",
-                markerfacecolor="None",
-                markeredgecolor="indianred",
-                markersize=10,
-                linestyle="None",
-                label="Cloud base (OBS)",
-            ),
-        ]
-        ax_scatter.legend(handles=legend_elements)
+            # add customised legend
+            legend_elements = [
+                Patch(color="white", label=f"{var.long_name} (FCST)"),
+                Line2D(
+                    [0],
+                    [0],
+                    marker="^",
+                    markerfacecolor="None",
+                    markeredgecolor="indianred",
+                    markersize=10,
+                    linestyle="None",
+                    label="Cloud base (OBS)",
+                ),
+            ]
+            ax_scatter.legend(handles=legend_elements)
 
         # if combining automatic and manual legend elemnts
         ### where some data has already been plotted to ax
