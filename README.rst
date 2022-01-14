@@ -20,11 +20,13 @@ Usage
 2. Available entry-points (show available options with ``--help``)
 
   a) ``plot_rs``: plot radiousounding
-  b) ``plot_icon``: plot vertical profiles of variables from ICON simulations
+  b) ``plot_icon_profiles``: plot vertical profiles of variables from ICON simulations
+  c) ``plot_icon_heatmap``: plot heatmap (time-height-crosssection) of ICON simulation
 
 
-Example command:
-``plot_icon --date 21111012 --folder /scratch/swester/output_icon/ICON-1/ --var qv --var temp --var qc --leadtime 12 --leadtime 13``
+Example commands:
+``plot_rs --date 2021111912 --params temp --params dewp_temp --alt_top 2500``
+``plot_icon_profiles --date 21111012 --folder /scratch/swester/output_icon/ICON-1/ --var qv --var temp --var qc --leadtime 12 --leadtime 13 --add_rs 12``
 
 Credits
 -------
