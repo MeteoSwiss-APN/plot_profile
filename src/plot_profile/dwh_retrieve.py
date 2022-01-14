@@ -185,6 +185,9 @@ def dwh2pandas(cmd, verbose):
         parse_dates=["termin"],
     )
 
+    # NEW: reformat the 'termin' column
+    data["termin"] = data["termin"].dt.strftime("%Y-%m-%d %H:%M:%S")
+
     # clean up the dataframe: replae "10000000" with NaN
     data.replace(1e7, np.nan, inplace=True)
 
