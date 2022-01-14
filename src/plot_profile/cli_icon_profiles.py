@@ -248,7 +248,7 @@ def main(
                 device="rs",
                 station="pay",
                 vars=rs_var,
-                timestamps=timestamp.strftime("%Y%m%d%H%M"),
+                timestamps=timestamp.strftime("%Y%m%d%H"),
                 verbose=verbose,
             )
 

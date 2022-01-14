@@ -699,22 +699,22 @@ def create_heatmap(
             ax.set_xlim(left=lt_dt_series.iloc[0], right=lt_dt_series.iloc[-1])
             ax_scatter.set_xlim(surface_timestamp[0], surface_timestamp[-1])
 
-        # add customised legend
-        legend_elements = [
-            Patch(color="white", label=f"{var.long_name} (FCST)"),
-            Line2D(
-                [0],
-                [0],
-                marker="^",
-                markerfacecolor="None",
-                markeredgecolor="indianred",
-                markersize=10,
-                linestyle="None",
-                label="Cloud base (OBS)",
-            ),
-        ]
-        ax_scatter.legend(handles=legend_elements)
-
+            # add customised legend
+            legend_elements = [
+                Patch(color="white", label=f"{var.long_name} (FCST)"),
+                Line2D(
+                    [0],
+                    [0],
+                    marker="^",
+                    markerfacecolor="None",
+                    markeredgecolor="indianred",
+                    markersize=10,
+                    linestyle="None",
+                    label="Cloud base (OBS)",
+                ),
+            ]
+            ax_scatter.legend(handles=legend_elements)
+            
         # if combining automatic and manual legend elemnts
         ### where some data has already been plotted to ax
         ###handles, labels = ax.get_legend_handles_labels()
