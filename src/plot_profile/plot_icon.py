@@ -149,7 +149,7 @@ def plot_single_variable(
     init_hour = date.hour
 
     # create figure
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
 
     # add grid to figure
     if show_grid:
@@ -458,7 +458,6 @@ def create_plot(
 
     """
     df_height = data_dict["height"]
-
     # CASE: one plot which comprises two variables
     if len(variables_list) == 2:
         plot_two_variables(
@@ -714,7 +713,7 @@ def create_heatmap(
                 ),
             ]
             ax_scatter.legend(handles=legend_elements)
-            
+
         # if combining automatic and manual legend elemnts
         ### where some data has already been plotted to ax
         ###handles, labels = ax.get_legend_handles_labels()
