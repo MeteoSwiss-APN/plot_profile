@@ -14,6 +14,7 @@ import click
 from .dwh_retrieve import dwh_retrieve
 from .get_icon import get_icon
 from .plot_icon import create_plot
+from .utils import slice_top_bottom
 from .utils import validtime_from_leadtime
 
 # import ipdb
@@ -244,14 +245,21 @@ def main(
 
         # loop over timestamps and fill data_dict
         for timestamp in rs_timestamps:
-            obs_dict["rs"][timestamp] = dwh_retrieve(
+            unsliced_timestamp_df = dwh_retrieve(
                 device="rs",
                 station="pay",
                 vars=rs_var,
                 timestamps=timestamp.strftime("%Y%m%d%H"),
                 verbose=verbose,
             )
-
+            crit = slice_top_bottom(
+                df_height=unsliced_timestamp_df["altitude"],
+                alt_top=alt_top,
+                alt_bot=alt_bot,
+                verbose=verbose,
+            )
+            sliced_timestamp_df = unsliced_timestamp_df[crit]
+            obs_dict["rs"][timestamp] = sliced_timestamp_df
     else:
         obs_dict = None
 
