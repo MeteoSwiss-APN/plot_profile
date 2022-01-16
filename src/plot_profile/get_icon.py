@@ -256,6 +256,6 @@ def get_icon(
         df_values = df_values[crit]
 
         # add to dictionary
-        data_dict[variable] = df_values[crit]
+        data_dict[variable] = df_values
 
     return data_dict
