@@ -33,3 +33,11 @@ This package was created with `Cookiecutter`_ and the `MeteoSwiss-APN/mch-python
 
 .. _`Cookiecutter`: https://github.com/audreyr/cookiecutter
 .. _`MeteoSwiss-APN/mch-python-blueprint`: https://github.com/MeteoSwiss-APN/mch-python-blueprint
+
+TO DO's
+-------
+ - support read-in of ICON files in GRIB2-format
+ - allow different filename-formats for ICON-files
+ - plot timeseries of DWH-surface variables
+ - add timeseries of simulated surface variables
+ - heatmap of MWR temperature data
