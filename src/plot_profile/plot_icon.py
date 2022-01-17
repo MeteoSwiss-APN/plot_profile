@@ -262,6 +262,7 @@ def plot_two_variables(
     show_grid,
     show_marker,
     zeroline,
+    single_xaxis,
 ):
     print(f"--- creating plot for variables ({variables_list[0]}, {variables_list[1]})")
 
@@ -286,6 +287,21 @@ def plot_two_variables(
         return
     var_1 = vdf[variables_list[1]]
 
+    # check the units
+    same_unit = var_0.unit == var_1.unit
+
+    if single_xaxis:
+        print(
+            f"Single X-Axis Flag has been provided. \
+        \nVariable 1 has unit:\t{var_0.unit} \
+        \nVariable 2 has unit:\t{var_1.unit}"
+        )
+        if same_unit:
+            print("Create one plot with both variables using the same x-axis.")
+        if not same_unit:
+            print("Caution: Variables dont share the same unit. Add second x-axis.")
+            single_xaxis = False
+
     # leadtimes
     lts = df_values_0.columns
 
@@ -298,8 +314,14 @@ def plot_two_variables(
     init_hour = date.hour
 
     # create figure
-    fig, ax_bottom = plt.subplots()
-    ax_top = ax_bottom.twiny()  # add shared x-axis
+    _, ax_bottom = plt.subplots()
+
+    if single_xaxis and same_unit:  # plot both variables on same axis
+        ax_top = ax_bottom
+    if (
+        not same_unit or not single_xaxis
+    ):  # plot first variable on bottom xaxis & second variable on top xaxis
+        ax_top = ax_bottom.twiny()
 
     # add grid to figure, if show_grid flag was provided
     if show_grid:
@@ -362,26 +384,44 @@ def plot_two_variables(
         ax_top.set_xlim(var_1.min_value, var_1.max_value)
 
     if xmin and xmax:
-        assert len(xmin) == len(
-            variables_list
-        ), f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax})"
-        ax_bottom.set_xlim(xmin[0], xmax[0])
-        ax_top.set_xlim(xmin[1], xmax[1])
+        if not single_xaxis:
+            if len(xmin) is not len(variables_list):
+                print(
+                    f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax}, single_xaxis flag: {single_xaxis})"
+                )
+                ax_bottom.set_xlim(xmin[0], xmax[0])
+            elif len(xmin) == len(variables_list):
+                print(
+                    f"X-range defined for both variables. (xmin = {xmin} / xmax = {xmax}"
+                )
+                ax_bottom.set_xlim(xmin[0], xmax[0])
+                ax_top.set_xlim(xmin[1], xmax[1])
+
+        if single_xaxis:
+            ax_bottom.set_xlim(xmin[0], xmax[0])
 
     # adjust appearance
-    ax_bottom.set(
-        xlabel=f"{var_0.long_name} [{var_0.unit}]",
-        ylabel="Altitude [m asl]",
-        ylim=(get_yrange(alt_bot, alt_top, df_height)),
-        title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
-    )
+    if not same_unit:
+        ax_bottom.set(
+            xlabel=f"{var_0.long_name} [{var_0.unit}]",
+            ylabel="Altitude [m asl]",
+            ylim=(get_yrange(alt_bot, alt_top, df_height)),
+            title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
+        )
 
-    ax_top.set(
-        xlabel=f"{var_1.long_name} [{var_1.unit}]",
-        ylabel="Altitude [m asl]",
-        ylim=(get_yrange(alt_bot, alt_top, df_height)),
-        label=f"{variables_list[1]}",
-    )
+        ax_top.set(
+            xlabel=f"{var_1.long_name} [{var_1.unit}]",
+            ylabel="Altitude [m asl]",
+            ylim=(get_yrange(alt_bot, alt_top, df_height)),
+            label=f"{variables_list[1]}",
+        )
+    if same_unit:
+        ax_bottom.set(
+            xlabel=f"{var_0.long_name} & {var_1.long_name} [{var_0.unit}]",
+            ylabel="Altitude [m asl]",
+            ylim=(get_yrange(alt_bot, alt_top, df_height)),
+            title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
+        )
 
     # create legend
     lns = ln0 + ln1
@@ -429,6 +469,7 @@ def create_plot(
     show_grid,
     show_marker,
     zeroline,
+    single_xaxis,
 ):
     """Plot vertical profile of variable(s).
 
@@ -455,6 +496,7 @@ def create_plot(
         show_grid (bool):               add grid to plot
         show_marker (bool):             add marker to vertical lines
         zeroline (bool):                add zeroline to plot
+        single_xaxis (bool):            plot variables w/ same unit on one xaxis if this flag has been provided
 
     """
     df_height = data_dict["height"]
@@ -482,6 +524,7 @@ def create_plot(
             show_grid,
             show_marker,
             zeroline,
+            single_xaxis,
         )
     # CASE: one plot for each variable
     else:

@@ -161,6 +161,11 @@ from .utils import validtime_from_leadtime
     help="Use fix xrange from variable dataframe. Overwrites specified xmin and xmax. Flag, def: False",
 )
 @click.option(
+    "--single_xaxis",
+    is_flag=True,
+    help="Plot two variables w/ the same unit only on one x-axis, not two. Flag, def: False",
+)
+@click.option(
     "--zeroline",
     is_flag=True,
     help="Show grid on plot. Flag, def: False",
@@ -192,6 +197,7 @@ def main(
     xmin: tuple,
     xmax: tuple,
     xrange_fix: bool,
+    single_xaxis: bool,
 ):
     """Plot vertical profiles of variables from ICON simulation.
 
@@ -286,6 +292,7 @@ def main(
         show_grid=show_grid,
         show_marker=show_marker,
         zeroline=zeroline,
+        single_xaxis=single_xaxis,
     )
 
     print("--- done")
