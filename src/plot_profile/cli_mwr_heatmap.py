@@ -15,6 +15,7 @@ import click
 from .dwh_retrieve import dwh_retrieve
 from .plot_mwr import mwr_heatmap
 from .stations import sdf
+from .variables import vdf
 
 # import ipdb
 
@@ -24,23 +25,17 @@ from .stations import sdf
 @click.option(
     "--start",
     type=click.DateTime(formats=["%y%m%d%H"]),
-    help="MANDATORY: Start timestamp: yymmddHHMM",
+    help="MANDATORY: Start timestamp: yymmddHH",
 )
 @click.option(
     "--end",
     type=click.DateTime(formats=["%y%m%d%H"]),
-    help="MANDATORY: End timestamp: yymmddHHMM",
+    help="MANDATORY: End timestamp: yymmddHH",
 )
 @click.option(
     "--var",
-    type=click.Choice(
-        [
-            "temp",
-        ],
-        case_sensitive=True,
-    ),
-    multiple=True,
-    help="MANDATORY: Variable name(s).",
+    type=str,
+    help="MANDATORY: Variable name.",
 )
 # optional options
 @click.option("--alt_bot", type=int, help="Altitude bottom. Def: surface.")
@@ -127,8 +122,13 @@ def main(
         device="mwr", station=loc, vars=var, timestamps=[start, end], verbose=verbose
     )
 
-    mwr_heatmap(
-        mwr_data=mwr_data, datatypes=datatypes, outpath=outpath, station=station
-    )
+    for var in vars:
+        mwr_heatmap(
+            mwr_data=mwr_data,
+            var=vdf[var],
+            station=sdf[loc],
+            datatypes=datatypes,
+            outpath=outpath,
+        )
 
     print("--- done")
