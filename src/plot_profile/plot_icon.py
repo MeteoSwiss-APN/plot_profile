@@ -149,7 +149,7 @@ def plot_single_variable(
     init_hour = date.hour
 
     # create figure
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
 
     # add grid to figure
     if show_grid:
@@ -262,6 +262,7 @@ def plot_two_variables(
     show_grid,
     show_marker,
     zeroline,
+    single_xaxis,
 ):
     print(f"--- creating plot for variables ({variables_list[0]}, {variables_list[1]})")
 
@@ -286,6 +287,21 @@ def plot_two_variables(
         return
     var_1 = vdf[variables_list[1]]
 
+    # check the units
+    same_unit = var_0.unit == var_1.unit
+
+    if single_xaxis:
+        print(
+            f"Single X-Axis Flag has been provided. \
+        \nVariable 1 has unit:\t{var_0.unit} \
+        \nVariable 2 has unit:\t{var_1.unit}"
+        )
+        if same_unit:
+            print("Create one plot with both variables using the same x-axis.")
+        if not same_unit:
+            print("Caution: Variables dont share the same unit. Add second x-axis.")
+            single_xaxis = False
+
     # leadtimes
     lts = df_values_0.columns
 
@@ -298,8 +314,14 @@ def plot_two_variables(
     init_hour = date.hour
 
     # create figure
-    fig, ax_bottom = plt.subplots()
-    ax_top = ax_bottom.twiny()  # add shared x-axis
+    _, ax_bottom = plt.subplots()
+
+    if single_xaxis and same_unit:  # plot both variables on same axis
+        ax_top = ax_bottom
+    if (
+        not same_unit or not single_xaxis
+    ):  # plot first variable on bottom xaxis & second variable on top xaxis
+        ax_top = ax_bottom.twiny()
 
     # add grid to figure, if show_grid flag was provided
     if show_grid:
@@ -362,26 +384,44 @@ def plot_two_variables(
         ax_top.set_xlim(var_1.min_value, var_1.max_value)
 
     if xmin and xmax:
-        assert len(xmin) == len(
-            variables_list
-        ), f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax})"
-        ax_bottom.set_xlim(xmin[0], xmax[0])
-        ax_top.set_xlim(xmin[1], xmax[1])
+        if not single_xaxis:
+            if len(xmin) is not len(variables_list):
+                print(
+                    f"No xrange defined for both variables. (xmin = {xmin} / xmax = {xmax}, single_xaxis flag: {single_xaxis})"
+                )
+                ax_bottom.set_xlim(xmin[0], xmax[0])
+            elif len(xmin) == len(variables_list):
+                print(
+                    f"X-range defined for both variables. (xmin = {xmin} / xmax = {xmax}"
+                )
+                ax_bottom.set_xlim(xmin[0], xmax[0])
+                ax_top.set_xlim(xmin[1], xmax[1])
+
+        if single_xaxis:
+            ax_bottom.set_xlim(xmin[0], xmax[0])
 
     # adjust appearance
-    ax_bottom.set(
-        xlabel=f"{var_0.long_name} [{var_0.unit}]",
-        ylabel="Altitude [m asl]",
-        ylim=(get_yrange(alt_bot, alt_top, df_height)),
-        title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
-    )
+    if not same_unit:
+        ax_bottom.set(
+            xlabel=f"{var_0.long_name} [{var_0.unit}]",
+            ylabel="Altitude [m asl]",
+            ylim=(get_yrange(alt_bot, alt_top, df_height)),
+            title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
+        )
 
-    ax_top.set(
-        xlabel=f"{var_1.long_name} [{var_1.unit}]",
-        ylabel="Altitude [m asl]",
-        ylim=(get_yrange(alt_bot, alt_top, df_height)),
-        label=f"{variables_list[1]}",
-    )
+        ax_top.set(
+            xlabel=f"{var_1.long_name} [{var_1.unit}]",
+            ylabel="Altitude [m asl]",
+            ylim=(get_yrange(alt_bot, alt_top, df_height)),
+            label=f"{variables_list[1]}",
+        )
+    if same_unit:
+        ax_bottom.set(
+            xlabel=f"{var_0.long_name} & {var_1.long_name} [{var_0.unit}]",
+            ylabel="Altitude [m asl]",
+            ylim=(get_yrange(alt_bot, alt_top, df_height)),
+            title=f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC",
+        )
 
     # create legend
     lns = ln0 + ln1
@@ -429,6 +469,7 @@ def create_plot(
     show_grid,
     show_marker,
     zeroline,
+    single_xaxis,
 ):
     """Plot vertical profile of variable(s).
 
@@ -455,10 +496,10 @@ def create_plot(
         show_grid (bool):               add grid to plot
         show_marker (bool):             add marker to vertical lines
         zeroline (bool):                add zeroline to plot
+        single_xaxis (bool):            plot variables w/ same unit on one xaxis if this flag has been provided
 
     """
     df_height = data_dict["height"]
-
     # CASE: one plot which comprises two variables
     if len(variables_list) == 2:
         plot_two_variables(
@@ -483,6 +524,7 @@ def create_plot(
             show_grid,
             show_marker,
             zeroline,
+            single_xaxis,
         )
     # CASE: one plot for each variable
     else:
@@ -581,59 +623,63 @@ def create_heatmap(
     lt_dt_series = pd.Series(lt_dt)
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ NEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-    same_start = (
-        surface_timestamp[0] == lt_dt_2[0]
-    )  # --> if True: the model & the measurements start at the same time
-    same_end = (
-        surface_timestamp[-1] == lt_dt_2[-1]
-    )  # --> if True: the model & the measurements end at the same time
+    if surface_data is not None:
+        same_start = (
+            surface_timestamp[0] == lt_dt_2[0]
+        )  # --> if True: the model & the measurements start at the same time
+        same_end = (
+            surface_timestamp[-1] == lt_dt_2[-1]
+        )  # --> if True: the model & the measurements end at the same time
 
-    if not (same_start and same_end):
-        if verbose:
-            print(
-                f"The time-axis for the surface station needs to be aligned to the time-axis of the model data."
+        if not (same_start and same_end):
+            if verbose:
+                print(
+                    f"The time-axis for the surface station needs to be aligned to the time-axis of the model data."
+                )
+
+            # create a list using linspace, which starts at the same time as lt_dt_2 and ends at the same time as lt_dt_2
+            # the step size (dt) is chosen as 10 minutes, as this is the smalles possible interval between consecutive measurements
+            # at the surface station
+            start = dt.datetime.strptime(lt_dt_2[0], "%Y-%m-%d %H:%M")
+            end = dt.datetime.strptime(lt_dt_2[-1], "%Y-%m-%d %H:%M")
+            n = (
+                int(((end - start).total_seconds() / 3600) * 6) + 1
+            )  # *6, because there are six 10 minute intervals per hour;
+            top_x_axis_values = pd.date_range(
+                start, end, periods=n
+            ).tolist()  # these values represent the hidden tick marks of the top x axis
+            top_x_axis_cbh, top_x_axis_ver_vis = (
+                [],
+                [],
+            )  # these lists need to be filled.
+            j = 0
+
+            for timestamp in top_x_axis_values:
+                if str(timestamp) not in surface_timestamp:
+                    if verbose:
+                        print(
+                            f"No measurement found for time: {timestamp}. Appending {np.NaN}"
+                        )
+                    top_x_axis_cbh.append(np.NaN)
+                    top_x_axis_ver_vis.append(np.NaN)
+                if str(timestamp) in surface_timestamp:
+                    if verbose:
+                        print(
+                            f"Measurement found for time: {timestamp}. Appending corresponding values ({surface_cbh[j]}/{surface_ver_vis[j]})"
+                        )
+                    top_x_axis_cbh.append(surface_cbh[j])
+                    top_x_axis_ver_vis.append(surface_ver_vis[j])
+                    j += 1
+
+            # assign new lists to old variable names & create masked lists, s.t. NaN values are not ignored
+            surface_timestamp = top_x_axis_values
+            surface_cbh = np.ma.masked_where(top_x_axis_cbh == np.NaN, top_x_axis_cbh)
+            surface_ver_vis = np.ma.masked_where(
+                top_x_axis_ver_vis == np.NaN, top_x_axis_ver_vis
             )
 
-        # create a list using linspace, which starts at the same time as lt_dt_2 and ends at the same time as lt_dt_2
-        # the step size (dt) is chosen as 10 minutes, as this is the smalles possible interval between consecutive measurements
-        # at the surface station
-        start = dt.datetime.strptime(lt_dt_2[0], "%Y-%m-%d %H:%M")
-        end = dt.datetime.strptime(lt_dt_2[-1], "%Y-%m-%d %H:%M")
-        n = (
-            int(((end - start).total_seconds() / 3600) * 6) + 1
-        )  # *6, because there are six 10 minute intervals per hour;
-        top_x_axis_values = pd.date_range(
-            start, end, periods=n
-        ).tolist()  # these values represent the hidden tick marks of the top x axis
-        top_x_axis_cbh, top_x_axis_ver_vis = [], []  # these lists need to be filled.
-        j = 0
-
-        for timestamp in top_x_axis_values:
-            if str(timestamp) not in surface_timestamp:
-                if verbose:
-                    print(
-                        f"No measurement found for time: {timestamp}. Appending {np.NaN}"
-                    )
-                top_x_axis_cbh.append(np.NaN)
-                top_x_axis_ver_vis.append(np.NaN)
-            if str(timestamp) in surface_timestamp:
-                if verbose:
-                    print(
-                        f"Measurement found for time: {timestamp}. Appending corresponding values ({surface_cbh[j]}/{surface_ver_vis[j]})"
-                    )
-                top_x_axis_cbh.append(surface_cbh[j])
-                top_x_axis_ver_vis.append(surface_ver_vis[j])
-                j += 1
-
-        # assign new lists to old variable names & create masked lists, s.t. NaN values are not ignored
-        surface_timestamp = top_x_axis_values
-        surface_cbh = np.ma.masked_where(top_x_axis_cbh == np.NaN, top_x_axis_cbh)
-        surface_ver_vis = np.ma.masked_where(
-            top_x_axis_ver_vis == np.NaN, top_x_axis_ver_vis
-        )
-
-    elif verbose:
-        print(f"The timestamp axes are aligned already.")
+        elif verbose:
+            print(f"The timestamp axes are aligned already.")
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ NEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
     # dates used in the filename / title of heat plots
     init_date = date.strftime("%b %-d, %Y")
@@ -714,7 +760,7 @@ def create_heatmap(
                 ),
             ]
             ax_scatter.legend(handles=legend_elements)
-            
+
         # if combining automatic and manual legend elemnts
         ### where some data has already been plotted to ax
         ###handles, labels = ax.get_legend_handles_labels()
