@@ -114,7 +114,7 @@ def parse_vars(vars, device):
 
     Args:
     vars        (tuple)     variables
-    device      (str)       measurement device: rs, mwr, 2m
+    device      (str)       measurement device: rs, mwr, 2m, 5cm
 
     Returns:
     str         E.g. 'temp' or 'temp,dewp_temp'
@@ -404,7 +404,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 return new_df
 
     # surface-based data
-    elif device in ["2m"]:
+    elif device in ["2m", "5cm"]:
 
         # call dwh retrieve for surface-based data
         raw_data = dwh_surface(
@@ -456,10 +456,10 @@ if __name__ == "__main__":
 
     if test_surface:
         data = dwh_retrieve(
-            device="2m",
-            station="pay",
-            vars=("temp", "cbh", "ver_vis"),
-            timestamps=["202111190000", "202111190300"],
+            device="5cm",
+            station="gla",
+            vars=("temp",),
+            timestamps=["202201190000", "202201191400"],
             verbose=True,
         )
         print(f"\nSurface Station dataframe looks like:\n{data}")
