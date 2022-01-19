@@ -1,6 +1,6 @@
 """Purpose: Plot time-height-crosssection of MWR observational data.
 
-Author: Michel Zeller
+Author: Stephanie Westerhuis
 
 Date: 05/01/2022.
 """
@@ -64,7 +64,7 @@ from .variables import vdf
         case_sensitive=True,
     ),
     multiple=False,
-    default=["png"],
+    default="png",
     help="Choose data type(s) of final result. Def: png",
 )
 @click.option("--loc", default="pay", type=str, help="Name of location. Def: pay")
@@ -108,27 +108,42 @@ def main(
     plot_mwr_heatmap --start 21111812 --end 21111912 --var temp --alt_top 2000
 
     """
-    # check whether station exists
+    # retrieve station dataframe
     try:
         station = sdf[loc]
         if verbose:
             print(f"Retrieving MWR data for {station.long_name}.")
     except KeyError:
-        print("! {loc} is not listed as an available station.")
+        print(f"! {loc} is not listed as an available station.")
         sys.exit(1)
 
-    # retrieve obs from DWH
-    mwr_data = dwh_retrieve(
-        device="mwr", station=loc, vars=var, timestamps=[start, end], verbose=verbose
-    )
+    # retrieve variable dataframe
+    try:
+        var_frame = vdf[var]
+        if verbose:
+            print(f"Selected variable: {var_frame.long_name}.")
+    except KeyError:
+        print(f"! {var} is not available as variable.")
+        sys.exit(1)
 
-    for var in vars:
-        mwr_heatmap(
-            mwr_data=mwr_data,
-            var=vdf[var],
-            station=sdf[loc],
-            datatypes=datatypes,
-            outpath=outpath,
-        )
+    ## retrieve obs from DWH
+    mwr_data = dwh_retrieve(
+        device="mwr",
+        station=loc,
+        vars=var,
+        timestamps=[start, end],
+        verbose=verbose,
+    )
+    mwr_data.head()
+    # slice top and bottom
+
+    # for var in vars:
+    #    mwr_heatmap(
+    #        mwr_data=mwr_data,
+    #        var=vdf[var],
+    #        station=sdf[loc],
+    #        datatypes=datatypes,
+    #        outpath=outpath,
+    #    )
 
     print("--- done")
