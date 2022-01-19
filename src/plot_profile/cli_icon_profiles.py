@@ -14,6 +14,7 @@ import click
 from .dwh_retrieve import dwh_retrieve
 from .get_icon import get_icon
 from .plot_icon import create_plot
+from .stations import sdf
 from .utils import slice_top_bottom
 from .utils import validtime_from_leadtime
 
@@ -114,13 +115,9 @@ from .utils import validtime_from_leadtime
     default=(0,),
     help="Leadtime(s) to be shown in one plot. Def: 0.",
 )
-@click.option(
-    "--lat", default=46.81281, type=float, help="Latitude of location. Def: 46.81 (PAY)"
-)
-@click.option(
-    "--lon", default=6.94363, type=float, help="Longitude of location. Def: 6.94 (PAY)"
-)
-@click.option("--loc", default="pay", type=str, help="Name of location. Def: pay")
+@click.option("--lat", type=float, help="Latitude of location.")
+@click.option("--lon", type=float, help="Longitude of location.")
+@click.option("--loc", type=str, help="Name of location.")
 @click.option("--model", default="icon-1", type=str, help="NWP model name. Def: icon-1")
 @click.option(
     "--outpath",
@@ -205,11 +202,39 @@ def main(
     If 2 variables are given, they will be shown in the same figure.
 
     Example command:
-    plot_icon_profiles --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --leadtime 11 --leadtime 12
+    plot_icon_profiles --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --leadtime 11 --leadtime 12 --loc pay
 
     Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 
     """
+    # 0) Parse loc / lat / lon input
+    ################################
+    try:
+        station = sdf[loc]
+        lat = station.lat
+        lon = station.lon
+        if verbose:
+            print(f"Selected location: {station.long_name}")
+            print(f"  lat: {lat}")
+            print(f"  lon: {lon}")
+    except KeyError:
+        if not lat and not lon:
+            print("! lat and lon missing!")
+            sys.exit(1)
+        if not lat:
+            print("! lat missing!")
+            sys.exit(1)
+        if not lon:
+            print("! lon missing!")
+            sys.exit(1)
+        if not loc:
+            print("! Location name is missing!")
+            sys.exit(1)
+        if verbose:
+            print(f"Specified lat: {lat}")
+            print(f"Specified lon: {lon}")
+            print(f"Specified name for location: {loc}")
+
     # A) retrieve data from ICON forecasts
     ######################################
     data_dict = get_icon(
