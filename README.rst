@@ -43,6 +43,7 @@ This package was created with `Cookiecutter`_ and the `MeteoSwiss-APN/mch-python
 
 TO DO's
 -------
+- complete stations.py: add station height and remove umlaute
 - allow for multiple icon_names in variables.py
 - plot timeseries of DWH-surface variables
 - add timeseries of simulated surface variables for 1 or more configurations
