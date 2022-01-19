@@ -38,8 +38,9 @@ This package was created with `Cookiecutter`_ and the `MeteoSwiss-APN/mch-python
 
 TO DO's
 -------
+ - plot timeseries of DWH-surface variables
+ - add timeseries of simulated surface variables for 1 or more configurations
+ - heatmap of MWR temperature data (started by Steffi but not finished yet)
+ - labelling of leadtimes and radiosoundings in icon_profiles-plot
  - support read-in of ICON files in GRIB2-format
  - allow different filename-formats for ICON-files
- - plot timeseries of DWH-surface variables
- - add timeseries of simulated surface variables
- - heatmap of MWR temperature data
