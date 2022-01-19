@@ -60,6 +60,7 @@ scripts = [
     "plot_icon_profiles=plot_profile.cli_icon_profiles:main",
     "plot_icon_heatmap=plot_profile.cli_icon_heatmap:main",
     "plot_mwr_heatmap=plot_profile.cli_mwr_heatmap:main",
+    "plot_timeseries=plot_profile.cli_timeseries:main",
 ]
 
 setup(
