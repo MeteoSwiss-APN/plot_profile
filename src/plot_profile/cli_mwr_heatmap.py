@@ -1,6 +1,6 @@
 """Purpose: Plot time-height-crosssection of MWR observational data.
 
-Author: Michel Zeller
+Author: Stephanie Westerhuis
 
 Date: 05/01/2022.
 """
@@ -15,6 +15,7 @@ import click
 from .dwh_retrieve import dwh_retrieve
 from .plot_mwr import mwr_heatmap
 from .stations import sdf
+from .variables import vdf
 
 # import ipdb
 
@@ -24,23 +25,17 @@ from .stations import sdf
 @click.option(
     "--start",
     type=click.DateTime(formats=["%y%m%d%H"]),
-    help="MANDATORY: Start timestamp: yymmddHHMM",
+    help="MANDATORY: Start timestamp: yymmddHH",
 )
 @click.option(
     "--end",
     type=click.DateTime(formats=["%y%m%d%H"]),
-    help="MANDATORY: End timestamp: yymmddHHMM",
+    help="MANDATORY: End timestamp: yymmddHH",
 )
 @click.option(
     "--var",
-    type=click.Choice(
-        [
-            "temp",
-        ],
-        case_sensitive=True,
-    ),
-    multiple=True,
-    help="MANDATORY: Variable name(s).",
+    type=str,
+    help="MANDATORY: Variable name.",
 )
 # optional options
 @click.option("--alt_bot", type=int, help="Altitude bottom. Def: surface.")
@@ -69,7 +64,7 @@ from .stations import sdf
         case_sensitive=True,
     ),
     multiple=False,
-    default=["png"],
+    default="png",
     help="Choose data type(s) of final result. Def: png",
 )
 @click.option("--loc", default="pay", type=str, help="Name of location. Def: pay")
@@ -113,22 +108,42 @@ def main(
     plot_mwr_heatmap --start 21111812 --end 21111912 --var temp --alt_top 2000
 
     """
-    # check whether station exists
+    # retrieve station dataframe
     try:
         station = sdf[loc]
         if verbose:
             print(f"Retrieving MWR data for {station.long_name}.")
     except KeyError:
-        print("! {loc} is not listed as an available station.")
+        print(f"! {loc} is not listed as an available station.")
         sys.exit(1)
 
-    # retrieve obs from DWH
-    mwr_data = dwh_retrieve(
-        device="mwr", station=loc, vars=var, timestamps=[start, end], verbose=verbose
-    )
+    # retrieve variable dataframe
+    try:
+        var_frame = vdf[var]
+        if verbose:
+            print(f"Selected variable: {var_frame.long_name}.")
+    except KeyError:
+        print(f"! {var} is not available as variable.")
+        sys.exit(1)
 
-    mwr_heatmap(
-        mwr_data=mwr_data, datatypes=datatypes, outpath=outpath, station=station
+    ## retrieve obs from DWH
+    mwr_data = dwh_retrieve(
+        device="mwr",
+        station=loc,
+        vars=var,
+        timestamps=[start, end],
+        verbose=verbose,
     )
+    mwr_data.head()
+    # slice top and bottom
+
+    # for var in vars:
+    #    mwr_heatmap(
+    #        mwr_data=mwr_data,
+    #        var=vdf[var],
+    #        station=sdf[loc],
+    #        datatypes=datatypes,
+    #        outpath=outpath,
+    #    )
 
     print("--- done")

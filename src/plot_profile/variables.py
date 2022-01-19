@@ -213,7 +213,7 @@ vdf["temp"].linestyle = "-"
 vdf["temp"].mult = 1
 vdf["temp"].plus = -273
 vdf["temp"].avg = False
-vdf["temp"].dwh_id = {"rs": "745", "2m": "91", "mwr": "3147"}
+vdf["temp"].dwh_id = {"rs": "745", "2m": "91", "mwr": "3147", "5cm": "92"}
 
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"
