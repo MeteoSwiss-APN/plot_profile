@@ -1443,14 +1443,6 @@ sdf["oro"].lat = 46.572
 sdf["oro"].lon = 6.858
 sdf["oro"].elevation = 829
 
-# La Brévine
-sdf["brl"].short_name = "brl"
-sdf["brl"].long_name = "La Brévine"
-sdf["brl"].dwh_id = "06617"
-sdf["brl"].dwh_name = "BRL"
-sdf["brl"].lat = 46.984
-sdf["brl"].lon = 6.61
-sdf["brl"].elevation = 1042
 
 # Schüpfheim
 sdf["spf"].short_name = "spf"
