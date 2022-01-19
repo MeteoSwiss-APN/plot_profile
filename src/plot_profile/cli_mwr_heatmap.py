@@ -10,14 +10,14 @@ import sys
 
 # Third-party
 import click
+import pandas as pd
 
 # Local
 from .dwh_retrieve import dwh_retrieve
 from .plot_mwr import mwr_heatmap
 from .stations import sdf
+from .utils import slice_top_bottom
 from .variables import vdf
-
-# import ipdb
 
 
 @click.command()
@@ -134,16 +134,23 @@ def main(
         timestamps=[start, end],
         verbose=verbose,
     )
-    mwr_data.head()
     # slice top and bottom
+    if not alt_bot:
+        alt_bot = mwr_data.index.min()
+    crit = slice_top_bottom(mwr_data.index, alt_top, alt_bot)
+    # make same index
+    crit.index = mwr_data.index
+    mwr_data = mwr_data[crit]
 
-    # for var in vars:
-    #    mwr_heatmap(
-    #        mwr_data=mwr_data,
-    #        var=vdf[var],
-    #        station=sdf[loc],
-    #        datatypes=datatypes,
-    #        outpath=outpath,
-    #    )
+    mwr_heatmap(
+        mwr_data=mwr_data,
+        station=station,
+        var=var_frame,
+        min_value=min,
+        max_value=max,
+        appendix=appendix,
+        datatypes=datatypes,
+        outpath=outpath,
+    )
 
     print("--- done")
