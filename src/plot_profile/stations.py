@@ -74,6 +74,92 @@ sdf = pd.DataFrame(
         "goe",  # Gösgen
         "bus",  # Buchs / Aarau
         "ego",  # Egolzwil
+        "and",  # Andeer
+        "sae",  # Säntis
+        "vad",  # Vaduz
+        "pil",
+        "alt",
+        "ulr",
+        "pio",
+        "lug",
+        "gro",
+        "sam",
+        "chu",
+        "nap",
+        "mag",
+        "sbo",
+        "dis",
+        "gih",
+        "arh",
+        "dav",
+        "stg",
+        "gla",
+        "gue",
+        "sha",
+        "sma",
+        "sbe",
+        "wfj",
+        "cov",
+        "rob",
+        "scu",
+        "gut",
+        "wae",
+        "tae",
+        "reh",
+        "otl",
+        "bez",
+        "cim",
+        "lei",
+        "grh",
+        "com",
+        "lae",
+        "hoe",
+        "roe",
+        "psi",
+        "flu",
+        "obr",
+        "lat",
+        "vls",
+        "ges",
+        "lac",
+        "biv",
+        "mer",
+        "mtr",
+        "bia",
+        "tit",
+        "vio",
+        "elm",
+        "ant",
+        "sag",
+        "ilz",
+        "srs",
+        "vev",
+        "chz",
+        "bin",
+        "hll",
+        "moa",
+        "gos",
+        "cev",
+        "aro",
+        "biz",
+        "sia",
+        "beh",
+        "buf",
+        "cma",
+        "gen",
+        "oro",
+        "brl",
+        "spf",
+        "vab",
+        "pma",
+        "nas",
+        "sim",
+        "egh",
+        "ebk",
+        "smm",
+        "rag",
+        "ein",
+        "hai",
     ],
     # attributes
     index=[
@@ -671,10 +757,6 @@ sdf["ego"].lat = 47.179428
 sdf["ego"].lon = 8.004758
 sdf["ego"].elevation = 522
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-TODO = "to be done."
-
-
 # Andeer
 sdf["and"].short_name = "and"
 sdf["and"].long_name = "Andeer"
@@ -682,16 +764,16 @@ sdf["and"].dwh_id = "06787"
 sdf["and"].dwh_name = "AND"
 sdf["and"].lat = 46.61
 sdf["and"].lon = 9.432
-sdf["and"].elevation = TODO
+sdf["and"].elevation = 989
 
-# S�ntis
+# Säntis
 sdf["sae"].short_name = "sae"
-sdf["sae"].long_name = "S�ntis"
+sdf["sae"].long_name = "Säntis"
 sdf["sae"].dwh_id = "06680"
 sdf["sae"].dwh_name = "SAE"
 sdf["sae"].lat = 47.249
 sdf["sae"].lon = 9.343
-sdf["sae"].elevation = TODO
+sdf["sae"].elevation = 2504
 
 # Vaduz
 sdf["vad"].short_name = "vad"
@@ -700,7 +782,7 @@ sdf["vad"].dwh_id = "06990"
 sdf["vad"].dwh_name = "VAD"
 sdf["vad"].lat = 47.127
 sdf["vad"].lon = 9.518
-sdf["vad"].elevation = TODO
+sdf["vad"].elevation = 459
 
 # Pilatus
 sdf["pil"].short_name = "pil"
@@ -709,7 +791,7 @@ sdf["pil"].dwh_id = "06659"
 sdf["pil"].dwh_name = "PIL"
 sdf["pil"].lat = 46.979
 sdf["pil"].lon = 8.252
-sdf["pil"].elevation = TODO
+sdf["pil"].elevation = 2107
 
 # Altdorf
 sdf["alt"].short_name = "alt"
@@ -718,7 +800,7 @@ sdf["alt"].dwh_id = "06672"
 sdf["alt"].dwh_name = "ALT"
 sdf["alt"].lat = 46.887
 sdf["alt"].lon = 8.622
-sdf["alt"].elevation = TODO
+sdf["alt"].elevation = 440
 
 # Ulrichen
 sdf["ulr"].short_name = "ulr"
@@ -727,7 +809,7 @@ sdf["ulr"].dwh_id = "06745"
 sdf["ulr"].dwh_name = "ULR"
 sdf["ulr"].lat = 46.505
 sdf["ulr"].lon = 8.308
-sdf["ulr"].elevation = TODO
+sdf["ulr"].elevation = 1348
 
 # Piotta
 sdf["pio"].short_name = "pio"
@@ -736,7 +818,7 @@ sdf["pio"].dwh_id = "06753"
 sdf["pio"].dwh_name = "PIO"
 sdf["pio"].lat = 46.515
 sdf["pio"].lon = 8.688
-sdf["pio"].elevation = TODO
+sdf["pio"].elevation = 991
 
 # Lugano
 sdf["lug"].short_name = "lug"
@@ -745,7 +827,7 @@ sdf["lug"].dwh_id = "06770"
 sdf["lug"].dwh_name = "LUG"
 sdf["lug"].lat = 46.004
 sdf["lug"].lon = 8.96
-sdf["lug"].elevation = TODO
+sdf["lug"].elevation = 275
 
 # Grono
 sdf["gro"].short_name = "gro"
@@ -754,7 +836,7 @@ sdf["gro"].dwh_id = "06758"
 sdf["gro"].dwh_name = "GRO"
 sdf["gro"].lat = 46.255
 sdf["gro"].lon = 9.164
-sdf["gro"].elevation = TODO
+sdf["gro"].elevation = 326
 
 # Samedan
 sdf["sam"].short_name = "sam"
@@ -763,7 +845,7 @@ sdf["sam"].dwh_id = "06792"
 sdf["sam"].dwh_name = "SAM"
 sdf["sam"].lat = 46.526
 sdf["sam"].lon = 9.879
-sdf["sam"].elevation = TODO
+sdf["sam"].elevation = 1711
 
 # Chur
 sdf["chu"].short_name = "chu"
@@ -772,7 +854,7 @@ sdf["chu"].dwh_id = "06786"
 sdf["chu"].dwh_name = "CHU"
 sdf["chu"].lat = 46.87
 sdf["chu"].lon = 9.531
-sdf["chu"].elevation = TODO
+sdf["chu"].elevation = 558
 
 # Napf
 sdf["nap"].short_name = "nap"
@@ -781,7 +863,7 @@ sdf["nap"].dwh_id = "06639"
 sdf["nap"].dwh_name = "NAP"
 sdf["nap"].lat = 47.005
 sdf["nap"].lon = 7.94
-sdf["nap"].elevation = TODO
+sdf["nap"].elevation = 1406
 
 # Magadino / Cadenazzo
 sdf["mag"].short_name = "mag"
@@ -790,7 +872,7 @@ sdf["mag"].dwh_id = "06762"
 sdf["mag"].dwh_name = "MAG"
 sdf["mag"].lat = 46.16
 sdf["mag"].lon = 8.934
-sdf["mag"].elevation = TODO
+sdf["mag"].elevation = 205
 
 # Stabio
 sdf["sbo"].short_name = "sbo"
@@ -799,7 +881,7 @@ sdf["sbo"].dwh_id = "06771"
 sdf["sbo"].dwh_name = "SBO"
 sdf["sbo"].lat = 45.843
 sdf["sbo"].lon = 8.932
-sdf["sbo"].elevation = TODO
+sdf["sbo"].elevation = 353
 
 # Disentis
 sdf["dis"].short_name = "dis"
@@ -808,7 +890,7 @@ sdf["dis"].dwh_id = "06782"
 sdf["dis"].dwh_name = "DIS"
 sdf["dis"].lat = 46.707
 sdf["dis"].lon = 8.853
-sdf["dis"].elevation = TODO
+sdf["dis"].elevation = 1199
 
 # Giswil
 sdf["gih"].short_name = "gih"
@@ -817,7 +899,7 @@ sdf["gih"].dwh_id = "06657"
 sdf["gih"].dwh_name = "GIH"
 sdf["gih"].lat = 46.849
 sdf["gih"].lon = 8.19
-sdf["gih"].elevation = TODO
+sdf["gih"].elevation = 473
 
 # Altenrhein
 sdf["arh"].short_name = "arh"
@@ -826,7 +908,7 @@ sdf["arh"].dwh_id = "06690"
 sdf["arh"].dwh_name = "ARH"
 sdf["arh"].lat = 47.484
 sdf["arh"].lon = 9.567
-sdf["arh"].elevation = TODO
+sdf["arh"].elevation = 400
 
 # Davos
 sdf["dav"].short_name = "dav"
@@ -835,7 +917,7 @@ sdf["dav"].dwh_id = "06784"
 sdf["dav"].dwh_name = "DAV"
 sdf["dav"].lat = 46.813
 sdf["dav"].lon = 9.844
-sdf["dav"].elevation = TODO
+sdf["dav"].elevation = 1596
 
 # St. Gallen
 sdf["stg"].short_name = "stg"
@@ -844,7 +926,7 @@ sdf["stg"].dwh_id = "06681"
 sdf["stg"].dwh_name = "STG"
 sdf["stg"].lat = 47.425
 sdf["stg"].lon = 9.399
-sdf["stg"].elevation = TODO
+sdf["stg"].elevation = 778
 
 # Glarus
 sdf["gla"].short_name = "gla"
@@ -853,16 +935,16 @@ sdf["gla"].dwh_id = "06685"
 sdf["gla"].dwh_name = "GLA"
 sdf["gla"].lat = 47.035
 sdf["gla"].lon = 9.067
-sdf["gla"].elevation = TODO
+sdf["gla"].elevation = 519
 
-# G�tsch, Andermatt
+# Gütsch, Andermatt
 sdf["gue"].short_name = "gue"
-sdf["gue"].long_name = "G�tsch, Andermatt"
+sdf["gue"].long_name = "Gütsch, Andermatt"
 sdf["gue"].dwh_id = "06750"
 sdf["gue"].dwh_name = "GUE"
 sdf["gue"].lat = 46.652
 sdf["gue"].lon = 8.616
-sdf["gue"].elevation = TODO
+sdf["gue"].elevation = 2288
 
 # Luzern
 sdf["luz"].short_name = "luz"
@@ -871,7 +953,7 @@ sdf["luz"].dwh_id = "06650"
 sdf["luz"].dwh_name = "LUZ"
 sdf["luz"].lat = 47.036
 sdf["luz"].lon = 8.301
-sdf["luz"].elevation = TODO
+sdf["luz"].elevation = 456
 
 # Engelberg
 sdf["eng"].short_name = "eng"
@@ -880,7 +962,7 @@ sdf["eng"].dwh_id = "06655"
 sdf["eng"].dwh_name = "ENG"
 sdf["eng"].lat = 46.822
 sdf["eng"].lon = 8.411
-sdf["eng"].elevation = TODO
+sdf["eng"].elevation = 1037
 
 # Schaffhausen
 sdf["sha"].short_name = "sha"
@@ -889,16 +971,16 @@ sdf["sha"].dwh_id = "06620"
 sdf["sha"].dwh_name = "SHA"
 sdf["sha"].lat = 47.69
 sdf["sha"].lon = 8.62
-sdf["sha"].elevation = TODO
+sdf["sha"].elevation = 441
 
-# Z�rich / Fluntern
+# Zürich / Fluntern
 sdf["sma"].short_name = "sma"
-sdf["sma"].long_name = "Z�rich / Fluntern"
+sdf["sma"].long_name = "Zürich / Fluntern"
 sdf["sma"].dwh_id = "06660"
 sdf["sma"].dwh_name = "SMA"
 sdf["sma"].lat = 47.378
 sdf["sma"].lon = 8.566
-sdf["sma"].elevation = TODO
+sdf["sma"].elevation = 558
 
 # S. Bernardino
 sdf["sbe"].short_name = "sbe"
@@ -907,7 +989,7 @@ sdf["sbe"].dwh_id = "06783"
 sdf["sbe"].dwh_name = "SBE"
 sdf["sbe"].lat = 46.464
 sdf["sbe"].lon = 9.185
-sdf["sbe"].elevation = TODO
+sdf["sbe"].elevation = 1641
 
 # Weissfluhjoch
 sdf["wfj"].short_name = "wfj"
@@ -916,7 +998,7 @@ sdf["wfj"].dwh_id = "06780"
 sdf["wfj"].dwh_name = "WFJ"
 sdf["wfj"].lat = 46.833
 sdf["wfj"].lon = 9.806
-sdf["wfj"].elevation = TODO
+sdf["wfj"].elevation = 2694
 
 # Piz Corvatsch
 sdf["cov"].short_name = "cov"
@@ -925,7 +1007,7 @@ sdf["cov"].dwh_id = "06791"
 sdf["cov"].dwh_name = "COV"
 sdf["cov"].lat = 46.418
 sdf["cov"].lon = 9.821
-sdf["cov"].elevation = TODO
+sdf["cov"].elevation = 3297
 
 # Poschiavo / Robbia
 sdf["rob"].short_name = "rob"
@@ -934,7 +1016,7 @@ sdf["rob"].dwh_id = "06794"
 sdf["rob"].dwh_name = "ROB"
 sdf["rob"].lat = 46.347
 sdf["rob"].lon = 10.063
-sdf["rob"].elevation = TODO
+sdf["rob"].elevation = 1080
 
 # Scuol
 sdf["scu"].short_name = "scu"
@@ -943,43 +1025,43 @@ sdf["scu"].dwh_id = "06798"
 sdf["scu"].dwh_name = "SCU"
 sdf["scu"].lat = 46.793
 sdf["scu"].lon = 10.283
-sdf["scu"].elevation = TODO
+sdf["scu"].elevation = 1306
 
-# G�ttingen
+# Güttingen
 sdf["gut"].short_name = "gut"
-sdf["gut"].long_name = "G�ttingen"
+sdf["gut"].long_name = "Güttingen"
 sdf["gut"].dwh_id = "06621"
 sdf["gut"].dwh_name = "GUT"
 sdf["gut"].lat = 47.602
 sdf["gut"].lon = 9.279
-sdf["gut"].elevation = TODO
+sdf["gut"].elevation = 442
 
-# W�denswil
+# Wädenswil
 sdf["wae"].short_name = "wae"
-sdf["wae"].long_name = "W�denswil"
+sdf["wae"].long_name = "Wädenswil"
 sdf["wae"].dwh_id = "06673"
 sdf["wae"].dwh_name = "WAE"
 sdf["wae"].lat = 47.221
 sdf["wae"].lon = 8.678
-sdf["wae"].elevation = TODO
+sdf["wae"].elevation = 488
 
-# Aadorf / T�nikon
+# Aadorf / Tänikon
 sdf["tae"].short_name = "tae"
-sdf["tae"].long_name = "Aadorf / T�nikon"
+sdf["tae"].long_name = "Aadorf / Tänikon"
 sdf["tae"].dwh_id = "06679"
 sdf["tae"].dwh_name = "TAE"
 sdf["tae"].lat = 47.48
 sdf["tae"].lon = 8.905
-sdf["tae"].elevation = TODO
+sdf["tae"].elevation = 540
 
-# Z�rich / Affoltern
+# Zürich / Affoltern
 sdf["reh"].short_name = "reh"
-sdf["reh"].long_name = "Z�rich / Affoltern"
+sdf["reh"].long_name = "Zürich / Affoltern"
 sdf["reh"].dwh_id = "06664"
 sdf["reh"].dwh_name = "REH"
 sdf["reh"].lat = 47.428
 sdf["reh"].lon = 8.518
-sdf["reh"].elevation = TODO
+sdf["reh"].elevation = 445
 
 # Locarno / Monti
 sdf["otl"].short_name = "otl"
@@ -988,7 +1070,7 @@ sdf["otl"].dwh_id = "06760"
 sdf["otl"].dwh_name = "OTL"
 sdf["otl"].lat = 46.172
 sdf["otl"].lon = 8.787
-sdf["otl"].elevation = TODO
+sdf["otl"].elevation = 369
 
 # Beznau
 sdf["bez"].short_name = "bez"
@@ -997,7 +1079,7 @@ sdf["bez"].dwh_id = "06646"
 sdf["bez"].dwh_name = "BEZ"
 sdf["bez"].lat = 47.557
 sdf["bez"].lon = 8.233
-sdf["bez"].elevation = TODO
+sdf["bez"].elevation = 328
 
 # Cimetta
 sdf["cim"].short_name = "cim"
@@ -1006,7 +1088,7 @@ sdf["cim"].dwh_id = "06759"
 sdf["cim"].dwh_name = "CIM"
 sdf["cim"].lat = 46.2
 sdf["cim"].lon = 8.792
-sdf["cim"].elevation = TODO
+sdf["cim"].elevation = 1663
 
 # Leibstadt
 sdf["lei"].short_name = "lei"
@@ -1015,7 +1097,7 @@ sdf["lei"].dwh_id = "06666"
 sdf["lei"].dwh_name = "LEI"
 sdf["lei"].lat = 47.597
 sdf["lei"].lon = 8.188
-sdf["lei"].elevation = TODO
+sdf["lei"].elevation = 343
 
 # Grimsel Hospiz
 sdf["grh"].short_name = "grh"
@@ -1024,7 +1106,7 @@ sdf["grh"].dwh_id = "06744"
 sdf["grh"].dwh_name = "GRH"
 sdf["grh"].lat = 46.572
 sdf["grh"].lon = 8.333
-sdf["grh"].elevation = TODO
+sdf["grh"].elevation = 1988
 
 # Acquarossa / Comprovasco
 sdf["com"].short_name = "com"
@@ -1033,52 +1115,52 @@ sdf["com"].dwh_id = "06756"
 sdf["com"].dwh_name = "COM"
 sdf["com"].lat = 46.46
 sdf["com"].lon = 8.935
-sdf["com"].elevation = TODO
+sdf["com"].elevation = 577
 
-# L�gern
+# Lägern
 sdf["lae"].short_name = "lae"
-sdf["lae"].long_name = "L�gern"
+sdf["lae"].long_name = "Lägern"
 sdf["lae"].dwh_id = "06669"
 sdf["lae"].dwh_name = "LAE"
 sdf["lae"].lat = 47.482
 sdf["lae"].lon = 8.397
-sdf["lae"].elevation = TODO
+sdf["lae"].elevation = 873
 
-# H�rnli
+# Hörnli
 sdf["hoe"].short_name = "hoe"
-sdf["hoe"].long_name = "H�rnli"
+sdf["hoe"].long_name = "Hörnli"
 sdf["hoe"].dwh_id = "06689"
 sdf["hoe"].dwh_name = "HOE"
 sdf["hoe"].lat = 47.371
 sdf["hoe"].lon = 8.942
-sdf["hoe"].elevation = TODO
+sdf["hoe"].elevation = 1134
 
-# Robi�i
+# Robièi
 sdf["roe"].short_name = "roe"
-sdf["roe"].long_name = "Robi�i"
+sdf["roe"].long_name = "Robièi"
 sdf["roe"].dwh_id = "06751"
 sdf["roe"].dwh_name = "ROE"
 sdf["roe"].lat = 46.443
 sdf["roe"].lon = 8.513
-sdf["roe"].elevation = TODO
+sdf["roe"].elevation = 1904
 
-# W�renlingen / PSI
+# Würenlingen / PSI
 sdf["psi"].short_name = "psi"
-sdf["psi"].long_name = "W�renlingen / PSI"
+sdf["psi"].long_name = "Würenlingen / PSI"
 sdf["psi"].dwh_id = "06647"
 sdf["psi"].dwh_name = "PSI"
 sdf["psi"].lat = 47.536
 sdf["psi"].lon = 8.227
-sdf["psi"].elevation = TODO
+sdf["psi"].elevation = 336
 
-# Fl�hli, LU
+# Flühli, LU
 sdf["flu"].short_name = "flu"
-sdf["flu"].long_name = "Fl�hli, LU"
+sdf["flu"].long_name = "Flühli, LU"
 sdf["flu"].dwh_id = "06652"
 sdf["flu"].dwh_name = "FLU"
 sdf["flu"].lat = 46.889
 sdf["flu"].lon = 8.02
-sdf["flu"].elevation = TODO
+sdf["flu"].elevation = 942
 
 # Oberriet / Kriessern
 sdf["obr"].short_name = "obr"
@@ -1087,16 +1169,16 @@ sdf["obr"].dwh_id = "06649"
 sdf["obr"].dwh_name = "OBR"
 sdf["obr"].lat = 47.377
 sdf["obr"].lon = 9.613
-sdf["obr"].elevation = TODO
+sdf["obr"].elevation = 411
 
-# Berg�n / Latsch
+# Bergün / Latsch
 sdf["lat"].short_name = "lat"
-sdf["lat"].long_name = "Berg�n / Latsch"
+sdf["lat"].long_name = "Bergün / Latsch"
 sdf["lat"].dwh_id = "06642"
 sdf["lat"].dwh_name = "LAT"
 sdf["lat"].lat = 46.627
 sdf["lat"].lon = 9.754
-sdf["lat"].elevation = TODO
+sdf["lat"].elevation = 1410
 
 # Vals
 sdf["vls"].short_name = "vls"
@@ -1105,7 +1187,7 @@ sdf["vls"].dwh_id = "06663"
 sdf["vls"].dwh_name = "VLS"
 sdf["vls"].lat = 46.628
 sdf["vls"].lon = 9.189
-sdf["vls"].elevation = TODO
+sdf["vls"].elevation = 1244
 
 # Gersau
 sdf["ges"].short_name = "ges"
@@ -1114,7 +1196,7 @@ sdf["ges"].dwh_id = "06653"
 sdf["ges"].dwh_name = "GES"
 sdf["ges"].lat = 46.996
 sdf["ges"].lon = 8.523
-sdf["ges"].elevation = TODO
+sdf["ges"].elevation = 522
 
 # Lachen / Galgenen
 sdf["lac"].short_name = "lac"
@@ -1123,7 +1205,7 @@ sdf["lac"].dwh_id = "06665"
 sdf["lac"].dwh_name = "LAC"
 sdf["lac"].lat = 47.179
 sdf["lac"].lon = 8.859
-sdf["lac"].elevation = TODO
+sdf["lac"].elevation = 470
 
 # Bivio
 sdf["biv"].short_name = "biv"
@@ -1132,7 +1214,7 @@ sdf["biv"].dwh_id = "06774"
 sdf["biv"].dwh_name = "BIV"
 sdf["biv"].lat = 46.462
 sdf["biv"].lon = 9.669
-sdf["biv"].elevation = TODO
+sdf["biv"].elevation = 1858
 
 # Meiringen
 sdf["mer"].short_name = "mer"
@@ -1141,7 +1223,7 @@ sdf["mer"].dwh_id = "06637"
 sdf["mer"].dwh_name = "MER"
 sdf["mer"].lat = 46.732
 sdf["mer"].lon = 8.169
-sdf["mer"].elevation = TODO
+sdf["mer"].elevation = 591
 
 # Matro
 sdf["mtr"].short_name = "mtr"
@@ -1150,7 +1232,7 @@ sdf["mtr"].dwh_id = "06754"
 sdf["mtr"].dwh_name = "MTR"
 sdf["mtr"].lat = 46.41
 sdf["mtr"].lon = 8.925
-sdf["mtr"].elevation = TODO
+sdf["mtr"].elevation = 2193
 
 # Biasca
 sdf["bia"].short_name = "bia"
@@ -1159,7 +1241,7 @@ sdf["bia"].dwh_id = "10000000"
 sdf["bia"].dwh_name = "BIA"
 sdf["bia"].lat = 46.336
 sdf["bia"].lon = 8.978
-sdf["bia"].elevation = TODO
+sdf["bia"].elevation = 280
 
 # Titlis
 sdf["tit"].short_name = "tit"
@@ -1168,7 +1250,7 @@ sdf["tit"].dwh_id = "06740"
 sdf["tit"].dwh_name = "TIT"
 sdf["tit"].lat = 46.771
 sdf["tit"].lon = 8.426
-sdf["tit"].elevation = TODO
+sdf["tit"].elevation = 3096
 
 # Vicosoprano
 sdf["vio"].short_name = "vio"
@@ -1177,7 +1259,7 @@ sdf["vio"].dwh_id = "06788"
 sdf["vio"].dwh_name = "VIO"
 sdf["vio"].lat = 46.353
 sdf["vio"].lon = 9.628
-sdf["vio"].elevation = TODO
+sdf["vio"].elevation = 1091
 
 # Elm
 sdf["elm"].short_name = "elm"
@@ -1186,7 +1268,7 @@ sdf["elm"].dwh_id = "06682"
 sdf["elm"].dwh_name = "ELM"
 sdf["elm"].lat = 46.924
 sdf["elm"].lon = 9.175
-sdf["elm"].elevation = TODO
+sdf["elm"].elevation = 960
 
 # Andermatt
 sdf["ant"].short_name = "ant"
@@ -1195,7 +1277,7 @@ sdf["ant"].dwh_id = "06695"
 sdf["ant"].dwh_name = "ANT"
 sdf["ant"].lat = 46.631
 sdf["ant"].lon = 8.581
-sdf["ant"].elevation = TODO
+sdf["ant"].elevation = 1437
 
 # Sattel, SZ
 sdf["sag"].short_name = "sag"
@@ -1204,7 +1286,7 @@ sdf["sag"].dwh_id = "06662"
 sdf["sag"].dwh_name = "SAG"
 sdf["sag"].lat = 47.081
 sdf["sag"].lon = 8.637
-sdf["sag"].elevation = TODO
+sdf["sag"].elevation = 792
 
 # Ilanz
 sdf["ilz"].short_name = "ilz"
@@ -1213,7 +1295,7 @@ sdf["ilz"].dwh_id = "06789"
 sdf["ilz"].dwh_name = "ILZ"
 sdf["ilz"].lat = 46.775
 sdf["ilz"].lon = 9.215
-sdf["ilz"].elevation = TODO
+sdf["ilz"].elevation = 700
 
 # Schiers
 sdf["srs"].short_name = "srs"
@@ -1222,7 +1304,7 @@ sdf["srs"].dwh_id = "06790"
 sdf["srs"].dwh_name = "SRS"
 sdf["srs"].lat = 46.976
 sdf["srs"].lon = 9.668
-sdf["srs"].elevation = TODO
+sdf["srs"].elevation = 628
 
 # Vevey / Corseaux
 sdf["vev"].short_name = "vev"
@@ -1231,7 +1313,7 @@ sdf["vev"].dwh_id = "06603"
 sdf["vev"].dwh_name = "VEV"
 sdf["vev"].lat = 46.471
 sdf["vev"].lon = 6.815
-sdf["vev"].elevation = TODO
+sdf["vev"].elevation = 407
 
 # Cham
 sdf["chz"].short_name = "chz"
@@ -1240,7 +1322,7 @@ sdf["chz"].dwh_id = "06674"
 sdf["chz"].dwh_name = "CHZ"
 sdf["chz"].lat = 47.188
 sdf["chz"].lon = 8.465
-sdf["chz"].elevation = TODO
+sdf["chz"].elevation = 445
 
 # Binn
 sdf["bin"].short_name = "bin"
@@ -1249,7 +1331,7 @@ sdf["bin"].dwh_id = "06721"
 sdf["bin"].dwh_name = "BIN"
 sdf["bin"].lat = 46.368
 sdf["bin"].lon = 8.192
-sdf["bin"].elevation = TODO
+sdf["bin"].elevation = 1481
 
 # Hallau
 sdf["hll"].short_name = "hll"
@@ -1258,7 +1340,7 @@ sdf["hll"].dwh_id = "06624"
 sdf["hll"].dwh_name = "HLL"
 sdf["hll"].lat = 47.697
 sdf["hll"].lon = 8.47
-sdf["hll"].elevation = TODO
+sdf["hll"].elevation = 421
 
 # Mosen
 sdf["moa"].short_name = "moa"
@@ -1267,16 +1349,16 @@ sdf["moa"].dwh_id = "06644"
 sdf["moa"].dwh_name = "MOA"
 sdf["moa"].lat = 47.244
 sdf["moa"].lon = 8.233
-sdf["moa"].elevation = TODO
+sdf["moa"].elevation = 454
 
-# G�schenen
+# Göschenen
 sdf["gos"].short_name = "gos"
-sdf["gos"].long_name = "G�schenen"
+sdf["gos"].long_name = "Göschenen"
 sdf["gos"].dwh_id = "06668"
 sdf["gos"].dwh_name = "GOS"
 sdf["gos"].lat = 46.693
 sdf["gos"].lon = 8.595
-sdf["gos"].elevation = TODO
+sdf["gos"].elevation = 952
 
 # Cevio
 sdf["cev"].short_name = "cev"
@@ -1285,7 +1367,7 @@ sdf["cev"].dwh_id = "06752"
 sdf["cev"].dwh_name = "CEV"
 sdf["cev"].lat = 46.32
 sdf["cev"].lon = 8.603
-sdf["cev"].elevation = TODO
+sdf["cev"].elevation = 421
 
 # Arosa
 sdf["aro"].short_name = "aro"
@@ -1294,7 +1376,7 @@ sdf["aro"].dwh_id = "06785"
 sdf["aro"].dwh_name = "ARO"
 sdf["aro"].lat = 46.793
 sdf["aro"].lon = 9.679
-sdf["aro"].elevation = TODO
+sdf["aro"].elevation = 1880
 
 # Bischofszell / Sitterdorf
 sdf["biz"].short_name = "biz"
@@ -1303,7 +1385,7 @@ sdf["biz"].dwh_id = "06678"
 sdf["biz"].dwh_name = "BIZ"
 sdf["biz"].lat = 47.509
 sdf["biz"].lon = 9.267
-sdf["biz"].elevation = TODO
+sdf["biz"].elevation = 509
 
 # Segl-Maria
 sdf["sia"].short_name = "sia"
@@ -1312,7 +1394,7 @@ sdf["sia"].dwh_id = "06779"
 sdf["sia"].dwh_name = "SIA"
 sdf["sia"].lat = 46.432
 sdf["sia"].lon = 9.762
-sdf["sia"].elevation = TODO
+sdf["sia"].elevation = 1806
 
 # Passo del Bernina
 sdf["beh"].short_name = "beh"
@@ -1321,7 +1403,7 @@ sdf["beh"].dwh_id = "06797"
 sdf["beh"].dwh_name = "BEH"
 sdf["beh"].lat = 46.409
 sdf["beh"].lon = 10.02
-sdf["beh"].elevation = TODO
+sdf["beh"].elevation = 2267
 
 # Buffalora
 sdf["buf"].short_name = "buf"
@@ -1330,7 +1412,7 @@ sdf["buf"].dwh_id = "06778"
 sdf["buf"].dwh_name = "BUF"
 sdf["buf"].lat = 46.648
 sdf["buf"].lon = 10.267
-sdf["buf"].elevation = TODO
+sdf["buf"].elevation = 1973
 
 # Crap Masegn
 sdf["cma"].short_name = "cma"
@@ -1339,7 +1421,7 @@ sdf["cma"].dwh_id = "06688"
 sdf["cma"].dwh_name = "CMA"
 sdf["cma"].lat = 46.842
 sdf["cma"].lon = 9.18
-sdf["cma"].elevation = TODO
+sdf["cma"].elevation = 2471
 
 # Monte Generoso
 sdf["gen"].short_name = "gen"
@@ -1348,7 +1430,7 @@ sdf["gen"].dwh_id = "06777"
 sdf["gen"].dwh_name = "GEN"
 sdf["gen"].lat = 45.928
 sdf["gen"].lon = 9.018
-sdf["gen"].elevation = TODO
+sdf["gen"].elevation = 1602
 
 # Oron
 sdf["oro"].short_name = "oro"
@@ -1357,25 +1439,25 @@ sdf["oro"].dwh_id = "06708"
 sdf["oro"].dwh_name = "ORO"
 sdf["oro"].lat = 46.572
 sdf["oro"].lon = 6.858
-sdf["oro"].elevation = TODO
+sdf["oro"].elevation = 829
 
-# La Br�vine
+# La Brévine
 sdf["brl"].short_name = "brl"
-sdf["brl"].long_name = "La Br�vine"
+sdf["brl"].long_name = "La Brévine"
 sdf["brl"].dwh_id = "06617"
 sdf["brl"].dwh_name = "BRL"
 sdf["brl"].lat = 46.984
 sdf["brl"].lon = 6.61
-sdf["brl"].elevation = TODO
+sdf["brl"].elevation = 1042
 
-# Sch�pfheim
+# Schüpfheim
 sdf["spf"].short_name = "spf"
-sdf["spf"].long_name = "Sch�pfheim"
+sdf["spf"].long_name = "Schüpfheim"
 sdf["spf"].dwh_id = "06651"
 sdf["spf"].dwh_name = "SPF"
 sdf["spf"].lat = 46.947
 sdf["spf"].lon = 8.012
-sdf["spf"].elevation = TODO
+sdf["spf"].elevation = 746
 
 # Valbella
 sdf["vab"].short_name = "vab"
@@ -1384,7 +1466,7 @@ sdf["vab"].dwh_id = "06793"
 sdf["vab"].dwh_name = "VAB"
 sdf["vab"].lat = 46.755
 sdf["vab"].lon = 9.554
-sdf["vab"].elevation = TODO
+sdf["vab"].elevation = 1571
 
 # Piz Martegnas
 sdf["pma"].short_name = "pma"
@@ -1393,7 +1475,7 @@ sdf["pma"].dwh_id = "06795"
 sdf["pma"].dwh_name = "PMA"
 sdf["pma"].lat = 46.577
 sdf["pma"].lon = 9.53
-sdf["pma"].elevation = TODO
+sdf["pma"].elevation = 2670
 
 # Naluns / Schlivera
 sdf["nas"].short_name = "nas"
@@ -1402,7 +1484,7 @@ sdf["nas"].dwh_id = "06799"
 sdf["nas"].dwh_name = "NAS"
 sdf["nas"].lat = 46.817
 sdf["nas"].lon = 10.261
-sdf["nas"].elevation = TODO
+sdf["nas"].elevation = 2382
 
 # Simplon-Dorf
 sdf["sim"].short_name = "sim"
@@ -1411,7 +1493,7 @@ sdf["sim"].dwh_id = "06654"
 sdf["sim"].dwh_name = "SIM"
 sdf["sim"].lat = 46.197
 sdf["sim"].lon = 8.056
-sdf["sim"].elevation = TODO
+sdf["sim"].elevation = 1467
 
 # Eggishorn
 sdf["egh"].short_name = "egh"
@@ -1420,7 +1502,7 @@ sdf["egh"].dwh_id = "06739"
 sdf["egh"].dwh_name = "EGH"
 sdf["egh"].lat = 46.427
 sdf["egh"].lon = 8.093
-sdf["egh"].elevation = TODO
+sdf["egh"].elevation = 2895
 
 # Ebnat-Kappel
 sdf["ebk"].short_name = "ebk"
@@ -1429,16 +1511,16 @@ sdf["ebk"].dwh_id = "06693"
 sdf["ebk"].dwh_name = "EBK"
 sdf["ebk"].lat = 47.273
 sdf["ebk"].lon = 9.108
-sdf["ebk"].elevation = TODO
+sdf["ebk"].elevation = 625
 
-# Sta. Maria, Val M�stair
+# Sta. Maria, Val Müstair
 sdf["smm"].short_name = "smm"
-sdf["smm"].long_name = "Sta. Maria, Val M�stair"
+sdf["smm"].long_name = "Sta. Maria, Val Müstair"
 sdf["smm"].dwh_id = "06796"
 sdf["smm"].dwh_name = "SMM"
 sdf["smm"].lat = 46.602
 sdf["smm"].lon = 10.426
-sdf["smm"].elevation = TODO
+sdf["smm"].elevation = 1388
 
 # Bad Ragaz
 sdf["rag"].short_name = "rag"
@@ -1447,7 +1529,7 @@ sdf["rag"].dwh_id = "06686"
 sdf["rag"].dwh_name = "RAG"
 sdf["rag"].lat = 47.017
 sdf["rag"].lon = 9.503
-sdf["rag"].elevation = TODO
+sdf["rag"].elevation = 498
 
 # Einsiedeln
 sdf["ein"].short_name = "ein"
@@ -1456,7 +1538,7 @@ sdf["ein"].dwh_id = "06675"
 sdf["ein"].dwh_name = "EIN"
 sdf["ein"].lat = 47.133
 sdf["ein"].lon = 8.757
-sdf["ein"].elevation = TODO
+sdf["ein"].elevation = 912
 
 # Salen-Reutenen
 sdf["hai"].short_name = "hai"
@@ -1465,4 +1547,4 @@ sdf["hai"].dwh_id = "06623"
 sdf["hai"].dwh_name = "HAI"
 sdf["hai"].lat = 47.651
 sdf["hai"].lon = 9.024
-sdf["hai"].elevation = TODO
+sdf["hai"].elevation = 720
