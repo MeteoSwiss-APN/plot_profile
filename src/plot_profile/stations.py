@@ -10,157 +10,157 @@ import pandas as pd
 sdf = pd.DataFrame(
     # variables
     columns=[
-        "pay",
-        "klo",  # zurich kloten
-        "gre",  # grenchen
-        "gve",  # Genève / Cointrin
-        "bas",  # Basel / Binningen
-        "dol",  # La Dôle
-        "cgi",  # Nyon / Changins
-        "bie",  # Bière
-        "chb",  # Les Charbonnières
-        "mah",  # Mathod
-        "fre",  # Bullet / La Frétaz
-        "brl",  # La Brévine
-        "cdf",  # La Chaux-de-Fonds
-        "vit",  # Villars-Tiercelin
-        "puy",  # Pully
-        "neu",  # Neuchâtel
-        "crm",  # Cressier
-        "chm",  # Chaumont
-        "cha",  # Chasseral
-        "coy",  # Courtelary
-        "gra",  # Fribourg / Grangeneuve
-        "mas",  # Marsens
-        "mls",  # Le Moléson
-        "chd",  # Château-d'Oex
-        "cdm",  # Col des Mosses
-        "bou",  # Bouveret
-        "aig",  # Aigle
-        "evi",  # Evionnaz
-        "mar",  # Les Marécottes
-        "mob",  # Montagnier, Bagnes
-        "att",  # Les Attelas
-        "gsb",  # Col du Grand St-Bernard
-        "sio",  # Sion
-        "bol",  # Boltigen
-        "plf",  # Plaffeien
-        "mub",  # Mühleberg
-        "fah",  # Fahy
-        "dem",  # Delémont
-        "ber",  # Bern / Zollikofen
-        "ban",  # Bantiger
-        "thu",  # Thun
-        "fru",  # Frutigen
         "abo",  # Adelboden
-        "dia",  # Les Diablerets
-        "mve",  # Montana
-        "mte",  # Mottec
-        "evo",  # Evolène / Villa
-        "mrp",  # Monte Rosa-Plattje
-        "gor",  # Gornergrat
-        "zer",  # Zermatt
-        "grc",  # Grächen
-        "vis",  # Visp
-        "bla",  # Blatten, Lötschental
-        "jun",  # Jungfraujoch
-        "int",  # Interlaken
-        "lag",  # Langnau i.E.
-        "kop",  # Koppigen
-        "wyn",  # Wynau
-        "stc",  # St. Chrischona
-        "moe",  # Möhlin
-        "rue",  # Rünenberg
-        "goe",  # Gösgen
-        "bus",  # Buchs / Aarau
-        "ego",  # Egolzwil
+        "aig",  # Aigle
+        "alt",  # Altdorf
         "and",  # Andeer
+        "ant",  # Andermatt
+        "arh",  # Altenrhein
+        "aro",  # Arosa
+        "att",  # Les Attelas
+        "ban",  # Bantiger
+        "bas",  # Basel / Binningen
+        "beh",  # Passo del Bernina
+        "ber",  # Bern / Zollikofen
+        "bez",  # Beznau
+        "bia",  # Biasca
+        "bie",  # Bière
+        "bin",  # Binn
+        "biv",  # Bivio
+        "biz",  # Bischofszell / Sitterdorf
+        "bla",  # Blatten, Lötschental
+        "bol",  # Boltigen
+        "bou",  # Bouveret
+        "brl",  # La Brévine
+        "buf",  # Buffalora
+        "bus",  # Buchs / Aarau
+        "cdf",  # La Chaux-de-Fonds
+        "cdm",  # Col des Mosses
+        "cev",  # Cevio
+        "cgi",  # Nyon / Changins
+        "cha",  # Chasseral
+        "chb",  # Les Charbonnières
+        "chd",  # Château-d'Oex
+        "chm",  # Chaumont
+        "chu",  # Chur
+        "chz",  # Cham
+        "cim",  # Cimetta
+        "cma",  # Crap Masegn
+        "com",  # Acquarossa / Comprovasco
+        "cov",  # Piz Corvatsch
+        "coy",  # Courtelary
+        "crm",  # Cressier
+        "dav",  # Davos
+        "dem",  # Delémont
+        "dia",  # Les Diablerets
+        "dis",  # Disentis
+        "dol",  # La Dôle
+        "ebk",  # Ebnat-Kappel
+        "egh",  # Eggishorn
+        "ego",  # Egolzwil
+        "ein",  # Einsiedeln
+        "elm",  # Elm
+        "eng",  # Engelberg
+        "evi",  # Evionnaz
+        "evo",  # Evolène / Villa
+        "fah",  # Fahy
+        "flu",  # Flühli, LU
+        "fre",  # Bullet / La Frétaz
+        "fru",  # Frutigen
+        "gen",  # Monte Generoso
+        "ges",  # Gersau
+        "gih",  # Giswil
+        "gla",  # Glarus
+        "goe",  # Gösgen
+        "gor",  # Gornergrat
+        "gos",  # Göschenen
+        "gra",  # Fribourg / Grangeneuve
+        "grc",  # Grächen
+        "gre",  # Grenchen
+        "grh",  # Grimsel Hospiz
+        "gro",  # Grono
+        "gsb",  # Col du Grand St-Bernard
+        "gue",  # Gütsch, Andermatt
+        "gut",  # Güttingen
+        "gve",  # Genève / Cointrin
+        "hai",  # Salen-Reutenen
+        "hll",  # Hallau
+        "hoe",  # Hörnli
+        "ilz",  # Ilanz
+        "int",  # Interlaken
+        "jun",  # Jungfraujoch
+        "klo",  # Zurich Kloten
+        "kop",  # Koppigen
+        "lac",  # Lachen / Galgenen
+        "lae",  # Lägern
+        "lag",  # Langnau i.E.
+        "lat",  # Bergün / Latsch
+        "lei",  # Leibstadt
+        "lug",  # Lugano
+        "luz",  # Luzern
+        "mag",  # Magadino / Cadenazzo
+        "mah",  # Mathod
+        "mar",  # Les Marécottes
+        "mas",  # Marsens
+        "mer",  # Meiringen
+        "mls",  # Le Moléson
+        "moa",  # Mosen
+        "mob",  # Montagnier, Bagnes
+        "moe",  # Möhlin
+        "mrp",  # Monte Rosa-Plattje
+        "mte",  # Mottec
+        "mtr",  # Matro
+        "mub",  # Mühleberg
+        "mve",  # Montana
+        "nap",  # Napf
+        "nas",  # Naluns / Schlivera
+        "neu",  # Neuchâtel
+        "obr",  # Oberriet / Kriessern
+        "oro",  # Oron
+        "otl",  # Locarno / Monti
+        "pay",  # Payerne
+        "pil",  # Pilatus
+        "pio",  # Piotta
+        "plf",  # Plaffeien
+        "pma",  # Piz Martegnas
+        "psi",  # Würenlingen / PSI
+        "puy",  # Pully
+        "rag",  # Bad Ragaz
+        "reh",  # Zürich / Affoltern
+        "rob",  # Poschiavo / Robbia
+        "roe",  # Robièi
+        "rue",  # Rünenberg
         "sae",  # Säntis
+        "sag",  # Sattel, SZ
+        "sam",  # Samedan
+        "sbe",  # S. Bernardino
+        "sbo",  # Stabio
+        "scu",  # Scuol
+        "sha",  # Schaffhausen
+        "sia",  # Segl-Maria
+        "sim",  # Simplon-Dorf
+        "sio",  # Sion
+        "sma",  # Zürich / Fluntern
+        "smm",  # Sta. Maria, Val Müstair
+        "spf",  # Schüpfheim
+        "srs",  # Schiers
+        "stc",  # St. Chrischona
+        "stg",  # St. Gallen
+        "tae",  # Aadorf / Tänikon
+        "thu",  # Thun
+        "tit",  # Titlis
+        "ulr",  # Ulrichen
+        "vab",  # Valbella
         "vad",  # Vaduz
-        "pil",
-        "alt",
-        "ulr",
-        "pio",
-        "lug",
-        "gro",
-        "sam",
-        "chu",
-        "nap",
-        "mag",
-        "sbo",
-        "dis",
-        "gih",
-        "arh",
-        "dav",
-        "stg",
-        "gla",
-        "gue",
-        "sha",
-        "sma",
-        "sbe",
-        "wfj",
-        "cov",
-        "rob",
-        "scu",
-        "gut",
-        "wae",
-        "tae",
-        "reh",
-        "otl",
-        "bez",
-        "cim",
-        "lei",
-        "grh",
-        "com",
-        "lae",
-        "hoe",
-        "roe",
-        "psi",
-        "flu",
-        "obr",
-        "lat",
-        "vls",
-        "ges",
-        "lac",
-        "biv",
-        "mer",
-        "mtr",
-        "bia",
-        "tit",
-        "vio",
-        "elm",
-        "ant",
-        "sag",
-        "ilz",
-        "srs",
-        "vev",
-        "chz",
-        "bin",
-        "hll",
-        "moa",
-        "gos",
-        "cev",
-        "aro",
-        "biz",
-        "sia",
-        "beh",
-        "buf",
-        "cma",
-        "gen",
-        "oro",
-        "spf",
-        "vab",
-        "pma",
-        "nas",
-        "sim",
-        "egh",
-        "ebk",
-        "smm",
-        "rag",
-        "ein",
-        "hai",
-        "luz",
-        "eng",
+        "vev",  # Vevey / Corseaux
+        "vio",  # Vicosoprano
+        "vis",  # Visp
+        "vit",  # Villars-Tiercelin
+        "vls",  # Vals
+        "wae",  # Wädenswil
+        "wfj",  # Weissfluhjoch
+        "wyn",  # Wynau
+        "zer",  # Zermatt
     ],
     # attributes
     index=[
