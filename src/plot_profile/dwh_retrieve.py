@@ -71,7 +71,6 @@ def parse_timestamps(timestamps):
         elif len(timestamps) == 2:
             ts0 = timestamps[0]
             ts1 = timestamps[1]
-
             # if string
             if isinstance(ts0, str):
                 if len(ts0) == 10:
@@ -436,8 +435,22 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
 if __name__ == "__main__":
 
-    test_profile = True
+    test_profile = False
     test_surface = False
+    test_timeseries = True
+
+    if test_timeseries:
+        data = dwh_retrieve(
+            device="5cm",
+            station="gla",
+            vars="temp",  # temp variable corresponds for the '5cm' measurement device to variable id: 92
+            timestamps=[
+                "2021111900",
+                "2021111902",
+            ],
+            verbose=True,
+        )
+        print(f"5cm dataframe looks like:\n{data}")
 
     if test_profile:
         data = dwh_retrieve(
