@@ -399,8 +399,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 # use altitude as index
                 new_df.index = data[data.timestamp == ts]["altitude"]
 
-                print("! Assuming that all profile data have same altitude levels!")
-
                 return new_df
 
     # surface-based data

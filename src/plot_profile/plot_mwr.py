@@ -19,19 +19,24 @@ from .utils import save_fig
 # import ipdb
 
 
-def mwr_heatmap(mwr_data, var, station, datatypes, outpath):
+def mwr_heatmap(
+    mwr_data, station, var, min_value, max_value, appendix, datatypes, outpath
+):
     """Plot heatmap of MWR observational data.
 
     Args:
         mwr_data (pandas dataframe): data
-        var (pandas dataframe): variable
         station (pandas dataframe): station
+        var (pandas dataframe): variable
+        min_value (float): minimal value
+        max_value (float): maximum value
+        appendix (str): append to file outname
         datatypes (str): output filetype
         outpath (str): path to output
 
     """
     plt.rcParams["figure.figsize"] = (7.5, 4.5)
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
 
     # copied from plot_icon
     # im = ax.pcolormesh(
@@ -55,7 +60,7 @@ def mwr_heatmap(mwr_data, var, station, datatypes, outpath):
     # filename = f'mwr_heatmap_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{station.short_name}'
     filename = f"mwr_heatmap_{var.short_name}_{station.short_name}"
     if appendix:
-        filename = name + "_" + appendix
+        filename = filename + "_" + appendix
 
     save_fig(
         filename=filename,

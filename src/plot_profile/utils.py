@@ -57,7 +57,7 @@ def save_fig(filename, datatypes, outpath, fig=None):
         return
 
 
-def slice_top_bottom(df_height, alt_top, alt_bot, verbose):
+def slice_top_bottom(df_height, alt_top, alt_bot, verbose=False):
     """Criteria to cut away top and bottom of dataframe.
 
     Args:

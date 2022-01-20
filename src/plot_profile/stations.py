@@ -148,7 +148,6 @@ sdf = pd.DataFrame(
         "cma",
         "gen",
         "oro",
-        "brl",
         "spf",
         "vab",
         "pma",
@@ -185,7 +184,7 @@ sdf["pay"].elevation = 490.0
 
 # zurich kloten
 sdf["klo"].short_name = "klo"
-sdf["klo"].long_name = "Zurich Kloten"
+sdf["klo"].long_name = "Kloten"
 sdf["klo"].dwh_id = "06670"
 sdf["klo"].dwh_name = "KLO"
 sdf["klo"].lat = 47.479611
@@ -203,7 +202,7 @@ sdf["gre"].elevation = 428
 
 # genf
 sdf["gve"].short_name = "gve"
-sdf["gve"].long_name = "Genève / Cointrin"
+sdf["gve"].long_name = "Genève"
 sdf["gve"].dwh_id = "06700"
 sdf["gve"].dwh_name = "GVE"
 sdf["gve"].lat = 46.247519
@@ -212,7 +211,7 @@ sdf["gve"].elevation = 411
 
 # Basel / Binningen
 sdf["bas"].short_name = "bas"
-sdf["bas"].long_name = "Basel / Binningen"
+sdf["bas"].long_name = "Basel"
 sdf["bas"].dwh_id = "06601"
 sdf["bas"].dwh_name = "BAS"
 sdf["bas"].lat = 47.541142
@@ -230,7 +229,7 @@ sdf["dol"].elevation = 1670
 
 # Nyon / Changins
 sdf["cgi"].short_name = "cgi"
-sdf["cgi"].long_name = "Nyon / Changins"
+sdf["cgi"].long_name = "Nyon"
 sdf["cgi"].dwh_id = "06705"
 sdf["cgi"].dwh_name = "CGI"
 sdf["cgi"].lat = 46.401053
@@ -266,7 +265,7 @@ sdf["mah"].elevation = 435
 
 # Bullet / La Frétaz
 sdf["fre"].short_name = "fre"
-sdf["fre"].long_name = "Bullet / La Frétaz"
+sdf["fre"].long_name = "Bullet"
 sdf["fre"].dwh_id = "06619"
 sdf["fre"].dwh_name = "FRE"
 sdf["fre"].lat = 46.840622
@@ -356,7 +355,7 @@ sdf["coy"].elevation = 695
 
 # Fribourg / Grangeneuve
 sdf["gra"].short_name = "gra"
-sdf["gra"].long_name = "Fribourg / Grangeneuve"
+sdf["gra"].long_name = "Fribourg"
 sdf["gra"].dwh_id = "06625"
 sdf["gra"].dwh_name = "GRA"
 sdf["gra"].lat = 46.7714
@@ -437,7 +436,7 @@ sdf["mar"].elevation = 990
 
 # Montagnier, Bagnes
 sdf["mob"].short_name = "mob"
-sdf["mob"].long_name = "Montagnier, Bagnes"
+sdf["mob"].long_name = "Montagnier"
 sdf["mob"].dwh_id = "06615"
 sdf["mob"].dwh_name = "MOB"
 sdf["mob"].lat = 46.071019
@@ -518,7 +517,7 @@ sdf["dem"].elevation = 439
 
 # Bern / Zollikofen
 sdf["ber"].short_name = "ber"
-sdf["ber"].long_name = "Bern / Zollikofen"
+sdf["ber"].long_name = "Bern"
 sdf["ber"].dwh_id = "06631"
 sdf["ber"].dwh_name = "BER"
 sdf["ber"].lat = 46.990744
@@ -590,7 +589,7 @@ sdf["mte"].elevation = 1580
 
 # Evolène / Villa
 sdf["evo"].short_name = "evo"
-sdf["evo"].long_name = "Evolène / Villa"
+sdf["evo"].long_name = "Evolène"
 sdf["evo"].dwh_id = "06722"
 sdf["evo"].dwh_name = "EVO"
 sdf["evo"].lat = 46.112211
@@ -644,7 +643,7 @@ sdf["vis"].elevation = 639
 
 # Blatten, Lötschental
 sdf["bla"].short_name = "bla"
-sdf["bla"].long_name = "Blatten, Lötschental"
+sdf["bla"].long_name = "Blatten"
 sdf["bla"].dwh_id = "06725"
 sdf["bla"].dwh_name = "BLA"
 sdf["bla"].lat = 46.420453
@@ -734,21 +733,12 @@ sdf["goe"].elevation = 380
 
 # Buchs / Aarau
 sdf["bus"].short_name = "bus"
-sdf["bus"].long_name = "Buchs / Aarau"
+sdf["bus"].long_name = "Aarau"
 sdf["bus"].dwh_id = "06633"
 sdf["bus"].dwh_name = "BUS"
 sdf["bus"].lat = 47.384381
 sdf["bus"].lon = 8.07955
 sdf["bus"].elevation = 387
-
-# Egolzwil
-sdf["ego"].short_name = "ego"
-sdf["ego"].long_name = "Egolzwil"
-sdf["ego"].dwh_id = "06648"
-sdf["ego"].dwh_name = "EGO"
-sdf["ego"].lat = 47.179428
-sdf["ego"].lon = 8.004758
-sdf["ego"].elevation = 522
 
 # Egolzwil
 sdf["ego"].short_name = "ego"
@@ -869,7 +859,7 @@ sdf["nap"].elevation = 1406
 
 # Magadino / Cadenazzo
 sdf["mag"].short_name = "mag"
-sdf["mag"].long_name = "Magadino / Cadenazzo"
+sdf["mag"].long_name = "Magadino"
 sdf["mag"].dwh_id = "06762"
 sdf["mag"].dwh_name = "MAG"
 sdf["mag"].lat = 46.16
@@ -941,7 +931,7 @@ sdf["gla"].elevation = 519
 
 # Gütsch, Andermatt
 sdf["gue"].short_name = "gue"
-sdf["gue"].long_name = "Gütsch, Andermatt"
+sdf["gue"].long_name = "Gütsch"
 sdf["gue"].dwh_id = "06750"
 sdf["gue"].dwh_name = "GUE"
 sdf["gue"].lat = 46.652
@@ -977,7 +967,7 @@ sdf["sha"].elevation = 441
 
 # Zürich / Fluntern
 sdf["sma"].short_name = "sma"
-sdf["sma"].long_name = "Zürich / Fluntern"
+sdf["sma"].long_name = "Fluntern"
 sdf["sma"].dwh_id = "06660"
 sdf["sma"].dwh_name = "SMA"
 sdf["sma"].lat = 47.378
@@ -1013,7 +1003,7 @@ sdf["cov"].elevation = 3297
 
 # Poschiavo / Robbia
 sdf["rob"].short_name = "rob"
-sdf["rob"].long_name = "Poschiavo / Robbia"
+sdf["rob"].long_name = "Poschiavo"
 sdf["rob"].dwh_id = "06794"
 sdf["rob"].dwh_name = "ROB"
 sdf["rob"].lat = 46.347
@@ -1047,9 +1037,9 @@ sdf["wae"].lat = 47.221
 sdf["wae"].lon = 8.678
 sdf["wae"].elevation = 488
 
-# Aadorf / Tänikon
+# # Aadorf / Tänikon
 sdf["tae"].short_name = "tae"
-sdf["tae"].long_name = "Aadorf / Tänikon"
+sdf["tae"].long_name = "Tänikon"
 sdf["tae"].dwh_id = "06679"
 sdf["tae"].dwh_name = "TAE"
 sdf["tae"].lat = 47.48
@@ -1058,7 +1048,7 @@ sdf["tae"].elevation = 540
 
 # Zürich / Affoltern
 sdf["reh"].short_name = "reh"
-sdf["reh"].long_name = "Zürich / Affoltern"
+sdf["reh"].long_name = "Zürich"
 sdf["reh"].dwh_id = "06664"
 sdf["reh"].dwh_name = "REH"
 sdf["reh"].lat = 47.428
@@ -1067,7 +1057,7 @@ sdf["reh"].elevation = 445
 
 # Locarno / Monti
 sdf["otl"].short_name = "otl"
-sdf["otl"].long_name = "Locarno / Monti"
+sdf["otl"].long_name = "Locarno"
 sdf["otl"].dwh_id = "06760"
 sdf["otl"].dwh_name = "OTL"
 sdf["otl"].lat = 46.172
@@ -1103,7 +1093,7 @@ sdf["lei"].elevation = 343
 
 # Grimsel Hospiz
 sdf["grh"].short_name = "grh"
-sdf["grh"].long_name = "Grimsel Hospiz"
+sdf["grh"].long_name = "Grimsel"
 sdf["grh"].dwh_id = "06744"
 sdf["grh"].dwh_name = "GRH"
 sdf["grh"].lat = 46.572
@@ -1112,7 +1102,7 @@ sdf["grh"].elevation = 1988
 
 # Acquarossa / Comprovasco
 sdf["com"].short_name = "com"
-sdf["com"].long_name = "Acquarossa / Comprovasco"
+sdf["com"].long_name = "Acquarossa"
 sdf["com"].dwh_id = "06756"
 sdf["com"].dwh_name = "COM"
 sdf["com"].lat = 46.46
@@ -1148,7 +1138,7 @@ sdf["roe"].elevation = 1904
 
 # Würenlingen / PSI
 sdf["psi"].short_name = "psi"
-sdf["psi"].long_name = "Würenlingen / PSI"
+sdf["psi"].long_name = "Würenlingen"
 sdf["psi"].dwh_id = "06647"
 sdf["psi"].dwh_name = "PSI"
 sdf["psi"].lat = 47.536
@@ -1157,7 +1147,7 @@ sdf["psi"].elevation = 336
 
 # Flühli, LU
 sdf["flu"].short_name = "flu"
-sdf["flu"].long_name = "Flühli, LU"
+sdf["flu"].long_name = "Flühli"
 sdf["flu"].dwh_id = "06652"
 sdf["flu"].dwh_name = "FLU"
 sdf["flu"].lat = 46.889
@@ -1166,7 +1156,7 @@ sdf["flu"].elevation = 942
 
 # Oberriet / Kriessern
 sdf["obr"].short_name = "obr"
-sdf["obr"].long_name = "Oberriet / Kriessern"
+sdf["obr"].long_name = "Oberriet"
 sdf["obr"].dwh_id = "06649"
 sdf["obr"].dwh_name = "OBR"
 sdf["obr"].lat = 47.377
@@ -1175,7 +1165,7 @@ sdf["obr"].elevation = 411
 
 # Bergün / Latsch
 sdf["lat"].short_name = "lat"
-sdf["lat"].long_name = "Bergün / Latsch"
+sdf["lat"].long_name = "Bergün"
 sdf["lat"].dwh_id = "06642"
 sdf["lat"].dwh_name = "LAT"
 sdf["lat"].lat = 46.627
@@ -1202,7 +1192,7 @@ sdf["ges"].elevation = 522
 
 # Lachen / Galgenen
 sdf["lac"].short_name = "lac"
-sdf["lac"].long_name = "Lachen / Galgenen"
+sdf["lac"].long_name = "Lachen"
 sdf["lac"].dwh_id = "06665"
 sdf["lac"].dwh_name = "LAC"
 sdf["lac"].lat = 47.179
@@ -1239,7 +1229,7 @@ sdf["mtr"].elevation = 2193
 # Biasca
 sdf["bia"].short_name = "bia"
 sdf["bia"].long_name = "Biasca"
-sdf["bia"].dwh_id = "10000000"
+sdf["bia"].dwh_id = "9110"
 sdf["bia"].dwh_name = "BIA"
 sdf["bia"].lat = 46.336
 sdf["bia"].lon = 8.978
@@ -1283,7 +1273,7 @@ sdf["ant"].elevation = 1437
 
 # Sattel, SZ
 sdf["sag"].short_name = "sag"
-sdf["sag"].long_name = "Sattel, SZ"
+sdf["sag"].long_name = "Sattel"
 sdf["sag"].dwh_id = "06662"
 sdf["sag"].dwh_name = "SAG"
 sdf["sag"].lat = 47.081
@@ -1310,7 +1300,7 @@ sdf["srs"].elevation = 628
 
 # Vevey / Corseaux
 sdf["vev"].short_name = "vev"
-sdf["vev"].long_name = "Vevey / Corseaux"
+sdf["vev"].long_name = "Vevey"
 sdf["vev"].dwh_id = "06603"
 sdf["vev"].dwh_name = "VEV"
 sdf["vev"].lat = 46.471
@@ -1382,7 +1372,7 @@ sdf["aro"].elevation = 1880
 
 # Bischofszell / Sitterdorf
 sdf["biz"].short_name = "biz"
-sdf["biz"].long_name = "Bischofszell / Sitterdorf"
+sdf["biz"].long_name = "Bischofszell"
 sdf["biz"].dwh_id = "06678"
 sdf["biz"].dwh_name = "BIZ"
 sdf["biz"].lat = 47.509
@@ -1400,7 +1390,7 @@ sdf["sia"].elevation = 1806
 
 # Passo del Bernina
 sdf["beh"].short_name = "beh"
-sdf["beh"].long_name = "Passo del Bernina"
+sdf["beh"].long_name = "Berninapass"
 sdf["beh"].dwh_id = "06797"
 sdf["beh"].dwh_name = "BEH"
 sdf["beh"].lat = 46.409
@@ -1473,7 +1463,7 @@ sdf["pma"].elevation = 2670
 
 # Naluns / Schlivera
 sdf["nas"].short_name = "nas"
-sdf["nas"].long_name = "Naluns / Schlivera"
+sdf["nas"].long_name = "Naluns"
 sdf["nas"].dwh_id = "06799"
 sdf["nas"].dwh_name = "NAS"
 sdf["nas"].lat = 46.817
@@ -1482,7 +1472,7 @@ sdf["nas"].elevation = 2382
 
 # Simplon-Dorf
 sdf["sim"].short_name = "sim"
-sdf["sim"].long_name = "Simplon-Dorf"
+sdf["sim"].long_name = "Simplon Dorf"
 sdf["sim"].dwh_id = "06654"
 sdf["sim"].dwh_name = "SIM"
 sdf["sim"].lat = 46.197
@@ -1509,7 +1499,7 @@ sdf["ebk"].elevation = 625
 
 # Sta. Maria, Val Müstair
 sdf["smm"].short_name = "smm"
-sdf["smm"].long_name = "Sta. Maria, Val Müstair"
+sdf["smm"].long_name = "Sta. Maria"
 sdf["smm"].dwh_id = "06796"
 sdf["smm"].dwh_name = "SMM"
 sdf["smm"].lat = 46.602
