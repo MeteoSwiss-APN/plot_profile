@@ -10,7 +10,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# from numpy import NaN
+# Local
+from .stations import sdf
+from .variables import vdf
 
 
 def count_to_log_level(count: int) -> int:
@@ -130,6 +132,34 @@ def validtime_from_leadtime(date, leadtime, verbose=False):
         print(f"{date} + {leadtime}h = {validtime.strftime('%y%m%d%H')}")
 
     return validtime
+
+
+def check_inputs(var, loc, verbose):
+    """Check if the variables are in the variables dataframe. Check if the stations are in the stations dataframe.
+
+    Args:
+        var (str): variable(s)
+        loc (str): station id (i.e. gla for Glarus)
+        verbose (bool): add print statements to output or not
+
+    """
+    # 1) check if location is available
+    try:
+        station = sdf[loc]
+        if verbose:
+            print(f"--- retrieving MWR data for {station.long_name}.")
+    except KeyError:
+        print(f"! {loc} is not listed as an available station.")
+        sys.exit(1)
+
+    # 2) check if variables are defined for given devices
+    try:
+        var_frame = vdf[var]
+        if verbose:
+            print(f"--- selected variable: {var_frame.long_name}.")
+    except KeyError:
+        print(f"! {var} is not available as variable.")
+        sys.exit(1)
 
 
 # linestyles for several lead times
