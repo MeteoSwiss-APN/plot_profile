@@ -24,6 +24,10 @@ vdf = pd.DataFrame(
         "qv",
         "qv_dia",
         "rel_hum",
+        "rad_lw_down",
+        "rad_lw_up",
+        "rad_sw_down",
+        "rad_sw_up",
         "temp",
         "ver_vis",
         "wind_dir",
@@ -130,7 +134,7 @@ vdf["dewp_temp"].long_name = "Dew point temperature"
 vdf["dewp_temp"].unit = "°C"
 vdf["dewp_temp"].min_value = -5
 vdf["dewp_temp"].max_value = 15
-vdf["dewp_temp"].dwh_id = {"rs": "747"}
+vdf["dewp_temp"].dwh_id = {"rs": "747", "2m": "194"}
 
 # horizontal visiblity: hor_vis
 vdf["hor_vis"].short_name = "hor_vis"
@@ -198,7 +202,39 @@ vdf["rel_hum"].long_name = "Relative humidity"
 vdf["rel_hum"].unit = "%"
 vdf["rel_hum"].min_value = 0
 vdf["rel_hum"].max_value = 100
-vdf["rel_hum"].dwh_id = {"rs": "746"}
+vdf["rel_hum"].dwh_id = {
+    "rs": "746",
+    "2m_tower": "3698",
+    "10m_tower": "4953",
+    "30m_tower": "4961",
+}
+
+# radiation: longwave downward
+vdf["rad_lw_down"].short_name = "rad_lw_down"
+vdf["rad_lw_down"].long_name = "Longwave radiation: Downward"
+vdf["rad_lw_down"].unit = "W/m2"
+vdf["rad_lw_down"].dwh_id = {"2m_tower": "3762"}
+
+# radiation: longwave upward
+vdf["rad_lw_up"].short_name = "rad_lw_up"
+vdf["rad_lw_up"].long_name = "Longwave radiation: Upward"
+vdf["rad_lw_up"].unit = "W/m2"
+vdf["rad_lw_up"].dwh_id = {
+    "2m_tower": "5118",  # no data yet in DWH
+    "30m_tower": "5181",  # no data yet in DWH
+}
+
+# radiation: shortwave downward
+vdf["rad_sw_down"].short_name = "rad_sw_down"
+vdf["rad_sw_down"].long_name = "Shortwave radiation: Downward"
+vdf["rad_sw_down"].unit = "W/m2"
+vdf["rad_sw_down"].dwh_id = {"2m_tower": "3873"}
+
+# radiation: shortwave upward ("reflected")
+vdf["rad_sw_up"].short_name = "rad_sw_up"
+vdf["rad_sw_up"].long_name = "Shortwave radiation: Upward"
+vdf["rad_sw_up"].unit = "W/m2"
+vdf["rad_sw_up"].dwh_id = {"2m_tower": "4995"}
 
 # temperature: temp
 vdf["temp"].short_name = "temp"
@@ -213,7 +249,15 @@ vdf["temp"].linestyle = "-"
 vdf["temp"].mult = 1
 vdf["temp"].plus = -273
 vdf["temp"].avg = False
-vdf["temp"].dwh_id = {"rs": "745", "2m": "91", "mwr": "3147", "5cm": "92"}
+vdf["temp"].dwh_id = {
+    "rs": "745",
+    "2m": "91",
+    "mwr": "3147",
+    "5cm": "92",
+    "2m_tower": "3702",
+    "10m_tower": "4949",
+    "30m_tower": "4957",
+}
 
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"
