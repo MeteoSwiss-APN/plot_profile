@@ -41,6 +41,9 @@ from .utils import check_inputs
         [
             "5cm",
             "2m",
+            "2m_tower",
+            "10m_tower",
+            "30m_tower"
             # TODO: add all possible devices here
         ],
         case_sensitive=True,
@@ -117,9 +120,9 @@ def main(
 
     Currently, only temperature is supported.
 
-    Example command:
+    Example commands:
     plot_timeseries --start 21111900 --end 21111902 --loc gla --device 5cm --device 2m --var temp
-
+    plot_timeseries --outpath plots --start 21111900 --end 21111902 --loc pay --device 5cm --device 2m --device 2m_tower --device 10m_tower --device 30m_tower --var temp
     """
     check_inputs(var, loc, verbose)
 
