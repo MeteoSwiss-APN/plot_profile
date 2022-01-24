@@ -20,3 +20,63 @@ munits.registry[datetime.datetime] = converter
 from .stations import sdf
 from .utils import save_fig
 from .variables import vdf
+
+
+def create_plot(
+    data,
+    var,
+    start,
+    end,
+    datatypes,
+    outpath,
+    grid,
+    devices,
+    loc,
+    appendix,
+    verbose,
+):
+    """Create timeseries plot.
+
+    Args:
+        data (dict): dictionary, containing one dataframe for each device
+        var (tuple): list of variables (w/ same unit) to be added to plot
+        start (datetime obj): start time
+        end (datetime obj): end time
+        datatypes (tuple): list of output data types
+        outpath (str): output folder path
+        grid (bool): add grid to plot or not
+        devices (list): list of devices
+        loc (str): abbreviation of station name (location)
+        appendix (bool): add appendix to output name
+        verbose (bool): print 'extra' statements during computation
+
+    """
+    variable = vdf[var]
+    station = sdf[loc]
+    ylabel = f"{variable.long_name} [{variable.unit}]"
+    lims = (start, end)
+    dates = pd.to_datetime(data[devices[0]]["timestamp"], format="%Y-%m-%d %H:%M:%S")
+    fig, ax = plt.subplots(1, 1, figsize=(8, 5), constrained_layout=True)
+    plot_dict = {
+        0: "k-",
+        1: "k--",
+    }
+
+    for i, device in enumerate(devices):
+        label = f"{variable.short_name}: {device}"
+        y = data[device].temp.values
+        ax.plot(dates, y, plot_dict[i], label=label)  # TODO: add label
+
+    ax.set_xlim(lims)
+    title = f"Station: {station.long_name} | Period: {dt.strftime(start, '%d %b %H:%M')} - {dt.strftime(end, '%d %b %H:%M')}"
+    ax.set_title(label=title)
+    ax.set_ylabel(ylabel)
+    ax.legend()
+
+    if grid:
+        ax.grid(visible=True)
+
+    filename = f"ts_{start.day}{start.hour}_{end.day}{end.hour}"
+    save_fig(filename, datatypes, outpath, fig=fig)
+    plt.clf()
+    return
