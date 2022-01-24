@@ -1,20 +1,17 @@
 """Purpose: Plot time-height-crosssection of MWR observational data.
 
-Author: Stephanie Westerhuis
+Author: Michel Zeller
 
-Date: 05/01/2022.
+Date: 21/01/2022.
 """
-
-# Standard library
-import sys
 
 # Third-party
 import click
 
-# from .dwh_retrieve import dwh_retrieve
-# from .stations import sdf
-# from .variables import vdf
-# import ipdb
+# Local
+from .dwh_retrieve import dwh_retrieve
+from .plot_timeseries import create_plot
+from .utils import check_inputs
 
 
 @click.command()
@@ -32,10 +29,27 @@ import click
 @click.option(
     "--var",
     type=str,
+    # multiple=True, # TODO: implement later, s.t. several variables with the same unit can be selected
     help="MANDATORY: Variable name.",
 )
 @click.option(
     "--loc", default="pay", type=str, help="MANDATORY: Name of location. Def: pay"
+)
+@click.option(
+    "--device",
+    type=click.Choice(
+        [
+            "5cm",
+            "2m",
+            # TODO: add all possible devices here
+        ],
+        case_sensitive=True,
+    ),
+    multiple=True,
+    default=[
+        "5cm",
+    ],
+    help="MANDATORY: Choose type of device. Def: 5cm",
 )
 # optional options
 @click.option(
@@ -61,8 +75,10 @@ import click
         ],
         case_sensitive=True,
     ),
-    multiple=False,
-    default="png",
+    multiple=True,
+    default=[
+        "png",
+    ],
     help="Choose data type(s) of final result. Def: png",
 )
 @click.option(
@@ -76,63 +92,59 @@ import click
     default=False,
     help="Output details on what is happening.",
 )
+@click.option(
+    "--grid",
+    is_flag=True,
+    default=False,
+    help="Add grid to plot.",
+)
 def main(
     *,
+    # Mandatory
     start: str,
     end: str,
     var: str,
+    loc: str,
+    device: str,
+    # Optional
     appendix: str,
     datatypes: tuple,
-    loc: str,
     outpath: str,
     verbose: bool,
+    grid: bool,
 ):
-    """Plot heatmap of variables retrieved from microwave radiometer.
+    """Plot timeseries of variables retrieved from various differend measurement devices.
 
     Currently, only temperature is supported.
 
     Example command:
-    plot_mwr_heatmap --start 21111812 --end 21111912 --var temp --alt_top 2000
+    plot_timeseries --start 21111900 --end 21111902 --loc gla --device 5cm --device 2m --var temp
 
     """
-    print("hello world")
-    if False:
-        # retrieve station dataframe
-        try:
-            station = sdf[loc]
-            if verbose:
-                print(f"Retrieving MWR data for {station.long_name}.")
-        except KeyError:
-            print(f"! {loc} is not listed as an available station.")
-            sys.exit(1)
+    check_inputs(var, loc, verbose)
 
-        # retrieve variable dataframe
-        try:
-            var_frame = vdf[var]
-            if verbose:
-                print(f"Selected variable: {var_frame.long_name}.")
-        except KeyError:
-            print(f"! {var} is not available as variable.")
-            sys.exit(1)
-
-        ## retrieve obs from DWH
-        mwr_data = dwh_retrieve(
-            device="mwr",
+    data_dict = {}
+    for dev in device:
+        data_dict[dev] = dwh_retrieve(
+            device=dev,
             station=loc,
             vars=var,
             timestamps=[start, end],
-            verbose=verbose,
+            verbose=False,  # TODO: change False to verbose
         )
-        mwr_data.head()
-        # slice top and bottom
 
-        # for var in vars:
-        #    mwr_heatmap(
-        #        mwr_data=mwr_data,
-        #        var=vdf[var],
-        #        station=sdf[loc],
-        #        datatypes=datatypes,
-        #        outpath=outpath,
-        #    )
+    create_plot(
+        data=data_dict,
+        devices=device,
+        start=start,
+        end=end,
+        datatypes=datatypes,
+        outpath=outpath,
+        appendix=appendix,
+        verbose=verbose,
+        grid=grid,
+        var=var,
+        loc=loc,
+    )
 
     print("--- done")
