@@ -52,20 +52,35 @@ def create_plot(
 
     """
     variable = vdf[var]
+    var_short = variable.short_name
     station = sdf[loc]
     ylabel = f"{variable.long_name} [{variable.unit}]"
     lims = (start, end)
     dates = pd.to_datetime(data[devices[0]]["timestamp"], format="%Y-%m-%d %H:%M:%S")
     fig, ax = plt.subplots(1, 1, figsize=(8, 5), constrained_layout=True)
-    plot_dict = {
-        0: "k-",
-        1: "k--",
+
+    line_style_dict = {
+        0: "-",
+        1: "-",
+        2: "-",
+        3: "-",
+        4: (0, (1, 10)),
+    }
+
+    colour_dict = {
+        0: "black",
+        1: "blue",
+        2: "red",
+        3: "magenta",
+        4: "cyan",
     }
 
     for i, device in enumerate(devices):
-        label = f"{variable.short_name}: {device}"
-        y = data[device].temp.values
-        ax.plot(dates, y, plot_dict[i], label=label)  # TODO: add label
+        label = f"{var_short}: {device}"
+        y = data[device][var_short].values
+        dates = pd.to_datetime(data[device]["timestamp"], format="%Y-%m-%d %H:%M:%S")
+        print(i, device, len(y), len(dates))
+        ax.plot(dates, y, color=colour_dict[i], linestyle="-", label=label)
 
     ax.set_xlim(lims)
     title = f"Station: {station.long_name} | Period: {dt.strftime(start, '%d %b %H:%M')} - {dt.strftime(end, '%d %b %H:%M')}"
