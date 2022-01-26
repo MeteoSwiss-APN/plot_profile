@@ -172,6 +172,14 @@ def dwh2pandas(cmd, verbose):
         StringIO(out), skiprows=0, nrows=1, sep="\s+", header=None, engine="c"
     )
 
+    check = (
+        f"{header_line[0].iloc[0]} {header_line[1].iloc[0]} {header_line[2].iloc[0]}"
+    )
+    if check == "records read: 0":
+        raise SystemExit(
+            "--- ERROR: For the given time period, location and/or device, no data could be retrieved."
+        )
+
     # parse the command line output into pandas dataframe
     data = pd.read_csv(
         StringIO(out),
@@ -401,7 +409,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 return new_df
 
     # surface-based data
-    elif device in ["2m", "5cm"]:
+    elif device in ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower"]:
 
         # call dwh retrieve for surface-based data
         raw_data = dwh_surface(
@@ -441,14 +449,14 @@ if __name__ == "__main__":
 
     if test_timeseries:
         data = dwh_retrieve(
-            device="5cm",
+            device="2m_tower",
             station="gla",
-            vars="temp",  # temp variable corresponds for the '5cm' measurement device to variable id: 92
+            vars="temp",
             timestamps=[
                 "2021111900",
                 "2021111902",
             ],
-            verbose=True,
+            verbose=False,
         )
         print(f"5cm dataframe looks like:\n{data}")
 
@@ -458,10 +466,10 @@ if __name__ == "__main__":
             station="pay",
             vars="temp",
             timestamps=[
-                "202111190000",
-                "202111190200",
+                "2021111900",
+                "2021111902",
             ],
-            verbose=True,
+            verbose=False,
         )
         print(f"Sounding dataframe looks like:\n{data}")
 
