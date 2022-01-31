@@ -107,9 +107,9 @@ venv_*/
 
 # VS Code
 .vscode
-src/plot_profile/cli copy.py
+
+# development
 plots/*
-src/plot_profile/scratch/scratch_save_plot.py
 src/plot_profile/scratch/scratch_save_plot.py
 src/plot_profile/scratch/various.py
 src/plot_profile/commands.sh
