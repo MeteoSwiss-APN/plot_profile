@@ -213,13 +213,14 @@ vdf["rel_hum"].dwh_id = {
 vdf["rad_lw_down"].short_name = "rad_lw_down"
 vdf["rad_lw_down"].long_name = "Longwave radiation: Downward"
 vdf["rad_lw_down"].unit = "W/m2"
-vdf["rad_lw_down"].dwh_id = {"2m_tower": "3762"}
+vdf["rad_lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
 # radiation: longwave upward
 vdf["rad_lw_up"].short_name = "rad_lw_up"
 vdf["rad_lw_up"].long_name = "Longwave radiation: Upward"
 vdf["rad_lw_up"].unit = "W/m2"
 vdf["rad_lw_up"].dwh_id = {
+    "2m": "1531",
     "2m_tower": "5118",  # no data yet in DWH
     "30m_tower": "5181",  # no data yet in DWH
 }
@@ -228,13 +229,13 @@ vdf["rad_lw_up"].dwh_id = {
 vdf["rad_sw_down"].short_name = "rad_sw_down"
 vdf["rad_sw_down"].long_name = "Shortwave radiation: Downward"
 vdf["rad_sw_down"].unit = "W/m2"
-vdf["rad_sw_down"].dwh_id = {"2m_tower": "3873"}
+vdf["rad_sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
 
 # radiation: shortwave upward ("reflected")
 vdf["rad_sw_up"].short_name = "rad_sw_up"
 vdf["rad_sw_up"].long_name = "Shortwave radiation: Upward"
 vdf["rad_sw_up"].unit = "W/m2"
-vdf["rad_sw_up"].dwh_id = {"2m_tower": "4995"}
+vdf["rad_sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
 
 # temperature: temp
 vdf["temp"].short_name = "temp"
