@@ -108,7 +108,7 @@ venv_*/
 # VS Code
 .vscode
 src/plot_profile/cli copy.py
-plots/20210831/PAYERNE_20210831_complete_plot.png
+plots/*
 src/plot_profile/scratch/scratch_save_plot.py
 src/plot_profile/scratch/scratch_save_plot.py
 src/plot_profile/scratch/various.py
