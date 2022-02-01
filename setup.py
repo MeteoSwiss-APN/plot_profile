@@ -32,7 +32,7 @@ description_files = [
 
 metadata = {
     "name": "plot_profile",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Plot radiosounding profiles [to be continued]",
     "long_description": read_present_files(description_files),
     "author": "Michel Zeller",
