@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 # Local
-from .utils import save_fig
+from ..utils.utils import save_fig
 
 # import ipdb
 

@@ -20,11 +20,11 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
 # Local
-from .plot_rs import plot_clouds
-from .stations import sdf
-from .utils import linestyle_dict
-from .utils import save_fig
-from .variables import vdf
+from ..plot_rs.plot_rs import plot_clouds
+from ..utils.stations import sdf
+from ..utils.utils import linestyle_dict
+from ..utils.utils import save_fig
+from ..utils.variables import vdf
 
 # import ipdb
 
