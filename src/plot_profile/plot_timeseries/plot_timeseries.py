@@ -41,7 +41,6 @@ def create_plot(
     appendix,
     verbose,
 ):
-    # TODO: complete this docstring
     """Create timeseries plot.
 
     Args:
