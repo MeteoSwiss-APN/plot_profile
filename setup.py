@@ -32,7 +32,7 @@ description_files = [
 
 metadata = {
     "name": "plot_profile",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Plot radiosounding profiles [to be continued]",
     "long_description": read_present_files(description_files),
     "author": "Michel Zeller",
@@ -56,11 +56,11 @@ with open("requirements/requirements.in") as f:
 
 scripts = [
     "plot_profile=plot_profile.cli:main",  # main, no plotting routines attached
-    "plot_rs=plot_profile.cli_rs:main",
-    "plot_icon_profiles=plot_profile.cli_icon_profiles:main",
-    "plot_icon_heatmap=plot_profile.cli_icon_heatmap:main",
-    "plot_mwr_heatmap=plot_profile.cli_mwr_heatmap:main",
-    "plot_timeseries=plot_profile.cli_timeseries:main",
+    "plot_rs=plot_profile.plot_rs.cli_rs:main",
+    "plot_icon_profiles=plot_profile.plot_icon.cli_icon_profiles:main",
+    "plot_icon_heatmap=plot_profile.plot_icon.cli_icon_heatmap:main",
+    "plot_mwr_heatmap=plot_profile.plot_mwr.cli_mwr_heatmap:main",
+    "plot_timeseries=plot_profile.plot_timeseries.cli_timeseries:main",
 ]
 
 setup(

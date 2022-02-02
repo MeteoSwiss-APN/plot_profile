@@ -13,11 +13,11 @@ import click
 import pandas as pd
 
 # Local
-from .dwh_retrieve import dwh_retrieve
+from ..utils.dwh_retrieve import dwh_retrieve
+from ..utils.stations import sdf
+from ..utils.utils import slice_top_bottom
+from ..utils.variables import vdf
 from .plot_mwr import mwr_heatmap
-from .stations import sdf
-from .utils import slice_top_bottom
-from .variables import vdf
 
 
 @click.command()
@@ -105,7 +105,7 @@ def main(
     Currently, only temperature is supported.
 
     Example command:
-    plot_mwr_heatmap --start 21111812 --end 21111912 --var temp --alt_top 2000
+    plot_mwr_heatmap --start 21111812 --end 21111912 --var temp --alt_top 2000 --outpath plots
 
     """
     # retrieve station dataframe

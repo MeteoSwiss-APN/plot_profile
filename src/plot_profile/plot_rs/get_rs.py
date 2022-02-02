@@ -6,8 +6,8 @@ Date: 15/10/2021.
 """
 
 # Local
-from .dwh_retrieve import dwh_retrieve
-from .utils import slice_top_bottom
+from ..utils.dwh_retrieve import dwh_retrieve
+from ..utils.utils import slice_top_bottom
 
 
 def get_rs(date, params, clouds, station, print_steps, alt_bot, alt_top):

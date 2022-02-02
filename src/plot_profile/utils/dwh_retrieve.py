@@ -7,6 +7,7 @@ Date: 27/12/2022.
 
 # Standard library
 import datetime as dt
+import pprint
 import subprocess  # use: run command line commands from python
 import sys
 from io import StringIO
@@ -192,16 +193,10 @@ def dwh2pandas(cmd, verbose):
         parse_dates=["termin"],
     )
 
-    # NEW: reformat the 'termin' column
-    data["termin"] = data["termin"].dt.strftime("%Y-%m-%d %H:%M:%S")
-
-    # clean up the dataframe: replae "10000000" with NaN
-    data.replace(1e7, np.nan, inplace=True)
-
     # check if no data is available for the time period
     if data.empty:
         # TODO: Code should not break but return empty dataframe
-        raise SystemExit("--- WARN: no data available.")
+        raise SystemExit("--- WARN: no DWH data available.")
     else:
         if verbose:
             with pd.option_context(
@@ -214,6 +209,13 @@ def dwh2pandas(cmd, verbose):
             ):
                 print(data.head())
             print("Finished data retrieve from DWH into dataframe.")
+
+    # NEW: reformat the 'termin' column
+    data["termin"] = data["termin"].dt.strftime("%Y-%m-%d %H:%M:%S")
+
+    # clean up the dataframe: replae "10000000" with NaN
+    data.replace(1e7, np.nan, inplace=True)
+
     return data
 
 
