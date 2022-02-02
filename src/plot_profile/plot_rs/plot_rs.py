@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 # Local
-from .utils import save_fig
+from ..utils.utils import save_fig
 
 # import ipdb
 
@@ -33,11 +33,11 @@ def extract_clouds(df, relhum_thresh, print_steps):
         cloud_end:          array       array containing cloud layer end altitudes
 
     """
-    cloud_df = df[["altitude", "rel_hum"]]  # extract the altitude & relhum columns
+    cloud_df = df[["altitude", "rel_hum"]]  # extract the altitude & rel_hum columns
     cloud_df = cloud_df[
         cloud_df["rel_hum"] >= relhum_thresh
     ]  # remove rows where no clouds are present
-    cloud_df = cloud_df[["altitude"]]  # remove the relhum column
+    cloud_df = cloud_df[["altitude"]]  # remove the rel_hum column
     cloud_list = list(cloud_df.index.values)  # index list of cloud layers
     cloud_array = (
         cloud_df.to_numpy()
@@ -184,7 +184,7 @@ def plot_clouds(df, relhum_thresh, print_steps, ax, case=None):
     )
     if not cloud_start:
         print(
-            f'No clouds for this altidue range/date. (max relhum: {df["relhum"].max()} while relhum_thresh: {relhum_thresh})'
+            f'No clouds for this altidue range/date. (max rel_hum: {df["rel_hum"].max()} while relhum_thresh: {relhum_thresh})'
         )
     else:
         # plot lines which correspond to clouds
@@ -338,7 +338,7 @@ def create_plot(
         relevant_df_columns = [
             "altitude",
             "rel_hum",
-        ]  # keep altitude for yaxis & relhum for cloud layers
+        ]  # keep altitude for yaxis & rel_hum for cloud layers
     else:
         relevant_df_columns = [
             "altitude",

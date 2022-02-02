@@ -134,12 +134,13 @@ def validtime_from_leadtime(date, leadtime, verbose=False):
     return validtime
 
 
-def check_inputs(var, loc, verbose):
+def check_inputs(var, loc, dev, verbose):
     """Check if the variables are in the variables dataframe. Check if the stations are in the stations dataframe.
 
     Args:
         var (str): variable(s)
         loc (str): station id (i.e. gla for Glarus)
+        dev (str): device (i.e. 2m, 5cm,...)
         verbose (bool): add print statements to output or not
 
     """
@@ -154,15 +155,15 @@ def check_inputs(var, loc, verbose):
 
     # 2) check if variables are defined for given devices
     try:
-        var_frame = vdf[var]
+        var_for_device = vdf[var].dwh_id[dev]
         if verbose:
-            print(f"--- selected variable: {var_frame.long_name}.")
+            print(f"--- selected variable: {vdf[var].long_name} for device: {dev}")
     except KeyError:
-        print(f"! {var} is not available as variable.")
+        print(f"! {var} is not available as variable for device: {dev}")
         sys.exit(1)
 
 
-# linestyles for several lead times
+# linestyles, i.e. for several lead times
 linestyle_dict = {
     0: "solid",
     1: "dashed",
@@ -171,4 +172,15 @@ linestyle_dict = {
     4: (0, (1, 10)),  # loosely dotted
     5: (0, (5, 10)),  # loosely dashed
     6: (0, (3, 10, 1, 10)),  # loosely dashdotted
+}
+
+# colours, i.e .for different devices
+colour_dict = {
+    0: "black",
+    1: "blue",
+    2: "red",
+    3: "green",
+    4: "cyan",
+    5: "magenta",
+    6: "yellow",
 }

@@ -11,12 +11,12 @@ import sys
 import click
 
 # Local
-from .dwh_retrieve import dwh_retrieve
+from ..utils.dwh_retrieve import dwh_retrieve
+from ..utils.stations import sdf
+from ..utils.utils import slice_top_bottom
+from ..utils.utils import validtime_from_leadtime
 from .get_icon import get_icon
 from .plot_icon import create_plot
-from .stations import sdf
-from .utils import slice_top_bottom
-from .utils import validtime_from_leadtime
 
 # import ipdb
 
@@ -202,7 +202,7 @@ def main(
     If 2 variables are given, they will be shown in the same figure.
 
     Example command:
-    plot_icon_profiles --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --leadtime 11 --leadtime 12 --loc pay
+    plot_icon_profiles --date 21111812 --outpath plots --folder /scratch/swester/output_icon/ICON-1/ --var temp --leadtime 11 --leadtime 12 --loc pay
 
     Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 

@@ -12,7 +12,7 @@ from datetime import timedelta
 import click
 
 # Local
-from .dwh_retrieve import dwh_retrieve
+from ..utils.dwh_retrieve import dwh_retrieve
 from .get_icon import get_icon
 from .plot_icon import create_heatmap
 

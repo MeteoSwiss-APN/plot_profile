@@ -6,10 +6,13 @@ Date: 25/11/2021.
 """
 
 # Standard library
+import datetime
 import datetime as dt
 
 # Third-party
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import matplotlib.units as munits
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -17,13 +20,19 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
 # Local
-from .plot_rs import plot_clouds
-from .stations import sdf
-from .utils import linestyle_dict
-from .utils import save_fig
-from .variables import vdf
+from ..plot_rs.plot_rs import plot_clouds
+from ..utils.stations import sdf
+from ..utils.utils import linestyle_dict
+from ..utils.utils import save_fig
+from ..utils.variables import vdf
 
 # import ipdb
+
+
+converter = mdates.ConciseDateConverter()
+munits.registry[np.datetime64] = converter
+munits.registry[datetime.date] = converter
+munits.registry[datetime.datetime] = converter
 
 
 def get_yrange(alt_bot, alt_top, df_height):
@@ -571,6 +580,8 @@ def create_heatmap(
     var_max,
     surface_data=None,
 ):
+    start = date
+    end = date + dt.timedelta(hours=leadtime[-1])
     if surface_data is not None:
         # shift the values of the cbh & ver_vis columns by the elevation of the station (loc)
         surface_data.loc[surface_data["cbh"] != np.NaN, ["cbh"]] += sdf[loc].elevation
@@ -602,7 +613,6 @@ def create_heatmap(
     start_date = date.date()
     for lt in leadtime:
         lt_dt_2.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
-
         if (date + dt.timedelta(hours=lt)).date() != start_date:
             start_date = (date + dt.timedelta(hours=lt)).date()
             tmp = 0
@@ -622,65 +632,6 @@ def create_heatmap(
             lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%H:%M"))
     lt_dt_series = pd.Series(lt_dt)
 
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ NEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
-    if surface_data is not None:
-        same_start = (
-            surface_timestamp[0] == lt_dt_2[0]
-        )  # --> if True: the model & the measurements start at the same time
-        same_end = (
-            surface_timestamp[-1] == lt_dt_2[-1]
-        )  # --> if True: the model & the measurements end at the same time
-
-        if not (same_start and same_end):
-            if verbose:
-                print(
-                    f"The time-axis for the surface station needs to be aligned to the time-axis of the model data."
-                )
-
-            # create a list using linspace, which starts at the same time as lt_dt_2 and ends at the same time as lt_dt_2
-            # the step size (dt) is chosen as 10 minutes, as this is the smalles possible interval between consecutive measurements
-            # at the surface station
-            start = dt.datetime.strptime(lt_dt_2[0], "%Y-%m-%d %H:%M")
-            end = dt.datetime.strptime(lt_dt_2[-1], "%Y-%m-%d %H:%M")
-            n = (
-                int(((end - start).total_seconds() / 3600) * 6) + 1
-            )  # *6, because there are six 10 minute intervals per hour;
-            top_x_axis_values = pd.date_range(
-                start, end, periods=n
-            ).tolist()  # these values represent the hidden tick marks of the top x axis
-            top_x_axis_cbh, top_x_axis_ver_vis = (
-                [],
-                [],
-            )  # these lists need to be filled.
-            j = 0
-
-            for timestamp in top_x_axis_values:
-                if str(timestamp) not in surface_timestamp:
-                    if verbose:
-                        print(
-                            f"No measurement found for time: {timestamp}. Appending {np.NaN}"
-                        )
-                    top_x_axis_cbh.append(np.NaN)
-                    top_x_axis_ver_vis.append(np.NaN)
-                if str(timestamp) in surface_timestamp:
-                    if verbose:
-                        print(
-                            f"Measurement found for time: {timestamp}. Appending corresponding values ({surface_cbh[j]}/{surface_ver_vis[j]})"
-                        )
-                    top_x_axis_cbh.append(surface_cbh[j])
-                    top_x_axis_ver_vis.append(surface_ver_vis[j])
-                    j += 1
-
-            # assign new lists to old variable names & create masked lists, s.t. NaN values are not ignored
-            surface_timestamp = top_x_axis_values
-            surface_cbh = np.ma.masked_where(top_x_axis_cbh == np.NaN, top_x_axis_cbh)
-            surface_ver_vis = np.ma.masked_where(
-                top_x_axis_ver_vis == np.NaN, top_x_axis_ver_vis
-            )
-
-        elif verbose:
-            print(f"The timestamp axes are aligned already.")
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ NEW ~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
     # dates used in the filename / title of heat plots
     init_date = date.strftime("%b %-d, %Y")
     init_hour = date.hour
@@ -721,18 +672,21 @@ def create_heatmap(
 
         # scatter plot cloud base height & vertical visibility
         if surface_data is not None:
-            ax_scatter = ax.twiny()  # add axis for surface data
-            ax_scatter.axis("off")  # & hide it
-            ax_scatter.plot(
-                surface_timestamp,
+            dates = pd.to_datetime(
+                surface_data["timestamp"], format="%Y-%m-%d %H:%M:%S"
+            )
+            ax_top = ax.twiny()  # add axis for surface data
+            # ax_scatter.axis("off")  # & hide it
+            ax_top.plot(
+                dates,
                 surface_cbh,
                 linestyle="None",
                 marker="^",
                 markerfacecolor="none",
                 markeredgecolor="lightcoral",
             )
-            ax_scatter.plot(
-                surface_timestamp,
+            ax_top.plot(
+                dates,
                 surface_ver_vis,
                 linestyle="None",
                 marker="^",
@@ -743,7 +697,7 @@ def create_heatmap(
             # make sure, the top and bottom x-axis both start at the very left/right of the plot
             # these two lines mustn't be removed, as they are necessary to plot the masked arrays correctly
             ax.set_xlim(left=lt_dt_series.iloc[0], right=lt_dt_series.iloc[-1])
-            ax_scatter.set_xlim(surface_timestamp[0], surface_timestamp[-1])
+            ax_top.set_xlim(start, end)
 
             # add customised legend
             legend_elements = [
@@ -759,7 +713,7 @@ def create_heatmap(
                     label="Cloud base (OBS)",
                 ),
             ]
-            ax_scatter.legend(handles=legend_elements)
+            ax_top.legend(handles=legend_elements)
 
         # if combining automatic and manual legend elemnts
         ### where some data has already been plotted to ax

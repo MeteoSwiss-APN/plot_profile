@@ -16,8 +16,8 @@ import pandas as pd
 import xarray as xr
 
 # Local
-from .utils import slice_top_bottom
-from .variables import vdf
+from ..utils.utils import slice_top_bottom
+from ..utils.variables import vdf
 
 
 def lfff_name(lt):

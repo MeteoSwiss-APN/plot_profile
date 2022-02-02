@@ -4,14 +4,12 @@ Author: Michel Zeller
 
 Date: 21/01/2022.
 """
-
 # Third-party
 import click
 
 # Local
-from .dwh_retrieve import dwh_retrieve
+from .get_timeseries import get_data_dict
 from .plot_timeseries import create_plot
-from .utils import check_inputs
 
 
 @click.command()
@@ -29,7 +27,7 @@ from .utils import check_inputs
 @click.option(
     "--var",
     type=str,
-    # multiple=True, # TODO: implement later, s.t. several variables with the same unit can be selected
+    multiple=True,  # TODO: implement later, s.t. several variables with the same unit can be selected
     help="MANDATORY: Variable name.",
 )
 @click.option(
@@ -124,21 +122,14 @@ def main(
     plot_timeseries --start 21111900 --end 21111902 --loc gla --device 5cm --device 2m --var temp
     plot_timeseries --outpath plots --start 21111900 --end 21111902 --loc pay --device 5cm --device 2m --device 2m_tower --device 10m_tower --device 30m_tower --var temp
     """
-    check_inputs(var, loc, verbose)
-
-    data_dict = {}
-    for dev in device:
-        data_dict[dev] = dwh_retrieve(
-            device=dev,
-            station=loc,
-            vars=var,
-            timestamps=[start, end],
-            verbose=False,  # TODO: change False to verbose
-        )
+    data_dict, multi_axes = get_data_dict(
+        start=start, end=end, variable=var, loc=loc, device=device, verbose=verbose
+    )
 
     create_plot(
+        multi_axes=multi_axes,
         data=data_dict,
-        devices=device,
+        devices=list(set(device)),  # from the device-list, extract all unique devices
         start=start,
         end=end,
         datatypes=datatypes,
@@ -146,7 +137,7 @@ def main(
         appendix=appendix,
         verbose=verbose,
         grid=grid,
-        var=var,
+        var=list(set(var)),  # form the var-list, extract all unique variables
         loc=loc,
     )
 

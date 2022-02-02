@@ -11,9 +11,9 @@ import sys
 import click
 
 # Local
+from ..utils.stations import sdf
 from .get_rs import get_rs
 from .plot_rs import create_plot
-from .stations import sdf
 
 
 @click.command()
@@ -140,7 +140,7 @@ def main(
     Otherwise the axes limits will be fitted to the data.
 
     Example command:
-    plot_rs --date 2021111012 --outpath path/to/plots --grid --clouds --relhum_thresh 99 --params dewp_temp --params temp
+    plot_rs --date 2021111012 --outpath plots --grid --clouds --relhum_thresh 99 --params dewp_temp --params temp
 
     """
     # Preparations:
