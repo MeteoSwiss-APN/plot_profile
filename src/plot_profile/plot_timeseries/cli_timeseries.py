@@ -36,21 +36,14 @@ from .plot_timeseries import create_plot
 @click.option(
     "--device",
     type=click.Choice(
-        [
-            "5cm",
-            "2m",
-            "2m_tower",
-            "10m_tower",
-            "30m_tower"
-            # TODO: add all possible devices here
-        ],
+        ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower", "icon"],
         case_sensitive=True,
     ),
     multiple=True,
     default=[
-        "5cm",
+        "2m",
     ],
-    help="MANDATORY: Choose type of device. Def: 5cm",
+    help="MANDATORY: Choose type of device. Def: 2m",
 )
 # optional options
 @click.option(
@@ -99,6 +92,11 @@ from .plot_timeseries import create_plot
     default=False,
     help="Add grid to plot.",
 )
+@click.option(
+    "--init",
+    type=click.DateTime(formats=["%y%m%d%H"]),
+    help="MANDATORY: Init timestamp of model simulation: yymmddHH",
+)
 def main(
     *,
     # Mandatory
@@ -110,20 +108,25 @@ def main(
     # Optional
     appendix: str,
     datatypes: tuple,
+    grid: bool,
+    init: str,
     outpath: str,
     verbose: bool,
-    grid: bool,
 ):
     """Plot timeseries of variables retrieved from various differend measurement devices.
-
-    Currently, only temperature is supported.
 
     Example commands:
     plot_timeseries --start 21111900 --end 21111902 --loc gla --device 5cm --device 2m --var temp
     plot_timeseries --outpath plots --start 21111900 --end 21111902 --loc pay --device 5cm --device 2m --device 2m_tower --device 10m_tower --device 30m_tower --var temp
     """
     data_dict, multi_axes = get_data_dict(
-        start=start, end=end, variable=var, loc=loc, device=device, verbose=verbose
+        start=start,
+        end=end,
+        variable=var,
+        loc=loc,
+        device=device,
+        init=init,
+        verbose=verbose,
     )
 
     create_plot(
