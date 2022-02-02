@@ -54,6 +54,18 @@ from .plot_timeseries import create_plot
 )
 # optional options
 @click.option(
+    "--ymin",
+    type=float,
+    multiple=True,
+    help="Minimum value of y-axis/axes. Def: Fits values.",
+)
+@click.option(
+    "--ymax",
+    type=float,
+    multiple=True,
+    help="Maximum value of x-axis/axes. Def: Fits values.",
+)
+@click.option(
     "--appendix", type=str, help="String to append to output filename. Def: None"
 )
 @click.option(
@@ -108,6 +120,8 @@ def main(
     loc: str,
     device: str,
     # Optional
+    ymin: tuple,
+    ymax: tuple,
     appendix: str,
     datatypes: tuple,
     outpath: str,
@@ -127,6 +141,8 @@ def main(
     )
 
     create_plot(
+        ymin=ymin,
+        ymax=ymax,
         multi_axes=multi_axes,
         data=data_dict,
         devices=list(set(device)),  # from the device-list, extract all unique devices
