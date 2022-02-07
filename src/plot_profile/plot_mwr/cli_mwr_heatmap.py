@@ -7,6 +7,7 @@ Date: 05/01/2022.
 
 # Standard library
 import sys
+from pprint import pprint as pp
 
 # Third-party
 import click
@@ -134,6 +135,7 @@ def main(
         timestamps=[start, end],
         verbose=verbose,
     )
+
     # slice top and bottom
     if not alt_bot:
         alt_bot = mwr_data.index.min()
@@ -142,7 +144,13 @@ def main(
     crit.index = mwr_data.index
     mwr_data = mwr_data[crit]
 
+    pp(mwr_data.head())
+    mwr_data = mwr_data.subtract(273.15)  # K --> °C
+    pp(mwr_data.head())
+
     mwr_heatmap(
+        start=start,
+        end=end,
         mwr_data=mwr_data,
         station=station,
         var=var_frame,
