@@ -399,7 +399,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
                 # loop over timestamps to fill new dataframe
                 for ts in unique_ts:
-                    print(ts)
+                    # print(ts)
                     new_df[ts] = data[data.timestamp == ts][var].values
 
                 # use altitude as index

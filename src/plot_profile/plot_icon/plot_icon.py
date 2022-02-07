@@ -618,7 +618,8 @@ def create_heatmap(
             shading="auto",
             cmap=var.colormap,
         )
-        ax_colormesh.axis("off")  # remove x-axis of heatmap
+        # ax_colormesh.axis("off")  # remove x-axis of heatmap
+        ax_colormesh.get_xaxis().set_visible(False)
         ax_colormesh.set_xlim(left=lt_dt[0], right=lt_dt[-1])
         cbar = fig.colorbar(im, ax=ax_colormesh)
         cbar.ax.set_ylabel(f"{var.long_name} [{var.unit}]")
