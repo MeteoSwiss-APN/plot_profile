@@ -234,11 +234,9 @@ def plot_single_variable(
     #  if multuple leadtimes: no leadtimes specified in filename
     #  (user can add customised appendix to distinguish situations)
     if len(lts) == 1:
-        name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_+{lts[0]}h_{var.short_name}_{loc}'
+        name = f'profile_{model}_{date.strftime("%y%m%d_%H")}_+{lts[0]}_{loc}_{var.short_name}'
     else:
-        name = (
-            f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}'
-        )
+        name = f'profile_{model}_{date.strftime("%y%m%d_%H")}_+{lts[0]}_+{lts[-1]}_{loc}_{var.short_name}'
     if appendix:
         name = name + "_" + appendix
 
@@ -444,9 +442,9 @@ def plot_two_variables(
 
     # filename
     if len(lts) == 1:
-        name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_+{lts[0]}h_{var_0.short_name}_{var_1.short_name}_{loc}'
+        name = f'profile_{model}_{date.strftime("%y%m%d_%H")}_+{lts[0]}_{loc}_{var_0.short_name}_{var_1.short_name}'
     else:
-        name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var_0.short_name}_{var_1.short_name}_{loc}'
+        name = f'profile_{model}_{date.strftime("%y%m%d_%H")}_+{lts[0]}_+{lts[-1]}_{loc}_{var_0.short_name}_{var_1.short_name}'
     if appendix:
         name = name + "_" + appendix
 
@@ -711,11 +709,13 @@ def create_heatmap(
             f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC"
         )
         ax_colormesh.set_ylabel(f"Altitude [m asl]")
+
         # save figure
-        name = f'{model}_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{loc}_heatmap'
+        name = f'heatmap_{model}_{date.strftime("%y%m%d_%H")}_+{leadtime[0]}_+{leadtime[-1]}_{loc}_{var.short_name}'
+
         if appendix:
             name = name + "_" + appendix
-        plt.tight_layout()
 
         save_fig(filename=name, datatypes=datatypes, outpath=outpath)
+
     return

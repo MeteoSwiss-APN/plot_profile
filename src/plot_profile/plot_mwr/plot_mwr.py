@@ -83,10 +83,9 @@ def mwr_heatmap(
     plt.tight_layout()
 
     # save figure
-    # filename = f'mwr_heatmap_{date.strftime("%y%m%d")}_{date.hour:02}_{var.short_name}_{station.short_name}'
-    filename = f"mwr_heatmap_{var.short_name}_{station.short_name}"
+    name = f'heatmap_mwr_{date.strftime("%y%m%d_%H")}_{station.short_name}_{var.short_name}'
     if appendix:
-        filename = filename + "_" + appendix
+        name = name + "_" + appendix
 
     datatypes = [
         "png",
