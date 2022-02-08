@@ -19,6 +19,8 @@ import xarray as xr
 from ..utils.utils import slice_top_bottom
 from ..utils.variables import vdf
 
+# from ipdb import set_trace
+
 
 def lfff_name(lt):
     """Create mch-filename for icon ctrl run for given leadtime.
@@ -259,3 +261,28 @@ def get_icon(
         data_dict[variable] = df_values
 
     return data_dict
+
+
+def get_icon_timeseries(lat, lon, vars, init, start_lt, end_lt, folder, verbose):
+    """Retrieve timeseries from ICON output.
+
+    Args:
+        lat (float): latitude
+        lon (float): longitude
+        vars (list): variables
+        init (datetime object): init date of simulation
+        start_lt (int): start leadtime
+        end_lt (int): end leadtime
+        folder (str): folder containing subfolders with icon runs
+        verbose (bool): print details
+
+    """
+    # determine index
+
+    # load icon files
+
+    # create data_dict
+
+    # loop over vars
+    for var in vars:
+        print(var)

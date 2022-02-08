@@ -6,15 +6,13 @@ import sys
 from pprint import pprint
 
 # Local
+from ..plot_icon.get_icon import get_icon_timeseries
 from ..utils.dwh_retrieve import dwh_retrieve
 from ..utils.utils import check_inputs
 from ..utils.variables import vdf
 
-# def retrieve_icon_timeseries(lat, lon, vars, init, start_lt, end_lt, verbose):
-#    pass
 
-
-def get_data_dict(start, end, variable, loc, device, init, verbose):
+def get_data_dict(start, end, variable, loc, device, init, folder, verbose):
     # check, that the provided variables at most require 2 units
     units = []
     for var in list(set(variable)):
@@ -75,15 +73,16 @@ def get_data_dict(start, end, variable, loc, device, init, verbose):
             vars += [variables[index]]
 
         if dev == "icon":
-            continue
-            # data_dict["icon"] = retrieve_icon_timeseries(
-            # lat=loc.latitude,
-            # lon=lon.longitude,
-            # vars=vars,
-            # init=init,
-            # start_lt=(start - init ) / 3600,
-            # end_lt=(end - init) / 3600,
-            # verbose=verbose)
+            data_dict["icon"] = get_icon_timeseries(
+                lat=loc.latitude,
+                lon=loc.longitude,
+                vars=vars,
+                init=init,
+                start_lt=(start - init) / 3600,
+                end_lt=(end - init) / 3600,
+                folder=folder,
+                verbose=verbose,
+            )
 
         data_dict[dev] = dwh_retrieve(
             device=dev,

@@ -75,6 +75,18 @@ from .plot_timeseries import create_plot
     ],
     help="Choose data type(s) of final result. Def: png",
 )
+@click.option("--folder", type=str, help="Path to ICON simulations.")
+@click.option(
+    "--grid",
+    is_flag=True,
+    default=False,
+    help="Add grid to plot.",
+)
+@click.option(
+    "--init",
+    type=click.DateTime(formats=["%y%m%d%H"]),
+    help="Init timestamp of model simulation: yymmddHH",
+)
 @click.option(
     "--outpath",
     type=str,
@@ -85,17 +97,6 @@ from .plot_timeseries import create_plot
     is_flag=True,
     default=False,
     help="Output details on what is happening.",
-)
-@click.option(
-    "--grid",
-    is_flag=True,
-    default=False,
-    help="Add grid to plot.",
-)
-@click.option(
-    "--init",
-    type=click.DateTime(formats=["%y%m%d%H"]),
-    help="MANDATORY: Init timestamp of model simulation: yymmddHH",
 )
 def main(
     *,
@@ -108,6 +109,7 @@ def main(
     # Optional
     appendix: str,
     datatypes: tuple,
+    folder: str,
     grid: bool,
     init: str,
     outpath: str,
@@ -126,6 +128,7 @@ def main(
         loc=loc,
         device=device,
         init=init,
+        folder=folder,
         verbose=verbose,
     )
 
