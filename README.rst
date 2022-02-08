@@ -6,7 +6,7 @@ plot_profile
 
 Installation
 ------------
-1. ``git clone git@github.com:MeteoSwiss-APN/plot_profile.git``
+1. ``git clone https://github.com/MeteoSwiss-APN/plot_profile.git``
 2. ``conda activate base``
 3. ``conda install pip``
 4. ``conda deactivate``
