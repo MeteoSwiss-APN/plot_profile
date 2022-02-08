@@ -8,6 +8,7 @@ Date: 25/11/2021.
 # Standard library
 import datetime
 import datetime as dt
+from pprint import pprint
 
 # Third-party
 import matplotlib.dates as mdates
@@ -578,57 +579,15 @@ def create_heatmap(
     var_max,
     surface_data=None,
 ):
-    start = date
-    end = date + dt.timedelta(hours=leadtime[-1])
-    if surface_data is not None:
-        # shift the values of the cbh & ver_vis columns by the elevation of the station (loc)
-        surface_data.loc[surface_data["cbh"] != np.NaN, ["cbh"]] += sdf[loc].elevation
-        surface_data.loc[surface_data["ver_vis"] > 0, ["ver_vis"]] = sdf[loc].elevation
-        surface_timestamp = surface_data.timestamp.values
-        surface_cbh = surface_data.cbh.values
-        surface_ver_vis = surface_data.ver_vis.values
-
     # the height dataframe is the same for all variables, thus outside of the
     # for-loop below. it needs some reformatting and type alignement for later use
-    df_height = data_dict[
-        "height"
-    ].to_frame()  # convert pandas series to pandas dataframe
+    df_height = data_dict["height"].to_frame()
+    df_height.rename(columns={0: "height"}, inplace=True)
 
-    df_height.rename(
-        columns={0: "height"}, inplace=True
-    )  # rename the first column from '0' to 'height'
-
-    # generate new column names for the dataframes
-    # the col-dict links the abbreviated leadtimes (i.e. 00, 02, 04,...) to their
-    # respective datetime equivalents (i.e. start_date + leadtime)
-
-    # lt-dt contains all leadtimes and the first leadtimes on new dates have a different
-    # formatting from the rest
-
-    # lt_dt_2 contains all leadtimes with a uniform format %Y-%m-%d %H:%M (but is not used later)
-    lt_dt, col_dict, lt_dt_2 = [], {}, []
-    tmp = 0
-    start_date = date.date()
+    # create date list for all colums of heatmap
+    lt_dt = []
     for lt in leadtime:
-        lt_dt_2.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
-        if (date + dt.timedelta(hours=lt)).date() != start_date:
-            start_date = (date + dt.timedelta(hours=lt)).date()
-            tmp = 0
-        # the first leadtime on the startdate is formatted like: %b %-d, %H:%M
-        # if the simulation covers several days, the first leadtimes on other days
-        # also have this formatting (specified by the tmp variable)
-        if tmp == 0:
-            col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M")
-            lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%b %-d, %H:%M"))
-            # col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M")
-            # lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
-            tmp = 1
-        # else the formatting is only HH:MM. These timesteps ultimately are displayed
-        # on the x-axis. It is not desireable to have the date for each x-tick-label.
-        else:
-            col_dict[lt] = (date + dt.timedelta(hours=lt)).strftime("%H:%M")
-            lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%H:%M"))
-    lt_dt_series = pd.Series(lt_dt)
+        lt_dt.append((date + dt.timedelta(hours=lt)).strftime("%Y-%m-%d %H:%M"))
 
     # dates used in the filename / title of heat plots
     init_date = date.strftime("%b %-d, %Y")
@@ -646,36 +605,54 @@ def create_heatmap(
             print(f"No plot is generated for {variable}.")
             break  # just continue with the next variable - should not break the whole loop
 
-        # rename the column names from leadtimes as int to leadtimes as datetime objects
-        # because the column names are the x-axis ticklabels of the heatmap
-        df_values.rename(columns=col_dict, inplace=True)
-
         plt.rcParams["figure.figsize"] = (7.5, 4.5)
-        fig, ax = plt.subplots()
+        fig, ax_colormesh = plt.subplots()
 
-        # REMARK: it is important, that the heatmap gets plotted before the scatter plot - don't change this order!
         # plot heatmap
-        im = ax.pcolormesh(
-            lt_dt_series,
+        im = ax_colormesh.pcolormesh(
+            lt_dt,
             np.round(df_values.index.to_list()),
             df_values,
             shading="auto",
             cmap=var.colormap,
         )
-        cbar = fig.colorbar(im, ax=ax)
+        # ax_colormesh.axis("off")  # remove x-axis of heatmap
+        ax_colormesh.get_xaxis().set_visible(False)
+        ax_colormesh.set_xlim(left=lt_dt[0], right=lt_dt[-1])
+        cbar = fig.colorbar(im, ax=ax_colormesh)
         cbar.ax.set_ylabel(f"{var.long_name} [{var.unit}]")
 
         if var_min:
             im.set_clim(var_min, var_max)
 
+        # IF no surface_data is added to heatmap, initialise new axes-instace which can be
+        # formatted using the concise date formater
+        if surface_data is None:
+            start = date
+            end = date + dt.timedelta(hours=leadtime[-1])
+            ax_date = ax_colormesh.twiny()
+            ax_date.xaxis.set_ticks_position("bottom")
+            ax_date.plot([start, end], [np.NaN, np.NaN])
+            ax_date.set_xlim(start, end)
+
         # scatter plot cloud base height & vertical visibility
         if surface_data is not None:
+            # shift the values of the cbh & ver_vis columns by the elevation of the station (loc)
+            surface_data.loc[surface_data["cbh"] != np.NaN, ["cbh"]] += sdf[
+                loc
+            ].elevation
+            surface_data.loc[surface_data["ver_vis"] > 0, ["ver_vis"]] = sdf[
+                loc
+            ].elevation
+            surface_cbh = surface_data.cbh.values
+            surface_ver_vis = surface_data.ver_vis.values
+
             dates = pd.to_datetime(
                 surface_data["timestamp"], format="%Y-%m-%d %H:%M:%S"
             )
-            ax_top = ax.twiny()  # add axis for surface data
-            # ax_scatter.axis("off")  # & hide it
-            ax_top.plot(
+            ax_cbh = ax_colormesh.twiny()  # add axis for surface data
+            ax_cbh.xaxis.set_ticks_position("bottom")  # the rest is the same
+            ax_cbh.plot(
                 dates,
                 surface_cbh,
                 linestyle="None",
@@ -683,7 +660,7 @@ def create_heatmap(
                 markerfacecolor="none",
                 markeredgecolor="lightcoral",
             )
-            ax_top.plot(
+            ax_cbh.plot(
                 dates,
                 surface_ver_vis,
                 linestyle="None",
@@ -692,10 +669,8 @@ def create_heatmap(
                 markeredgecolor="indianred",
             )
 
-            # make sure, the top and bottom x-axis both start at the very left/right of the plot
-            # these two lines mustn't be removed, as they are necessary to plot the masked arrays correctly
-            ax.set_xlim(left=lt_dt_series.iloc[0], right=lt_dt_series.iloc[-1])
-            ax_top.set_xlim(start, end)
+            # to ensure that all axes are aligned, set_xlim
+            ax_cbh.set_xlim(start, end)
 
             # add customised legend
             legend_elements = [
@@ -711,7 +686,7 @@ def create_heatmap(
                     label="Cloud base (OBS)",
                 ),
             ]
-            ax_top.legend(handles=legend_elements)
+            ax_cbh.legend(handles=legend_elements)
 
         # if combining automatic and manual legend elemnts
         ### where some data has already been plotted to ax
@@ -727,11 +702,13 @@ def create_heatmap(
 
         # adjust appearance
         plt.tick_params(axis="both", labelsize=8)
-        plt.setp(ax.get_xticklabels(), rotation=45, ha="right")  # rotated x-axis ticks
-        ax.set_title(f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC")
-        ax.set_ylabel(f"Altitude [m asl]")
-
-        plt.tight_layout()
+        plt.setp(
+            ax_colormesh.get_xticklabels(), rotation=45, ha="right"
+        )  # rotated x-axis ticks
+        ax_colormesh.set_title(
+            f"{model.upper()} @ {loc.upper()}: {init_date}, {init_hour} UTC"
+        )
+        ax_colormesh.set_ylabel(f"Altitude [m asl]")
 
         # save figure
         name = f'heatmap_{model}_{date.strftime("%y%m%d_%H")}_+{leadtime[0]}_+{leadtime[-1]}_{loc}_{var.short_name}'

@@ -26,6 +26,8 @@ from ..utils.variables import vdf
 
 
 def create_plot(
+    ymin,
+    ymax,
     multi_axes,
     data,
     var,
@@ -39,10 +41,11 @@ def create_plot(
     appendix,
     verbose,
 ):
-    # TODO: complete this docstring
     """Create timeseries plot.
 
     Args:
+        ymin (tuple): list of y-min values
+        ymax (tuple): list of y-max values
         multi_axes (bool): plot 2 yaxis if True
         data (dict): dictionary, containing one dataframe for each device
         var (tuple): list of variables (w/ same unit) to be added to plot
@@ -66,6 +69,33 @@ def create_plot(
         # https://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
         left_ax.grid(visible=True)
         right_ax.grid(visible=True)
+
+    # apply limits to the y-axis/axes if some have been specified
+    if ymin and ymax:
+        if not multi_axes:
+            left_ax.set_ylim(ymin[0], ymax[0])
+            if len(ymin) != len(ymax):
+                print(
+                    f"WARNING: inconsistent number of y-axes limits provided! #min: {len(ymin)}, #max: {len(ymax)}"
+                )
+                print(f"Applied limits: ymin = {ymin[0]}, ymax = {ymax[0]}")
+
+        else:  # there are two y axes
+            if (
+                len(ymin) == 1 and len(ymax) == 1
+            ):  # user provided one ymin/ymax pair --> apply to the left axis
+                left_ax.set_ylim(ymin[0], ymax[0])
+            elif (
+                len(ymin) == 2 and len(ymax) == 2
+            ):  # user provided 2 ymin/xmax pairs --> apply to both axis
+                left_ax.set_ylim(ymin[0], ymax[0])
+                right_ax.set_ylim(ymin[1], ymax[1])
+            else:  # ymin/ymax flags have been used iconsistently --> print warning
+                print(
+                    f"WARNING: inconsistent number of y-axes limits provided! #min: {len(ymin)}, #max: {len(ymax)}"
+                )
+                print(f"No y-axes limits have been applied.")
+
     left_ax.set_xlim(start, end)
     title = f"Station: {sdf[loc].long_name} | Period: {dt.strftime(start, '%d %b %H:%M')} - {dt.strftime(end, '%d %b %H:%M')}"
     left_ax.set_title(label=title)
@@ -138,9 +168,12 @@ def create_plot(
             colour_index += 1
 
     # add legends
-    h1, l1 = left_ax.get_legend_handles_labels()
-    h2, l2 = right_ax.get_legend_handles_labels()
-    left_ax.legend(h1 + h2, l1 + l2)
+    if multi_axes:
+        h1, l1 = left_ax.get_legend_handles_labels()
+        h2, l2 = right_ax.get_legend_handles_labels()
+        left_ax.legend(h1 + h2, l1 + l2)
+    else:
+        left_ax.legend()
     filename = f"ts_{start.day}{start.hour}_{end.day}{end.hour}"
     save_fig(filename, datatypes, outpath, fig=fig)
     plt.clf()

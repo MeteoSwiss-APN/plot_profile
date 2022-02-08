@@ -210,9 +210,6 @@ def dwh2pandas(cmd, verbose):
                 print(data.head())
             print("Finished data retrieve from DWH into dataframe.")
 
-    # NEW: reformat the 'termin' column
-    data["termin"] = data["termin"].dt.strftime("%Y-%m-%d %H:%M:%S")
-
     # clean up the dataframe: replae "10000000" with NaN
     data.replace(1e7, np.nan, inplace=True)
 
@@ -402,7 +399,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
                 # loop over timestamps to fill new dataframe
                 for ts in unique_ts:
-                    print(ts)
+                    # print(ts)
                     new_df[ts] = data[data.timestamp == ts][var].values
 
                 # use altitude as index
