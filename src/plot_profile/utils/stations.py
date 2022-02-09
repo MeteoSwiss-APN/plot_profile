@@ -114,7 +114,7 @@ sdf = pd.DataFrame(
         "mve",  # Montana
         "nap",  # Napf
         "nas",  # Naluns / Schlivera
-        # "not",  # Nottwil
+        "not",  # Nottwil
         "neu",  # Neuchâtel
         "obr",  # Oberriet / Kriessern
         "oro",  # Oron
@@ -1472,13 +1472,13 @@ sdf["nas"].lon = 10.261
 sdf["nas"].elevation = 2382
 
 # Nottwil
-# sdf["not"].short_name = "not"
-# sdf["not"].long_name = "Nottwil"
-# sdf["not"].dwh_id = #TODO
-# sdf["not"].dwh_name = #TODO
-# sdf["not"].lat = #TODO
-# sdf["not"].lon = #TODO
-# sdf["not"].elevation = #TODO
+sdf["not"].short_name = "not"
+sdf["not"].long_name = "Nottwil"
+sdf["not"].dwh_id = "5003"
+sdf["not"].dwh_name = "RGNOT"
+sdf["not"].lat = 47.142
+sdf["not"].lon = 8.131
+sdf["not"].elevation = 510
 
 # Simplon-Dorf
 sdf["sim"].short_name = "sim"

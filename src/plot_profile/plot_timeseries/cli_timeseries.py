@@ -8,7 +8,7 @@ Date: 21/01/2022.
 import click
 
 # Local
-from .get_timeseries import get_data_dict
+from .get_timeseries import get_timeseries_dict
 from .plot_timeseries import create_plot
 
 
@@ -87,6 +87,24 @@ from .plot_timeseries import create_plot
     ],
     help="Choose data type(s) of final result. Def: png",
 )
+@click.option("--folder", type=str, help="Path to ICON simulations.")
+@click.option(
+    "--grid",
+    is_flag=True,
+    default=False,
+    help="Add grid to plot.",
+)
+@click.option(
+    "--grid_file",
+    type=str,
+    default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
+    help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
+)
+@click.option(
+    "--init",
+    type=click.DateTime(formats=["%y%m%d%H"]),
+    help="Init timestamp of model simulation: yymmddHH",
+)
 @click.option(
     "--outpath",
     type=str,
@@ -97,17 +115,6 @@ from .plot_timeseries import create_plot
     is_flag=True,
     default=False,
     help="Output details on what is happening.",
-)
-@click.option(
-    "--grid",
-    is_flag=True,
-    default=False,
-    help="Add grid to plot.",
-)
-@click.option(
-    "--init",
-    type=click.DateTime(formats=["%y%m%d%H"]),
-    help="MANDATORY: Init timestamp of model simulation: yymmddHH",
 )
 def main(
     *,
@@ -122,7 +129,9 @@ def main(
     ymax: tuple,
     appendix: str,
     datatypes: tuple,
+    folder: str,
     grid: bool,
+    grid_file: str,
     init: str,
     outpath: str,
     verbose: bool,
@@ -133,31 +142,33 @@ def main(
     plot_timeseries --start 21111900 --end 21111902 --loc gla --device 5cm --device 2m --var temp
     plot_timeseries --outpath plots --start 21111900 --end 21111902 --loc pay --device 5cm --device 2m --device 2m_tower --device 10m_tower --device 30m_tower --var temp
     """
-    data_dict, multi_axes = get_data_dict(
+    timeseries_dict, multi_axes = get_timeseries_dict(
         start=start,
         end=end,
         variable=var,
         loc=loc,
         device=device,
         init=init,
+        folder=folder,
+        grid_file=grid_file,
         verbose=verbose,
     )
 
     create_plot(
-        ymin=ymin,
-        ymax=ymax,
+        data=timeseries_dict,
         multi_axes=multi_axes,
-        data=data_dict,
         devices=list(set(device)),  # from the device-list, extract all unique devices
+        variables=list(set(var)),  # form the var-list, extract all unique variables
+        location=loc,
         start=start,
         end=end,
+        ymin=ymin,
+        ymax=ymax,
+        grid=grid,
         datatypes=datatypes,
         outpath=outpath,
         appendix=appendix,
         verbose=verbose,
-        grid=grid,
-        var=list(set(var)),  # form the var-list, extract all unique variables
-        loc=loc,
     )
 
     print("--- done")

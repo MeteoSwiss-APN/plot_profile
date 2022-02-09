@@ -26,41 +26,44 @@ from ..utils.variables import vdf
 
 
 def create_plot(
-    ymin,
-    ymax,
-    multi_axes,
     data,
-    var,
+    multi_axes,
+    devices,
+    variables,
+    location,
     start,
     end,
+    ymin,
+    ymax,
+    grid,
     datatypes,
     outpath,
-    grid,
-    devices,
-    loc,
     appendix,
     verbose,
 ):
     """Create timeseries plot.
 
     Args:
-        ymin (tuple): list of y-min values
-        ymax (tuple): list of y-max values
-        multi_axes (bool): plot 2 yaxis if True
         data (dict): dictionary, containing one dataframe for each device
-        var (tuple): list of variables (w/ same unit) to be added to plot
+        multi_axes (bool): plot 2 yaxis if True
+        devices (list): list of devices
+        variables (list): list of variables (w/ same unit) to be added to plot
+        location (str): abbreviation of station name
         start (datetime obj): start time
         end (datetime obj): end time
-        datatypes (tuple): list of output data types
-        outpath (str): output folder path
+        ymin (tuple): y-min values
+        ymax (tuple): y-max values
         grid (bool): add grid to plot or not
-        devices (list): list of devices
-        loc (str): abbreviation of station name (location)
+        datatypes (tuple): output data types
+        outpath (str): output folder path
         appendix (bool): add appendix to output name
-        verbose (bool): print 'extra' statements during computation
+        verbose (bool): print details
 
     """
-    # general
+    # get location dataframe
+    loc = sdf[location]
+
+    # prepare figure
     fig, left_ax = plt.subplots(1, 1, figsize=(8, 5), constrained_layout=True)
     if multi_axes:
         right_ax = left_ax.twinx()
@@ -97,7 +100,7 @@ def create_plot(
                 print(f"No y-axes limits have been applied.")
 
     left_ax.set_xlim(start, end)
-    title = f"Station: {sdf[loc].long_name} | Period: {dt.strftime(start, '%d %b %H:%M')} - {dt.strftime(end, '%d %b %H:%M')}"
+    title = f"{loc.long_name}: {start.strftime('%d. %b, %H:%M')} - {end.strftime('%d. %b, %H:%M')}"
     left_ax.set_title(label=title)
     left_unit, right_unit = "", ""
 
@@ -174,7 +177,12 @@ def create_plot(
         left_ax.legend(h1 + h2, l1 + l2)
     else:
         left_ax.legend()
-    filename = f"ts_{start.day}{start.hour}_{end.day}{end.hour}"
+
+    # filename
+    start_str = start.strftime("%y%m%d_%H")
+    end_str = end.strftime("%y%m%d_%H")
+    var_dev = "var_dev"
+    filename = f"timeseries_{start_str}-{end_str}_{loc.short_name}_{var_dev}"
     save_fig(filename, datatypes, outpath, fig=fig)
     plt.clf()
     return
