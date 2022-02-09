@@ -135,7 +135,7 @@ def validtime_from_leadtime(date, leadtime, verbose=False):
 
 
 def check_inputs(var, loc, dev, verbose):
-    """Check if the variables are in the variables dataframe. Check if the stations are in the stations dataframe.
+    """Check if the variables/stations are in the dataframes.
 
     Args:
         var (str): variable(s)
@@ -147,17 +147,25 @@ def check_inputs(var, loc, dev, verbose):
     # 1) check if location is available
     try:
         station = sdf[loc]
-        if verbose:
-            print(f"--- retrieving MWR data for {station.long_name}.")
     except KeyError:
         print(f"! {loc} is not listed as an available station.")
         sys.exit(1)
 
     # 2) check if variables are defined for given devices
+    if dev == "icon":
+        if isinstance(vdf[var].icon_name, str):
+            return
+        else:
+            print(f"--- selected variable: {vdf[var].long_name} not available for icon")
+            sys.exit(1)
+
+    # only for DWH variables
     try:
         var_for_device = vdf[var].dwh_id[dev]
         if verbose:
             print(f"--- selected variable: {vdf[var].long_name} for device: {dev}")
+        return
+
     except KeyError:
         print(f"! {var} is not available as variable for device: {dev}")
         sys.exit(1)

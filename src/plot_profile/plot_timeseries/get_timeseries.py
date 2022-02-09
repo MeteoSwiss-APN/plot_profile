@@ -8,11 +8,16 @@ from pprint import pprint
 # Local
 from ..plot_icon.get_icon import get_icon_timeseries
 from ..utils.dwh_retrieve import dwh_retrieve
+from ..utils.stations import sdf
 from ..utils.utils import check_inputs
 from ..utils.variables import vdf
 
+# from ipdb import set_trace
 
-def get_data_dict(start, end, variable, loc, device, init, folder, verbose):
+
+def get_timeseries_dict(
+    start, end, variable, loc, device, init, folder, grid_file, verbose
+):
     # check, that the provided variables at most require 2 units
     units = []
     for var in list(set(variable)):
@@ -60,7 +65,7 @@ def get_data_dict(start, end, variable, loc, device, init, folder, verbose):
         check_inputs(var=var, dev=dev, loc=loc, verbose=verbose)
 
     # retrieve for each device one dataframe, containing all corresponding variables
-    data_dict = {}
+    timeseries_dict = {}
     for dev in list(set(devices)):
 
         # get indices of variables corresponding to dev
@@ -72,19 +77,24 @@ def get_data_dict(start, end, variable, loc, device, init, folder, verbose):
         for index in vars_indices:
             vars += [variables[index]]
 
+        # device = icon
         if dev == "icon":
-            data_dict["icon"] = get_icon_timeseries(
-                lat=loc.latitude,
-                lon=loc.longitude,
+            timeseries_dict["icon"] = get_icon_timeseries(
+                lat=sdf[loc].lat,
+                lon=sdf[loc].lon,
                 vars=vars,
                 init=init,
-                start_lt=(start - init) / 3600,
-                end_lt=(end - init) / 3600,
+                start_lt=int((start - init).total_seconds() / 3600),  # full hours!
+                end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                 folder=folder,
+                grid_file=grid_file,
                 verbose=verbose,
             )
+            # go to next variable
+            continue
 
-        data_dict[dev] = dwh_retrieve(
+        # all other devices which are retrievable from DWH
+        timeseries_dict[dev] = dwh_retrieve(
             device=dev,
             station=loc,
             vars=vars,
@@ -92,4 +102,4 @@ def get_data_dict(start, end, variable, loc, device, init, folder, verbose):
             verbose=False,  # TODO: change False to verbose
         )
 
-    return data_dict, multi_axes
+    return timeseries_dict, multi_axes
