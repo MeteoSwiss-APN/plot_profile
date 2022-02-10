@@ -16,7 +16,7 @@ from ..utils.variables import vdf
 
 
 def get_timeseries_dict(
-    start, end, variable, loc, device, init, folder, grid_file, verbose
+    start, end, variable, loc, device, init, level, folder, grid_file, verbose
 ):
     # check, that the provided variables at most require 2 units
     units = []
@@ -84,6 +84,7 @@ def get_timeseries_dict(
                 lon=sdf[loc].lon,
                 vars=vars,
                 init=init,
+                level=level,
                 start_lt=int((start - init).total_seconds() / 3600),  # full hours!
                 end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                 folder=folder,

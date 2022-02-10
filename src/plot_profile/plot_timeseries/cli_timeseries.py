@@ -47,6 +47,13 @@ from .plot_timeseries import create_plot
 )
 # optional options
 @click.option(
+    "--level",
+    type=int,
+    default=1,
+    multiple=False,  # TODO: enable the choice of several altitude levels if necessary
+    help="Height level for Icon Data. Def: 1",
+)
+@click.option(
     "--ymin",
     type=float,
     multiple=True,
@@ -125,6 +132,7 @@ def main(
     loc: str,
     device: str,
     # Optional
+    level: int,
     ymin: tuple,
     ymax: tuple,
     appendix: str,
@@ -141,6 +149,8 @@ def main(
     Example commands:
     plot_timeseries --start 21111900 --end 21111902 --loc gla --device 5cm --device 2m --var temp
     plot_timeseries --outpath plots --start 21111900 --end 21111902 --loc pay --device 5cm --device 2m --device 2m_tower --device 10m_tower --device 30m_tower --var temp
+    # incl ICON
+    plot_timeseries --start 21111900 --end 21111912 --loc pay --device 2m --device icon --var temp --folder /scratch/swester/output_icon/ICON-1/ --init 21111812 --verbose --level 1 --outpath plots
     """
     timeseries_dict, multi_axes = get_timeseries_dict(
         start=start,
@@ -149,6 +159,7 @@ def main(
         loc=loc,
         device=device,
         init=init,
+        level=level,
         folder=folder,
         grid_file=grid_file,
         verbose=verbose,
