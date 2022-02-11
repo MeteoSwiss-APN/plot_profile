@@ -274,7 +274,7 @@ def get_icon(
 
 
 def get_icon_timeseries(
-    lat, lon, vars, init, start_lt, end_lt, folder, grid_file, verbose
+    lat, lon, vars, init, level, start_lt, end_lt, folder, grid_file, verbose
 ):
     """Retrieve timeseries from ICON output.
 
@@ -283,6 +283,7 @@ def get_icon_timeseries(
         lon (float): longitude
         vars (list): variables
         init (datetime object): init date of simulation
+        level (int): height level
         start_lt (int): start leadtime
         end_lt (int): end leadtime
         folder (str): folder containing subfolders with icon runs
@@ -330,8 +331,6 @@ def get_icon_timeseries(
     # timestamps = [init + dt.timedelta(hours=int(lt)) for lt in leadtimes]
     timestamps = []
     for lt in leadtimes:
-        print(lt)
-
         timestamps.append(init + dt.timedelta(hours=int(lt)))
 
     df["timestamp"] = timestamps
@@ -340,13 +339,13 @@ def get_icon_timeseries(
     for variable in vars:
         var = vdf[variable]
         try:
-            dsi = ds.isel(ncells=ind, height=-1)
+            dsi = ds.isel(ncells=ind, height=np.negative(level))
         except ValueError:
             try:
-                dsi = ds.isel(cells=ind, height=-1)
+                dsi = ds.isel(cells=ind, height=np.negative(level))
             except ValueError:
                 try:
-                    dsi = ds.isel(cells_1=ind, height=-1)
+                    dsi = ds.isel(cells_1=ind, height=np.negative(level))
                 except ValueError:
                     print(
                         f'! no dimensions called "cells_1", "ncells" or "cells" for {var.icon_name}'
