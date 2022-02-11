@@ -36,23 +36,19 @@ from .plot_timeseries import create_plot
 @click.option(
     "--device",
     type=click.Choice(
-        ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower", "icon"],
+        [
+            "5cm",
+            "2m",
+            "2m_tower",
+            "10m_tower",
+            "30m_tower",
+        ],
         case_sensitive=True,
     ),
     multiple=True,
-    default=[
-        "2m",
-    ],
-    help="MANDATORY: Choose type of device. Def: 2m",
+    help="MANDATORY: Choose type of device.",
 )
 # optional options
-@click.option(
-    "--level",
-    type=int,
-    default=1,
-    multiple=False,  # TODO: enable the choice of several altitude levels if necessary
-    help="Height level for Icon Data. Def: 1",
-)
 @click.option(
     "--ymin",
     type=float,
@@ -123,6 +119,18 @@ from .plot_timeseries import create_plot
     default=False,
     help="Output details on what is happening.",
 )
+@click.option(
+    "--add_model",
+    type=(str, str, int),
+    multiple=True,
+    help="Specify which model/variable/level should be added to plot. If no level should be retrieved, enter 0.",
+)
+@click.option(
+    "--add_obs",
+    type=(str, str),
+    multiple=True,
+    help="Specify which device/variable should be added to plot.",
+)
 def main(
     *,
     # Mandatory
@@ -132,7 +140,6 @@ def main(
     loc: str,
     device: str,
     # Optional
-    level: int,
     ymin: tuple,
     ymax: tuple,
     appendix: str,
@@ -143,6 +150,8 @@ def main(
     init: str,
     outpath: str,
     verbose: bool,
+    add_model: tuple,
+    add_obs: tuple,
 ):
     """Plot timeseries of variables retrieved from various differend measurement devices.
 
@@ -150,16 +159,33 @@ def main(
     plot_timeseries --start 21111900 --end 21111902 --loc gla --device 5cm --device 2m --var temp
     plot_timeseries --outpath plots --start 21111900 --end 21111902 --loc pay --device 5cm --device 2m --device 2m_tower --device 10m_tower --device 30m_tower --var temp
     # incl ICON
-    plot_timeseries --start 21111900 --end 21111912 --loc pay --device 2m --device icon --var temp --folder /scratch/swester/output_icon/ICON-1/ --init 21111812 --verbose --level 1 --outpath plots
+    plot_timeseries --start 21111900 --end 21111912 --loc pay --folder /scratch/swester/output_icon/ICON-1/ --init 21111812 --outpath plots --add_obs 2m temp --add_obs 10m_tower temp --add_obs 2m rad_sw_down --add_obs 2m rad_sw_up --add_model icon temp 1 --add_model icon temp 2
     """
+    # add is a tuple of tuples; which gets converted to a list of lists with the following
+    # the following line. afterwards two lists w/ all unique devices and variables are created
+    elements = None
+    add = list(add_obs) + list(add_model)
+    if add_model or add_obs:
+        elements = [
+            list(item) for item in list(add)
+        ]  # convert tuple of tuples to list of lists
+        devs = list([list[0] for list in add])  # list(set([list[0] for list in add]))
+        vars = list([list[1] for list in add])  # list(set([list[1] for list in add]))
+
+    # if plots for only one device w/ a number of different vars should be created,
+    # using the --var and --device flags could me more user friendly
+    if device and var:
+        devs = list(device)
+        vars = list(var)
+
     timeseries_dict, multi_axes = get_timeseries_dict(
         start=start,
         end=end,
-        variable=var,
+        elements=elements,  # all elements of the plot are in the add-list
+        variable=vars,
         loc=loc,
-        device=device,
+        device=devs,
         init=init,
-        level=level,
         folder=folder,
         grid_file=grid_file,
         verbose=verbose,
@@ -168,8 +194,6 @@ def main(
     create_plot(
         data=timeseries_dict,
         multi_axes=multi_axes,
-        devices=list(set(device)),  # from the device-list, extract all unique devices
-        variables=list(set(var)),  # form the var-list, extract all unique variables
         location=loc,
         start=start,
         end=end,

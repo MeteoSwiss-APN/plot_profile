@@ -9,6 +9,7 @@ Date: 11/11/2021
 import datetime as dt
 import sys
 from pathlib import Path
+from pprint import pprint
 
 # Third-party
 import numpy as np
@@ -274,14 +275,15 @@ def get_icon(
 
 
 def get_icon_timeseries(
-    lat, lon, vars, init, level, start_lt, end_lt, folder, grid_file, verbose
+    lat, lon, cols, vars, init, level, start_lt, end_lt, folder, grid_file, verbose
 ):
     """Retrieve timeseries from ICON output.
 
     Args:
         lat (float): latitude
         lon (float): longitude
-        vars (list): variables
+        cols (list): list of columns for icon dataframe
+        vars (list): icon variables, which should be plotted
         init (datetime object): init date of simulation
         level (int): height level
         start_lt (int): start leadtime
@@ -293,6 +295,8 @@ def get_icon_timeseries(
     """
     # determine index of loc from grid file
     ind, height, size = index_height_from_grid_file(lat, lon, grid_file, verbose)
+
+    hhl = calc_hhl(height)
 
     # directory with forecast files
     init_str = init.strftime("%y%m%d%H")
@@ -324,7 +328,7 @@ def get_icon_timeseries(
     # create df which collects icon variables
     #   pd.Dataframe with columns 'timestamp', 'var1', 'var2', ...
     columns = ["timestamp"]
-    columns.extend(vars)
+    columns.extend(cols)
     df = pd.DataFrame(columns=columns)
 
     # timestamps
@@ -335,28 +339,45 @@ def get_icon_timeseries(
 
     df["timestamp"] = timestamps
 
-    # loop over vars
-    for variable in vars:
+    # loop over icon variables and add them to the dataframe
+    # the entries of vars & level correspond to one another
+    for i, variable in enumerate(vars):
+        tmp_level = level[i]  # desired level for the current variable
+
+        if tmp_level != 0:
+            column_label = f"{variable}~{level[i]}"
+        else:
+            column_label = variable
+
         var = vdf[variable]
         try:
-            dsi = ds.isel(ncells=ind, height=np.negative(level))
+            if tmp_level != 0:
+                dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
+            else:
+                dsi = ds.isel(ncells=ind)
         except ValueError:
             try:
-                dsi = ds.isel(cells=ind, height=np.negative(level))
+                if tmp_level != 0:
+                    dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
+                else:
+                    dsi = ds.isel(ncells=ind)
             except ValueError:
                 try:
-                    dsi = ds.isel(cells_1=ind, height=np.negative(level))
+                    if tmp_level != 0:
+                        dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
+                    else:
+                        dsi = ds.isel(ncells=ind)
                 except ValueError:
                     print(
                         f'! no dimensions called "cells_1", "ncells" or "cells" for {var.icon_name}'
                     )
                     continue
         try:
-            values = dsi[var.icon_name] * var.mult + var.plus
+            values = dsi[var.icon_name].values * var.mult + var.plus
         except KeyError:
             print(f"{var.icon_name} cannot be found in forecast file")
             continue
 
-        df[variable] = values
+        df[column_label] = values
 
     return df
