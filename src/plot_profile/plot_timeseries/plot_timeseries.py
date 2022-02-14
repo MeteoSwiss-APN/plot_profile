@@ -3,6 +3,7 @@
 # Standard library
 import datetime
 from datetime import datetime as dt
+from os import sep
 from pprint import pprint
 
 # Third-party
@@ -28,8 +29,6 @@ from ..utils.variables import vdf
 def create_plot(
     data,
     multi_axes,
-    devices,
-    variables,
     location,
     start,
     end,
@@ -62,6 +61,7 @@ def create_plot(
     """
     # get location dataframe
     loc = sdf[location]
+    devices = data.keys()
 
     # prepare figure
     fig, left_ax = plt.subplots(1, 1, figsize=(8, 5), constrained_layout=True)
@@ -107,6 +107,7 @@ def create_plot(
     # plotting
     colour_index = 0
     for i, device in enumerate(devices):
+        tmp = False
         # 1) retrieve df
         df = data[device]
         # df = pd.to_datetime(df["timestamp"], format="%Y-%m-%d %H:%M:%S")
@@ -134,11 +135,21 @@ def create_plot(
                 continue
 
             # extract current variable
+            if "~" in variable:
+                var, level = (variable.split(sep="~"))[0], (variable.split(sep="~"))[1]
+                tmp = True
+
+            if tmp:
+                variable = var
+
             variable = vdf[variable]
             unit = variable.unit
             var_short = variable.short_name
             y = columnData.values
             label = f"{var_short}: {device}"
+
+            if tmp:
+                label = f"{var_short}: {device} (level: {level})"
 
             # define unit for the left axes
             if not left_unit:
