@@ -177,9 +177,10 @@ def dwh2pandas(cmd, verbose):
         f"{header_line[0].iloc[0]} {header_line[1].iloc[0]} {header_line[2].iloc[0]}"
     )
     if check == "records read: 0":
-        raise SystemExit(
-            "--- ERROR: For the given time period, location and/or device, no data could be retrieved."
+        print(
+            f"--- WARNING: For the given time period, location and/or device, no data could be retrieved. Returning empty dataframe."
         )
+        return pd.DataFrame()
 
     # parse the command line output into pandas dataframe
     data = pd.read_csv(
@@ -350,6 +351,9 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             verbose=verbose,
         )
 
+        if raw_data.empty:
+            return raw_data
+
         # rename column names to nice short names and
         #  make list of relevant columns
         raw_data.rename(columns={"termin": "timestamp"}, inplace=True)
@@ -418,6 +422,9 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             end=t2,
             verbose=verbose,
         )
+
+        if raw_data.empty:
+            return raw_data
 
         # rename column names to nice short names and
         #  make list of relevant columns

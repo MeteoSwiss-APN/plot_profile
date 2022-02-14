@@ -4,6 +4,9 @@ Author: Michel Zeller
 
 Date: 21/01/2022.
 """
+# Standard library
+from pprint import pprint
+
 # Third-party
 import click
 

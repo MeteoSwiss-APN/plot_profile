@@ -6,6 +6,7 @@ Date: 10/11/2021.
 """
 # Standard library
 import sys
+from pprint import pprint
 
 # Third-party
 import click
@@ -283,14 +284,19 @@ def main(
                 timestamps=timestamp.strftime("%Y%m%d%H"),
                 verbose=verbose,
             )
-            crit = slice_top_bottom(
-                df_height=unsliced_timestamp_df["altitude"],
-                alt_top=alt_top,
-                alt_bot=alt_bot,
-                verbose=verbose,
-            )
-            sliced_timestamp_df = unsliced_timestamp_df[crit]
-            obs_dict["rs"][timestamp] = sliced_timestamp_df
+
+            # if returned df is not empty add to obs_dict
+            if not unsliced_timestamp_df.empty:
+                crit = slice_top_bottom(
+                    df_height=unsliced_timestamp_df["altitude"],
+                    alt_top=alt_top,
+                    alt_bot=alt_bot,
+                    verbose=verbose,
+                )
+                sliced_timestamp_df = unsliced_timestamp_df[crit]
+                obs_dict["rs"][timestamp] = sliced_timestamp_df
+            else:  # else, don't add it to obs_dict.
+                obs_dict["rs"][timestamp] = None
     else:
         obs_dict = None
 
