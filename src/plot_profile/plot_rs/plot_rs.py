@@ -252,7 +252,7 @@ def plot_grid(ax, params, case=None):
         return
 
 
-def plot_winddir(df, fig, ax, case=None):
+def plot_winddir(df, fig, ax, hide_x_ticks, case=None):
     # TODO: add docstring
     if case == "single":
         adjustFigAspect(fig, aspect=0.5)
@@ -264,8 +264,9 @@ def plot_winddir(df, fig, ax, case=None):
     x_dir, y_dir = map_degrees(avg_winddir_array=avg_winddir_array)
     avg_altitude_array = altitude_df.to_numpy().round()
     arrow_anchor = [1] * len(avg_altitude_array)
-    ax.set_xticklabels("")
-    ax.set_xticks([])
+    if hide_x_ticks:
+        ax.set_xticklabels("")
+        ax.set_xticks([])
     np.meshgrid(arrow_anchor, avg_altitude_array)
     ax.quiver(
         arrow_anchor,
@@ -546,7 +547,11 @@ def create_plot(
                 ax[1].legend(handles=handles_right)
 
             if "wind_dir" in params:
-                plot_winddir(df=df, fig=fig, ax=ax[1])
+                hide_x_ticks = True
+                hide_x_ticks = (
+                    "wind_vel" not in params
+                )  # if windvel is also in params --> False --> x_ticks are not hidden
+                plot_winddir(df=df, fig=fig, ax=ax[1], hide_x_ticks=hide_x_ticks)
 
         if clouds:
             plot_clouds(

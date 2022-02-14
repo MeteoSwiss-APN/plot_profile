@@ -6,11 +6,12 @@ Date: 11/11/2021
 """
 
 # Standard library
+import datetime as dt
 import sys
 from pathlib import Path
+from pprint import pprint
 
 # Third-party
-# import ipdb
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -18,6 +19,8 @@ import xarray as xr
 # Local
 from ..utils.utils import slice_top_bottom
 from ..utils.variables import vdf
+
+# from ipdb import set_trace
 
 
 def lfff_name(lt):
@@ -85,6 +88,66 @@ def calc_hhl(hfl):
     return hhl
 
 
+def index_height_from_grid_file(lat, lon, grid, verbose):
+    """Retrieve index and height for specific grid point.
+
+    Args:
+        lat (float): latitude
+        lon (float): longitude
+        grid (str): grid file (netcdf)
+        verbose (bool): print details
+
+    Returns:
+        index (int)
+        height (1-dimensional np array)
+        size (int): size of grid file
+
+    """
+    if verbose:
+        print(
+            "Assuming that variable's grid corresponds to clat_1 and clon_1 from grid-file"
+        )
+        print(" with uuid FC046F09-ED97-850E-1E31-8927421B2B60.")
+
+    # load grid file
+    if verbose:
+        print(f"Load grid from: {grid}")
+    if Path(grid).is_file():
+        ds_grid = xr.open_dataset(grid).squeeze()
+    else:
+        print("Grid file does not exist!")
+        sys.exit(1)
+
+    # load latitude and longitude grid of constants file
+    lats_grid = ds_grid.clat_1.values
+    lons_grid = ds_grid.clon_1.values
+
+    # convert from radians to degrees if given in radians
+    if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
+        print("Assuming that lats and lons of grid file are given in radians.")
+        lats_grid = np.rad2deg(lats_grid)
+        lons_grid = np.rad2deg(lons_grid)
+
+    # find index closest to specified lat, lon (in grid file)
+    ind = ind_from_latlon(lats_grid, lons_grid, lat, lon, False)
+    if verbose:
+        print(f"Determined ind: {ind}.")
+
+    # lat and lon from grid file
+    if verbose:
+        print("Latitude and logitude of selected index in grid file:")
+        print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
+
+    # load HEIGHT from grid file
+    try:
+        height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
+    except KeyError:
+        print(f"Variable HEIGHT does not exist in grid file: {grid}")
+        sys.exit(1)
+
+    return ind, height, lats_grid.size
+
+
 def get_icon(
     folder,
     date,
@@ -116,7 +179,8 @@ def get_icon(
         pandas dataframe:       icon simulation values
 
     """
-    print("--- retrieving & filtering data")
+    if verbose:
+        print("--- retrieving & filtering data")
 
     # create dictionary to collect data of height and variables
     data_dict = {}
@@ -124,67 +188,31 @@ def get_icon(
     ### A) Grid file: latitude, longitude and altitude
     ##################################################
 
-    # load constants file
-    if verbose:
-        print(f"Load grid from: {grid}")
-    if Path(grid).is_file():
-        ds_grid = xr.open_dataset(grid).squeeze()
-    else:
-        print("Grid file does not exist!")
-        sys.exit(1)
-
-    # load latitude and longitude grid of constants file
-    lats_grid = ds_grid.clat_1.values
-    lons_grid = ds_grid.clon_1.values
-
-    # convert from radians to degrees if given in radians
-    if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
-        print("Assuming that lats and lons of grid file are given in radians.")
-        lats_grid = np.rad2deg(lats_grid)
-        lons_grid = np.rad2deg(lons_grid)
-
-    # find index closest to specified lat, lon (in grid file)
+    # index and height only have to be retrieved once
     if not ind:
-        ind = ind_from_latlon(lats_grid, lons_grid, lat, lon, False)
-        if verbose:
-            print(f"Determined ind: {ind}.")
+        ind, height, size = index_height_from_grid_file(lat, lon, grid, verbose)
 
-    # lat and lon from grid file
-    if verbose:
-        print("Latitude and logitude of selected index in grid file:")
-        print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
+        # create pandas objects of height values
+        df_height = pd.Series(data=calc_hhl(height))
 
-    # check whether forecast and grid file match
-    # if ds.cells_1.size != ds_grid.cells_1.size:
-    #    print("Sizes of forecast and grid file do not match!")
-    #    sys.exit(1)
+        # reverse order of df_height s.t. it is from bottom to top
+        df_height = df_height.iloc[::-1].reset_index(drop=True)
 
-    # load HEIGHT from grid file
-    try:
-        height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
-    except KeyError:
-        print(f"Variable HEIGHT does not exist in grid file: {grid}")
-        sys.exit(1)
+        # get criteria to cut away top and bottom
+        crit = slice_top_bottom(
+            df_height=df_height, alt_top=alt_top, alt_bot=alt_bot, verbose=verbose
+        )
 
-    # create pandas objects of height values
-    df_height = pd.Series(data=calc_hhl(height))
-
-    # reverse order of df_height s.t. it is from bottom to top
-    df_height = df_height.iloc[::-1].reset_index(drop=True)
-
-    # get criteria to cut away top and bottom
-    crit = slice_top_bottom(
-        df_height=df_height, alt_top=alt_top, alt_bot=alt_bot, verbose=verbose
-    )
-
-    # fill HEIGHT as sliced pandas series into dictionary
-    data_dict["height"] = df_height[crit]
+        # fill HEIGHT as sliced pandas series into dictionary
+        data_dict["height"] = df_height[crit]
 
     ### B) ICON forecast files
     ##########################
 
     date_str = date.strftime("%y%m%d%H")
 
+    # TODO the following should be a separate function which can be reused for
+    #      the timeseries
     # list icon files
     if verbose:
         print(f"Looking for files in {str(Path(folder, date_str))}")
@@ -203,23 +231,8 @@ def get_icon(
     if verbose:
         print("Finished loading files into xarray dataset.")
 
-    # extract latitude and longitude
-    # lats = ds.clat_1.values
-    # lons = ds.clon_1.values
-
-    if verbose:
-        print(
-            "Assuming that variable's grid corresponds to clat_1 and clon_1 from grid-file"
-        )
-        print(" with uuid FC046F09-ED97-850E-1E31-8927421B2B60.")
-
-    # convert from radians to degrees if given in radians
-    # if lats.max() < 2.0 and lons.max() < 2.0:
-    #    print("Assuming that lats and lons are given in radians.")
-    #    lats = np.rad2deg(lats)
-    #    lons = np.rad2deg(lons)
-
     for variable in variables_list:
+
         # specify variable (pandas dataframe with attributes)
         var = vdf[variable]
 
@@ -259,3 +272,112 @@ def get_icon(
         data_dict[variable] = df_values
 
     return data_dict
+
+
+def get_icon_timeseries(
+    lat, lon, cols, vars, init, level, start_lt, end_lt, folder, grid_file, verbose
+):
+    """Retrieve timeseries from ICON output.
+
+    Args:
+        lat (float): latitude
+        lon (float): longitude
+        cols (list): list of columns for icon dataframe
+        vars (list): icon variables, which should be plotted
+        init (datetime object): init date of simulation
+        level (int): height level
+        start_lt (int): start leadtime
+        end_lt (int): end leadtime
+        folder (str): folder containing subfolders with icon runs
+        grid_file (str): icon-1 grid file
+        verbose (bool): print details
+
+    """
+    # determine index of loc from grid file
+    ind, height, size = index_height_from_grid_file(lat, lon, grid_file, verbose)
+
+    hhl = calc_hhl(height)
+
+    # directory with forecast files
+    init_str = init.strftime("%y%m%d%H")
+    icon_dir = Path(folder, init_str)
+
+    if not icon_dir.is_dir():
+        print(f"{icon_dir} does not exist!")
+        sys.exit()
+
+    if verbose:
+        print(f"Looking for files in {str(icon_dir)}")
+
+    # retrieve lfff-files
+    leadtimes = np.arange(start_lt, end_lt + 1)
+    files = [Path(icon_dir, lfff_name(lt)) for lt in leadtimes]
+
+    if verbose:
+        print("files:")
+        for f in files:
+            print(f"  {f}")
+
+    # load forecast files as xarray dataset
+    if verbose:
+        print("Loading files into xarray dataset.")
+    ds = xr.open_mfdataset(files).squeeze()
+    if verbose:
+        print("Finished loading files into xarray dataset.")
+
+    # create df which collects icon variables
+    #   pd.Dataframe with columns 'timestamp', 'var1', 'var2', ...
+    columns = ["timestamp"]
+    columns.extend(cols)
+    df = pd.DataFrame(columns=columns)
+
+    # timestamps
+    # timestamps = [init + dt.timedelta(hours=int(lt)) for lt in leadtimes]
+    timestamps = []
+    for lt in leadtimes:
+        timestamps.append(init + dt.timedelta(hours=int(lt)))
+
+    df["timestamp"] = timestamps
+
+    # loop over icon variables and add them to the dataframe
+    # the entries of vars & level correspond to one another
+    for i, variable in enumerate(vars):
+        tmp_level = level[i]  # desired level for the current variable
+
+        if tmp_level != 0:
+            column_label = f"{variable}~{level[i]}"
+        else:
+            column_label = variable
+
+        var = vdf[variable]
+        try:
+            if tmp_level != 0:
+                dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
+            else:
+                dsi = ds.isel(ncells=ind)
+        except ValueError:
+            try:
+                if tmp_level != 0:
+                    dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
+                else:
+                    dsi = ds.isel(ncells=ind)
+            except ValueError:
+                try:
+                    if tmp_level != 0:
+                        dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
+                    else:
+                        dsi = ds.isel(ncells=ind)
+                except ValueError:
+                    print(
+                        f'! no dimensions called "cells_1", "ncells" or "cells" for {var.icon_name}'
+                    )
+                    continue
+        try:
+            values = dsi[var.icon_name].values * var.mult + var.plus
+        except KeyError:
+            print(f"{var.icon_name} cannot be found in forecast file")
+            continue
+
+        df[column_label] = values
+
+    return df

@@ -29,6 +29,7 @@ vdf = pd.DataFrame(
         "rad_sw_down",
         "rad_sw_up",
         "temp",
+        "2m_temp",
         "ver_vis",
         "wind_dir",
         "wind_vel",
@@ -259,6 +260,20 @@ vdf["temp"].dwh_id = {
     "10m_tower": "4949",
     "30m_tower": "4957",
 }
+
+# 2m temperature: 2m_temp
+vdf["2m_temp"].short_name = "2m_temp"
+vdf["2m_temp"].icon_name = "T_2M"
+vdf["2m_temp"].long_name = "2m Temperature"
+vdf["2m_temp"].unit = "°C"
+vdf["2m_temp"].min_value = -3.0  # 275
+vdf["2m_temp"].max_value = 5  # 287
+vdf["2m_temp"].color = "orangered"
+vdf["2m_temp"].marker = "o"
+vdf["2m_temp"].linestyle = "-"
+vdf["2m_temp"].mult = 1
+vdf["2m_temp"].plus = -273
+vdf["2m_temp"].avg = False
 
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"
