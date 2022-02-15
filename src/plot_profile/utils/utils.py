@@ -14,6 +14,8 @@ import pandas as pd
 from .stations import sdf
 from .variables import vdf
 
+# from ipdb import set_trace
+
 
 def count_to_log_level(count: int) -> int:
     """Map occurrence of the command line option verbose to the log level."""
@@ -192,3 +194,74 @@ colour_dict = {
     5: "magenta",
     6: "yellow",
 }
+
+
+def get_dim_names(ds_var, verbose):
+    """Retrieve dimension names for specific variable in xarray dataframe.
+
+    Names for time/level/index - dimensions are listed in
+    possible_xxx_names. For a given dataset containing only
+    1 variable the function deduces the dimension names.
+
+    Args:
+        ds_var (xarray df): dataframe for 1 variable
+        verbose (bool): print details
+
+    Returns:
+        dim_time (str)
+        dim_index (str)
+        dim_level (str)
+
+    """
+    possible_time_names = [
+        "time",
+    ]
+    possible_index_names = ["cells", "ncells", "cells_1"]
+    possible_level_names = [
+        "height",
+        "height_1",
+        "height_2",
+        "height_3",
+        "height_4",
+        "level",
+        "level_1",
+        "z_1",
+        "z_2",
+        "z_3",
+    ]
+
+    dim_time = None
+    dim_index = None
+    dim_level = None
+
+    # loop over dims given in dataset
+    for dim_names in ds_var.dims:
+
+        # check for time names
+        for time_name in possible_time_names:
+            if time_name in dim_names:
+                dim_time = time_name
+
+                if verbose:
+                    print(f"Found dim_time: {dim_time}.")
+                break
+
+        # check for index names
+        for index_name in possible_index_names:
+            if index_name in dim_names:
+                dim_index = index_name
+
+                if verbose:
+                    print(f"Found dim_index: {dim_index}.")
+                break
+
+        # check for level names
+        for level_name in possible_level_names:
+            if level_name in dim_names:
+                dim_level = level_name
+
+                if verbose:
+                    print(f"Found dim_level: {dim_level}.")
+                break
+
+    return dim_time, dim_index, dim_level
