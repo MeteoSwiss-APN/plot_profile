@@ -17,6 +17,7 @@ import pandas as pd
 import xarray as xr
 
 # Local
+from ..utils.utils import get_dim_names
 from ..utils.utils import slice_top_bottom
 from ..utils.variables import vdf
 
@@ -135,8 +136,8 @@ def index_height_from_grid_file(lat, lon, grid, verbose):
 
     # lat and lon from grid file
     if verbose:
-        print("Latitude and logitude of selected index in grid file:")
-        print(f"{lats_grid[ind]:.2f}, {lons_grid[ind]:.2f}")
+        print("Latitude and longitude of selected index in grid file:")
+        print(f"{lats_grid[ind]:.4f}, {lons_grid[ind]:.4f}")
 
     # load HEIGHT from grid file
     try:
@@ -351,33 +352,36 @@ def get_icon_timeseries(
 
         var = vdf[variable]
         try:
-            if tmp_level != 0:
-                dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
-            else:
-                dsi = ds.isel(ncells=ind)
-        except ValueError:
-            try:
-                if tmp_level != 0:
-                    dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
-                else:
-                    dsi = ds.isel(ncells=ind)
-            except ValueError:
-                try:
-                    if tmp_level != 0:
-                        dsi = ds.isel(ncells=ind, height=np.negative(tmp_level))
-                    else:
-                        dsi = ds.isel(ncells=ind)
-                except ValueError:
-                    print(
-                        f'! no dimensions called "cells_1", "ncells" or "cells" for {var.icon_name}'
-                    )
-                    continue
-        try:
-            values = dsi[var.icon_name].values * var.mult + var.plus
+            # values = dsi[var.icon_name].values * var.mult + var.plus
+            ds_var = ds[var.icon_name]
         except KeyError:
             print(f"{var.icon_name} cannot be found in forecast file")
             continue
 
-        df[column_label] = values
+        # assume that variable is of structure:
+        # a) time, height, N cells
+        # b) time, N cells
+        dim_time, dim_index, dim_level = get_dim_names(ds_var, verbose)
+
+        # a)
+        if (
+            isinstance(dim_time, str)
+            and isinstance(dim_index, str)
+            and isinstance(dim_level, str)
+        ):
+            values = ds_var.isel(**{dim_index: ind, dim_level: np.negative(tmp_level)})
+
+        # b)
+        elif (
+            isinstance(dim_time, str)
+            and isinstance(dim_index, str)
+            and dim_level is None
+        ):
+            values = ds_var.isel(**{dim_index: ind})
+        else:
+            print("--- ! Dims do not make sense: {dim_time}, {dim_index}, {dim_level}!")
+            continue
+
+        df[column_label] = values * var.mult + var.plus
 
     return df
