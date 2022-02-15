@@ -4,14 +4,12 @@ Author: Michel Zeller
 
 Date: 21/01/2022.
 """
-# Standard library
-from pprint import pprint
-
 # Third-party
 import click
 
 # Local
 from .get_timeseries import get_timeseries_dict
+from .pase_timeseries_inputs import parse_inputs
 from .plot_timeseries import create_plot
 
 
@@ -139,22 +137,24 @@ def main(
     # Mandatory
     start: str,
     end: str,
-    var: str,
     loc: str,
+    # Models, Devices and Variables
+    var: str,
     device: str,
+    add_model: tuple,
+    add_obs: tuple,
+    # Mandatory for ICON
+    grid: bool,
+    grid_file: str,
+    init: str,
     # Optional
     ymin: tuple,
     ymax: tuple,
     appendix: str,
     datatypes: tuple,
     folder: str,
-    grid: bool,
-    grid_file: str,
-    init: str,
     outpath: str,
     verbose: bool,
-    add_model: tuple,
-    add_obs: tuple,
 ):
     """Plot timeseries of variables retrieved from various differend measurement devices.
 
@@ -164,30 +164,16 @@ def main(
     # incl ICON
     plot_timeseries --start 21111900 --end 21111912 --loc pay --folder /scratch/swester/output_icon/ICON-1/ --init 21111812 --outpath plots --add_obs 2m temp --add_obs 10m_tower temp --add_obs 2m rad_sw_down --add_obs 2m rad_sw_up --add_model icon temp 1 --add_model icon temp 2
     """
-    # add is a tuple of tuples; which gets converted to a list of lists with the following
-    # the following line. afterwards two lists w/ all unique devices and variables are created
-    elements = None
-    add = list(add_obs) + list(add_model)
-    if add_model or add_obs:
-        elements = [
-            list(item) for item in list(add)
-        ]  # convert tuple of tuples to list of lists
-        devs = list([list[0] for list in add])  # list(set([list[0] for list in add]))
-        vars = list([list[1] for list in add])  # list(set([list[1] for list in add]))
+    elements, devs, multi_axes = parse_inputs(
+        loc, var, device, add_model, add_obs, verbose
+    )
 
-    # if plots for only one device w/ a number of different vars should be created,
-    # using the --var and --device flags could me more user friendly
-    if device and var:
-        devs = list(device)
-        vars = list(var)
-
-    timeseries_dict, multi_axes = get_timeseries_dict(
+    timeseries_dict = get_timeseries_dict(
         start=start,
         end=end,
-        elements=elements,  # all elements of the plot are in the add-list
-        variable=vars,
-        loc=loc,
+        elements=elements,
         device=devs,
+        loc=loc,
         init=init,
         folder=folder,
         grid_file=grid_file,
