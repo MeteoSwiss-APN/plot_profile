@@ -13,6 +13,13 @@ from ..utils.stations import sdf
 from ..utils.utils import check_inputs
 from ..utils.variables import vdf
 
+
+def get_arome():
+    # TODO: implement function to retrieve data from AROME model (.csv, .nc, whatever)
+    # and parse into pandas dataframe
+    return print("should return AROME dataframe at this point")
+
+
 # from ipdb import set_trace
 
 
@@ -79,7 +86,7 @@ def get_timeseries_dict(
             for index in vars_indices:
                 vars += [variables[index]]
 
-            timeseries_dict[dev] = dwh_retrieve(
+            data = dwh_retrieve(
                 device=dev,
                 station=loc,
                 vars=vars,
@@ -87,9 +94,12 @@ def get_timeseries_dict(
                 verbose=verbose,
             )
 
+            if not data.empty:
+                timeseries_dict[dev] = data
+
         return timeseries_dict, multi_axes
 
-    # if devices and variables have been provided ustig the --add flag
+    # if devices and variables have been provided ustig the --add_model; --add_obs flags
     else:
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ICON STUFF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
         # > icon_columns is a list, of column names for the icon-dataframe
@@ -107,10 +117,13 @@ def get_timeseries_dict(
                 else:
                     # print(f"adding icon column name: {element[1]}")
                     icon_columns.append(element[1])
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~AROME STUFF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+        # maybe some preliminary definitions and variables are necesary for the AROME model;
+        # define them here. TODO.
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
         # retrieve for each device one dataframe, containing all corresponding variables at all specified levels
-        timeseries_dict = dict.fromkeys(list(set(device)))
+        timeseries_dict = {}
         # fill the timeseries_dict
         for dev in list(set(device)):
             if dev == "icon":
@@ -130,6 +143,10 @@ def get_timeseries_dict(
                 # go to next variable
                 continue
 
+            if dev == "arome":
+                # call function, which returns a nice dataframe, containing the data from the arome model
+                timeseries_dict["arome"] = get_arome()
+
             # collect variables that belong to current device
             vars = []
             for element in elements:
@@ -137,12 +154,15 @@ def get_timeseries_dict(
                     vars.append(element[1])
 
             # all other devices apart from ICON which are retrievable from DWH
-            timeseries_dict[dev] = dwh_retrieve(
+            data = dwh_retrieve(
                 device=dev,
                 station=loc,
                 vars=vars,
                 timestamps=[start, end],
                 verbose=verbose,
             )
+
+            if not data.empty:
+                timeseries_dict[dev] = data
 
         return timeseries_dict, multi_axes

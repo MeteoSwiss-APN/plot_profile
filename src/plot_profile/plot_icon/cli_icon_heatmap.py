@@ -180,6 +180,10 @@ def main(
             timestamps=[t1, t2],
             verbose=verbose,
         )
+        # if the retrieved dataframe for the cloud base height is empty because no data for the given
+        # timeframe or location exists; assign None to surface_data
+        if surface_data.empty:
+            surface_data = None
     else:
         surface_data = None
 
