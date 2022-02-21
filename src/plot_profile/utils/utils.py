@@ -10,9 +10,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Local
-from .stations import sdf
-from .variables import vdf
+# First-party
+from plot_profile.utils.stations import sdf
+from plot_profile.utils.variables import vdf
 
 # from ipdb import set_trace
 

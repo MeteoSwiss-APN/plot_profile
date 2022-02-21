@@ -1,8 +1,8 @@
 """Retrieve available data into dict for timeseries plots."""
-# Local
-from ..plot_icon.get_icon import get_icon_timeseries
-from ..utils.dwh_retrieve import dwh_retrieve
-from ..utils.stations import sdf
+# First-party
+from plot_profile.plot_icon.get_icon import get_icon_timeseries
+from plot_profile.utils.dwh_retrieve import dwh_retrieve
+from plot_profile.utils.stations import sdf
 
 # from ipdb import set_trace
 

@@ -16,10 +16,10 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-# Local
-from ..utils.utils import get_dim_names
-from ..utils.utils import slice_top_bottom
-from ..utils.variables import vdf
+# First-party
+from plot_profile.utils.utils import get_dim_names
+from plot_profile.utils.utils import slice_top_bottom
+from plot_profile.utils.variables import vdf
 
 # from ipdb import set_trace
 
