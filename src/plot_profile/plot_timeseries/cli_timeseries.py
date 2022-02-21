@@ -9,7 +9,7 @@ import click
 
 # Local
 from .get_timeseries import get_timeseries_dict
-from .pase_timeseries_inputs import parse_inputs
+from .parse_timeseries_inputs import parse_inputs
 from .plot_timeseries import create_plot
 
 
