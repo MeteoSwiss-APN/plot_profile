@@ -216,7 +216,7 @@ def get_dim_names(ds_var, verbose):
     possible_time_names = [
         "time",
     ]
-    possible_index_names = ["cells", "ncells", "cells_1"]
+    possible_index_names = ["ncells", "cells_1", "cells"]
     possible_level_names = [
         "height",
         "height_1",
