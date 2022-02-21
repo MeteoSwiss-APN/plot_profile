@@ -2,8 +2,6 @@
 
 # Standard library
 import datetime
-from datetime import datetime as dt
-from os import sep
 from pprint import pprint
 
 # Third-party
@@ -21,7 +19,6 @@ munits.registry[datetime.datetime] = converter
 # Local
 from ..utils.stations import sdf
 from ..utils.utils import colour_dict
-from ..utils.utils import linestyle_dict
 from ..utils.utils import save_fig
 from ..utils.variables import vdf
 

@@ -627,15 +627,15 @@ def create_heatmap(
 
         # IF no surface_data is added to heatmap, initialise new axes-instace which can be
         # formatted using the concise date formater
+        start = date
+        end = date + dt.timedelta(hours=leadtime[-1])
         if surface_data is None:
-            start = date
-            end = date + dt.timedelta(hours=leadtime[-1])
             ax_date = ax_colormesh.twiny()
             ax_date.xaxis.set_ticks_position("bottom")
             ax_date.plot([start, end], [np.NaN, np.NaN])
             ax_date.set_xlim(start, end)
 
-        # scatter plot cloud base height & vertical visibility
+        # plot cloud base height & vertical visibility
         if surface_data is not None:
             # shift the values of the cbh & ver_vis columns by the elevation of the station (loc)
             surface_data.loc[surface_data["cbh"] != np.NaN, ["cbh"]] += sdf[
