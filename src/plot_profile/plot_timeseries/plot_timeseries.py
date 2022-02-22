@@ -16,11 +16,11 @@ munits.registry[np.datetime64] = converter
 munits.registry[datetime.date] = converter
 munits.registry[datetime.datetime] = converter
 
-# Local
-from ..utils.stations import sdf
-from ..utils.utils import colour_dict
-from ..utils.utils import save_fig
-from ..utils.variables import vdf
+# First-party
+from plot_profile.utils.stations import sdf
+from plot_profile.utils.utils import colour_dict
+from plot_profile.utils.utils import save_fig
+from plot_profile.utils.variables import vdf
 
 
 def create_plot(

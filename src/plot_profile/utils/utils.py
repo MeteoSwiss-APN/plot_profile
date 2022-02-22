@@ -10,9 +10,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-# Local
-from .stations import sdf
-from .variables import vdf
+# First-party
+from plot_profile.utils.stations import sdf
+from plot_profile.utils.variables import vdf
 
 # from ipdb import set_trace
 
@@ -216,7 +216,7 @@ def get_dim_names(ds_var, verbose):
     possible_time_names = [
         "time",
     ]
-    possible_index_names = ["cells", "ncells", "cells_1"]
+    possible_index_names = ["ncells", "cells_1", "cells"]
     possible_level_names = [
         "height",
         "height_1",

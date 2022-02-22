@@ -3,9 +3,9 @@
 # Standard library
 import sys
 
-# Local
-from ..utils.utils import check_inputs
-from ..utils.variables import vdf
+# First-party
+from plot_profile.utils.utils import check_inputs
+from plot_profile.utils.variables import vdf
 
 
 def check_units(vars):

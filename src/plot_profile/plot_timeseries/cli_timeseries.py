@@ -7,10 +7,10 @@ Date: 21/01/2022.
 # Third-party
 import click
 
-# Local
-from .get_timeseries import get_timeseries_dict
-from .parse_timeseries_inputs import parse_inputs
-from .plot_timeseries import create_plot
+# First-party
+from plot_profile.plot_timeseries.get_timeseries import get_timeseries_dict
+from plot_profile.plot_timeseries.parse_timeseries_inputs import parse_inputs
+from plot_profile.plot_timeseries.plot_timeseries import create_plot
 
 
 @click.command()
