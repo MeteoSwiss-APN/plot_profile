@@ -189,8 +189,17 @@ def create_plot(
     # filename
     start_str = start.strftime("%y%m%d_%H")
     end_str = end.strftime("%y%m%d_%H")
-    var_dev = "var_dev"
-    filename = f"timeseries_{start_str}-{end_str}_{loc.short_name}_{var_dev}"
+
+    var_dev = ""
+    for key in data:
+        var_dev += f"_{key}"
+        df = data[key]
+        columns = df.columns.tolist()
+        for column in columns:
+            if column != "timestamp":
+                var_dev += f"_{column}"
+
+    filename = f"timeseries_{start_str}-{end_str}_{loc.short_name}{var_dev}"
     save_fig(filename, datatypes, outpath, fig=fig)
     plt.clf()
     return
