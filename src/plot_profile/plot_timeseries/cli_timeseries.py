@@ -4,6 +4,11 @@ Author: Michel Zeller
 
 Date: 21/01/2022.
 """
+
+# Standard library
+import sys
+from pprint import pprint
+
 # Third-party
 import click
 
@@ -11,6 +16,8 @@ import click
 from plot_profile.plot_timeseries.get_timeseries import get_timeseries_dict
 from plot_profile.plot_timeseries.parse_timeseries_inputs import parse_inputs
 from plot_profile.plot_timeseries.plot_timeseries import create_plot
+
+# from ipdb import set_trace
 
 
 @click.command()
@@ -91,7 +98,7 @@ from plot_profile.plot_timeseries.plot_timeseries import create_plot
     ],
     help="Choose data type(s) of final result. Def: png",
 )
-@click.option("--folder", type=str, help="Path to ICON simulations.")
+@click.option("--folder", type=str, help="Path to model simulations.", multiple=True)
 @click.option(
     "--grid",
     is_flag=True,
@@ -107,6 +114,7 @@ from plot_profile.plot_timeseries.plot_timeseries import create_plot
 @click.option(
     "--init",
     type=click.DateTime(formats=["%y%m%d%H"]),
+    multiple=True,
     help="Init timestamp of model simulation: yymmddHH",
 )
 @click.option(
@@ -144,15 +152,15 @@ def main(
     add_model: tuple,
     add_obs: tuple,
     # Mandatory for ICON
-    grid: bool,
     grid_file: str,
     init: str,
+    folder: str,
     # Optional
     ymin: tuple,
     ymax: tuple,
     appendix: str,
+    grid: bool,
     datatypes: tuple,
-    folder: str,
     outpath: str,
     verbose: bool,
 ):
@@ -164,21 +172,22 @@ def main(
     # incl ICON
     plot_timeseries --start 21111900 --end 21111912 --loc pay --folder /scratch/swester/output_icon/ICON-1/ --init 21111812 --outpath plots --add_obs 2m temp --add_obs 10m_tower temp --add_obs 2m rad_sw_down --add_obs 2m rad_sw_up --add_model icon temp 1 --add_model icon temp 2
     """
-    elements, devs, multi_axes = parse_inputs(
-        loc, var, device, add_model, add_obs, verbose
+    elements, multi_axes = parse_inputs(
+        loc, var, device, add_model, add_obs, folder, init, verbose
     )
 
     timeseries_dict = get_timeseries_dict(
         start=start,
         end=end,
         elements=elements,
-        device=devs,
         loc=loc,
-        init=init,
-        folder=folder,
         grid_file=grid_file,
         verbose=verbose,
     )
+
+    pprint(timeseries_dict)
+    print("Michel has to do the plot now. Good luck.")
+    sys.exit(1)
 
     create_plot(
         data=timeseries_dict,

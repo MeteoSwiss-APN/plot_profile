@@ -13,71 +13,62 @@ def get_arome():
     return print("should return AROME dataframe at this point")
 
 
-def get_timeseries_dict(
-    start, end, elements, loc, device, init, folder, grid_file, verbose
-):
-    if "icon" in device:  # ICON STUFF
-        # > icon_columns is a list, of column names for the icon-dataframe
-        # > icon_vars is a list of variables to retrieve for the icon model
-        # > icon_levels is a corresponding list of levels, for which these variables should be retrieved
-        icon_columns, icon_vars, icon_levels = [], [], []
-        sep = "~"
-        for element in elements:
-            if element[0] == "icon":
-                icon_vars.append(element[1])
-                icon_levels.append(element[2])
-                if element[2] != 0:
-                    icon_columns.append(element[1] + sep + str(element[2]))
-                else:
-                    icon_columns.append(element[1])
-
-    # if "arome" in device:
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~AROME STUFF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    # maybe some preliminary definitions and variables are necesary for the AROME model;
-    # define them here. TODO.
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-
-    # retrieve for each device one dataframe, containing all corresponding variables at all specified levels
+def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
     timeseries_dict = {}
-    # fill the timeseries_dict
-    for dev in list(set(device)):
-        if dev == "icon":
-            timeseries_dict["icon"] = get_icon_timeseries(
+
+    # to count elements from each group
+    ind_icon = 0
+    ind_arome = 0
+    ind_obs = 0
+
+    # loop over elements
+    for element in elements:
+
+        # retrieve variable name
+        var_name = element[1]
+
+        # ICON
+        if element[0] == "icon":
+
+            level = element[2]
+            folder = element[3]
+            init = element[4]
+
+            timeseries_dict[f"icon~{ind_icon}"] = get_icon_timeseries(
                 lat=sdf[loc].lat,
                 lon=sdf[loc].lon,
-                cols=icon_columns,
-                vars=icon_vars,
+                vars=var_name,
                 init=init,
-                level=icon_levels,
+                level=level,
                 start_lt=int((start - init).total_seconds() / 3600),  # full hours!
                 end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                 folder=folder,
                 grid_file=grid_file,
                 verbose=verbose,
             )
-            continue  # go to next variable
 
-        if dev == "arome":
-            # call function, which returns a nice dataframe, containing the data from the arome model
-            timeseries_dict["arome"] = get_arome()
-            continue  # go to next variable
+            # increase icon index
+            ind_icon += 1
+            continue
 
-        # collect variables that belong to current device
-        vars = []
-        for element in elements:
-            if element[0] == dev:
-                vars.append(element[1])
+        # AROME
+        elif element[0] == "arome":
+            print("Has to be implemented.")
+            continue
 
-        # all other devices apart from ICON which are retrievable from DWH
-        data = dwh_retrieve(
-            device=dev,
-            station=loc,
-            vars=vars,
-            timestamps=[start, end],
-            verbose=verbose,
-        )
+        # OBS from DWH
+        else:
+            device = element[0]
+            data = dwh_retrieve(
+                device=device,
+                station=loc,
+                vars=var_name,
+                timestamps=[start, end],
+                verbose=verbose,
+            )
 
-        if not data.empty:
-            timeseries_dict[dev] = data
+            if not data.empty:
+                timeseries_dict[f"{device}~{ind_obs}"] = data
+                ind_obs += 1
 
     return timeseries_dict

@@ -276,17 +276,16 @@ def get_icon(
 
 
 def get_icon_timeseries(
-    lat, lon, cols, vars, init, level, start_lt, end_lt, folder, grid_file, verbose
+    lat, lon, vars, init, level, start_lt, end_lt, folder, grid_file, verbose
 ):
     """Retrieve timeseries from ICON output.
 
     Args:
         lat (float): latitude
         lon (float): longitude
-        cols (list): list of columns for icon dataframe
-        vars (list): icon variables, which should be plotted
+        vars (list of strings or string): icon variables
         init (datetime object): init date of simulation
-        level (int): height level
+        level (int): model level ("1" = lowest model level)
         start_lt (int): start leadtime
         end_lt (int): end leadtime
         folder (str): folder containing subfolders with icon runs
@@ -304,8 +303,8 @@ def get_icon_timeseries(
     icon_dir = Path(folder, init_str)
 
     if not icon_dir.is_dir():
-        print(f"{icon_dir} does not exist!")
-        sys.exit()
+        print(f"--- ! {icon_dir} does not exist!")
+        sys.exit(1)
 
     if verbose:
         print(f"Looking for files in {str(icon_dir)}")
@@ -327,32 +326,34 @@ def get_icon_timeseries(
         print("Finished loading files into xarray dataset.")
 
     # create df which collects icon variables
-    #   pd.Dataframe with columns 'timestamp', 'var1', 'var2', ...
-    columns = ["timestamp"]
-    columns.extend(cols)
-    df = pd.DataFrame(columns=columns)
+    #   pd.Dataframe with columns 'timestamp', 'var1~level1', 'var2', ...
+    df = pd.DataFrame()
 
     # timestamps
-    # timestamps = [init + dt.timedelta(hours=int(lt)) for lt in leadtimes]
     timestamps = []
     for lt in leadtimes:
         timestamps.append(init + dt.timedelta(hours=int(lt)))
 
     df["timestamp"] = timestamps
 
-    # loop over icon variables and add them to the dataframe
-    # the entries of vars & level correspond to one another
-    for i, variable in enumerate(vars):
-        tmp_level = level[i]  # desired level for the current variable
+    # loop over icon variable(s) and add them to the dataframe
 
-        if tmp_level != 0:
-            column_label = f"{variable}~{level[i]}"
-        else:
+    # "vars" can be string or list of strings
+    if isinstance(vars, str):
+        vars = [
+            vars,
+        ]
+    for i, variable in enumerate(vars):
+
+        # for variables without level, e.g. 2m_temperature
+        if level == 0:
             column_label = variable
+        # add level to name
+        else:
+            column_label = f"{variable}~{level}"
 
         var = vdf[variable]
         try:
-            # values = dsi[var.icon_name].values * var.mult + var.plus
             ds_var = ds[var.icon_name]
         except KeyError:
             print(f"{var.icon_name} cannot be found in forecast file")
@@ -369,7 +370,7 @@ def get_icon_timeseries(
             and isinstance(dim_index, str)
             and isinstance(dim_level, str)
         ):
-            values = ds_var.isel(**{dim_index: ind, dim_level: np.negative(tmp_level)})
+            values = ds_var.isel(**{dim_index: ind, dim_level: np.negative(level)})
 
         # b)
         elif (
