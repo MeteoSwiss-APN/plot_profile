@@ -213,10 +213,16 @@ def create_plot(
     end_str = end.strftime("%y%m%d_%H")
 
     var_dev = ""
-    for key in data:
+    for key, df in data.items():
+
+        # a) keys: "icon~0", "icon~1", "2m", "2m_tower"
+        # remove "0" for model-levels
+        if "~0" in key:
+            key = key.split(sep="~")[0]
         var_dev += f"_{key}"
-        df = data[key]
-        columns = df.columns.tolist()
+
+        # b) columns: "clct", "sw_up", "temp"
+        columns = df.columns
         for column in columns:
             if column != "timestamp":
                 var_dev += f"_{column}"

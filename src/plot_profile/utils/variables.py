@@ -230,13 +230,13 @@ vdf["rel_hum"].dwh_id = {
 
 # radiation: longwave downward
 vdf["lw_down"].short_name = "lw_down"
-vdf["lw_down"].long_name = "Downward LW rad."
+vdf["lw_down"].long_name = "Downward LW rad"
 vdf["lw_down"].unit = "W/m2"
 vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
 # radiation: longwave upward
 vdf["lw_up"].short_name = "lw_up"
-vdf["lw_up"].long_name = "Upward LW rad."
+vdf["lw_up"].long_name = "Upward LW rad"
 vdf["lw_up"].unit = "W/m2"
 vdf["lw_up"].dwh_id = {
     "2m": "1531",
@@ -246,7 +246,7 @@ vdf["lw_up"].dwh_id = {
 
 # radiation: shortwave downward
 vdf["sw_down"].short_name = "sw_down"
-vdf["sw_down"].long_name = "Downward SW rad."
+vdf["sw_down"].long_name = "Downward SW rad"
 vdf["sw_down"].unit = "W/m2"
 vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
 vdf["sw_down"].icon_name = "GLOB"
@@ -255,7 +255,7 @@ vdf["sw_down"].avg = True
 
 # radiation: shortwave upward ("reflected")
 vdf["sw_up"].short_name = "sw_up"
-vdf["sw_up"].long_name = "Upward SW rad."
+vdf["sw_up"].long_name = "Upward SW rad"
 vdf["sw_up"].unit = "W/m2"
 vdf["sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
 
