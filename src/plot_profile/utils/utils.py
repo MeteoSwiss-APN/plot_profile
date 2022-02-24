@@ -8,6 +8,7 @@ from pathlib import Path
 
 # Third-party
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 # First-party
@@ -265,3 +266,30 @@ def get_dim_names(ds_var, verbose):
                 break
 
     return dim_time, dim_index, dim_level
+
+
+def deaverage(arr):
+    """De-average values in array.
+
+    Values of some variables have been averaged
+    since beginning of the model simulation.
+
+    Args:
+        arr (1d array): ICON output variable
+
+    Returns:
+        1d array: de-averaged output
+
+    """
+    # length of input
+    n = len(arr)
+
+    # fill with nan (first value will stay nan)
+    de_arr = np.empty(n)
+    de_arr[:] = np.nan
+
+    # calculate de-averaged values
+    for i in range(1, len(arr)):
+        de_arr[i] = arr[i] * (i) - arr[i - 1] * (i - 1)
+
+    return de_arr
