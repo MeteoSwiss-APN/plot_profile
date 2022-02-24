@@ -130,7 +130,7 @@ from plot_profile.plot_timeseries.plot_timeseries import create_plot
 )
 @click.option(
     "--add_model",
-    type=(str, str, int),
+    type=(str, str, int, str),
     multiple=True,
     help="Specify which model/variable/level should be added to plot. If no level should be retrieved, enter 0.",
 )
@@ -171,6 +171,12 @@ def main(
     plot_timeseries --outpath plots --start 21111900 --end 21111902 --loc pay --device 5cm --device 2m --device 2m_tower --device 10m_tower --device 30m_tower --var temp
     # incl ICON
     plot_timeseries --start 21111900 --end 21111912 --loc pay --folder /scratch/swester/output_icon/ICON-1/ --init 21111812 --outpath plots --add_obs 2m temp --add_obs 10m_tower temp --add_obs 2m rad_sw_down --add_obs 2m rad_sw_up --add_model icon temp 1 --add_model icon temp 2
+
+    # incl several different ICON instances:
+    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111906 --add_model icon temp 1 ref --folder /scratch/swester/output_icon/ICON-1/  --init 21111812
+
+    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111906 --add_model icon temp 1 ref --add_model icon temp 10 exp --add_model icon temp 2 ref --add_model icon temp 20 exp --folder /scratch/swester/output_icon/ICON-1/  --folder /scratch/swester/output_icon/ICON-1/ --folder /scratch/swester/output_icon/exp1/ --folder /scratch/swester/output_icon/exp1/ --init 21111812
+
     """
     elements, multi_axes = parse_inputs(
         loc, var, device, add_model, add_obs, folder, init, verbose
@@ -185,9 +191,8 @@ def main(
         verbose=verbose,
     )
 
-    pprint(timeseries_dict)
-    print("Michel has to do the plot now. Good luck.")
-    sys.exit(1)
+    # pprint(timeseries_dict)
+    # sys.exit(1)
 
     create_plot(
         data=timeseries_dict,
