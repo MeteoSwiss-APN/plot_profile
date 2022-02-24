@@ -29,49 +29,31 @@ def check_units(vars):
     return multi_axes
 
 
-def parse_inputs(loc, var, device, add_model, add_obs, folder, init, verbose):
+def parse_inputs(loc, var, device, add_model, add_obs, model_src, verbose):
 
-    n_model = len(add_model)
-    n_obs = len(add_obs)
+    # create a dict out of model_src. each model id should be one key.
+    model_src_dict = {}
+    model_ids = []
+    for source in model_src:
+        id, dir, init_time = source[0], source[1], source[2]
+        model_src_dict[id] = [dir, init_time]
+        model_ids.append(id)
 
-    # add folder and init information to add_model
-    # create list "folders_inits" for each "add_model"
-    if n_model > 0:
-
-        # if only 1 folder and 1 init has been specified:
-        #  -> same for all add_model-inputs
-        # if multiple folders OR inits have been specified
-        #  -> connect tuples
-
-        n_folder = len(folder)
-        n_init = len(init)
-
-        if n_folder == 1 and n_init == 1:
-            folder_init = (folder[0], init[0])
-            folders_inits = [
-                folder_init,
-            ] * n_model
-        elif n_folder == n_init == n_model:
-            folders_inits = list(zip(folder, init))
-        elif n_folder == 1 and n_init == n_model:
-            folders_inits = list(zip((folder[0],) * n_init, init))
-        elif n_folder == n_model and n_init == 1:
-            folders_inits = list(zip(folder, (init[0],) * n_folder))
-        else:
-            print(f"--- ! Specified folders and inits cannot be combined!")
-            print(f"---   {n_model} model instances specified")
-            print(f"---   {n_init} inits specified")
-            print(f"---   {n_folder} folder specified")
-            sys.exit(1)
-
-    # list containing model information as 6-item tuples
-    #   model-name, variable, level, 'identification',input-folder, init-time
+    # iterate through list of models and add init & folder to it
     l_model = []
-    for t in range(n_model):
-        l_model.append(add_model[t] + folders_inits[t])
+    for model in add_model:
+        if model[3] not in model_ids:
+            print(
+                f"--- No model source information provided for model w/ id: {model[3]}"
+            )
+            print(
+                f"--- (Could just be a typo. Make sure the model ids in the --add_model & --model_src flags match)"
+            )
+            sys.exit(1)
+        model = tuple(list(model) + (model_src_dict[model[3]]))
+        l_model.append(model)
 
-    # list for observations (just to be consistent)
-    if n_obs > 0:
+    if add_obs:
         l_obs = list(add_obs)
     else:
         l_obs = []
@@ -89,34 +71,37 @@ def parse_inputs(loc, var, device, add_model, add_obs, folder, init, verbose):
     # check, that the provided variables at most require 2 units
     multi_axes = check_units(vars)
 
-    # create timeseries plots using the '--var' & '--device' flags
-    # if device and var:
-    #    device, variable = list(device), list(var)
+    #################################################################################################################
+    #################################################################################################################
+    # CREATE TIMESERIES PLOTS USING THE --VAR & --DEVICE FLAGS
+    if device and var:
+        device, variable = list(device), list(var)
 
-    #    # CASE 1: multiple devices, 1 variable --> plot this one variable for all devices
-    #    if len(variable) == 1 and len(device) > 1:
-    #        vars = [variable[0]] * len(device)
-    #        devs = list(device)
+        # CASE 1: multiple devices, 1 variable --> plot this one variable for all devices
+        if len(variable) == 1 and len(device) > 1:
+            vars = [variable[0]] * len(device)
+            devs = list(device)
 
-    #    # CASE 2: 1 device, multiple variables --> plot all variables for the single device
-    #    elif len(device) == 1 and len(variable) > 1:
-    #        devs = [device[0]] * len(variable)
-    #        vars = list(variable)
+        # CASE 2: 1 device, multiple variables --> plot all variables for the single device
+        elif len(device) == 1 and len(variable) > 1:
+            devs = [device[0]] * len(variable)
+            vars = list(variable)
 
-    #    # CASE 3: multiple devices and multiple variables --> require len(device)==len(var)
-    #    #  otherwise the assignment of variables to devices is ambiguous --> throw warning and exit
-    #    elif len(device) == len(variable):
-    #        devs = list(device)
-    #        vars = list(variable)
+        # CASE 3: multiple devices and multiple variables --> require len(device)==len(var)
+        #  otherwise the assignment of variables to devices is ambiguous --> throw warning and exit
+        elif len(device) == len(variable):
+            devs = list(device)
+            vars = list(variable)
 
-    #    else:
-    #        print(f"Assignement of devices and variables cannot be done explicitly.")
-    #        print(
-    #            f"Review command. (#variables: {len(variable)}, #devices: {len(device)})"
-    #        )
-    #        sys.exit(1)
+        else:
+            print(f"Assignement of devices and variables cannot be done explicitly.")
+            print(
+                f"Review command. (#variables: {len(variable)}, #devices: {len(device)})"
+            )
+            sys.exit(1)
 
-    #    elements = []
-    #    for dev, var in zip(devs, vars):
-    #        elements.append([dev, var])
+        elements = []
+        for dev, var in zip(devs, vars):
+            elements.append([dev, var])
+
     return elements, multi_axes
