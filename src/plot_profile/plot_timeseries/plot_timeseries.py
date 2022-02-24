@@ -68,7 +68,8 @@ def create_plot(
         # align ticks by implementing ideas from:
         # https://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
         left_ax.grid(visible=True)
-        right_ax.grid(visible=True)
+        # if multi_axes:
+        #     right_ax.grid(visible=True)
 
     # apply limits to the y-axis/axes if some have been specified
     if ymin and ymax:
@@ -104,7 +105,7 @@ def create_plot(
     # plotting
     colour_index = 0
     for i, device in enumerate(devices):
-        tmp = False
+        model = False
         # 1) retrieve df
         df = data[device]
         # df = pd.to_datetime(df["timestamp"], format="%Y-%m-%d %H:%M:%S")
@@ -132,22 +133,41 @@ def create_plot(
                 continue
 
             # extract current variable
-            if "~" in variable:
-                var, level = (variable.split(sep="~"))[0], (variable.split(sep="~"))[1]
-                tmp = True
+            if "icon" in device:
+                # i.e. 2m_temp could be an icon variable w/o '~'; so make sure the model variable has the correct value!
+                model = True
+                level = None
 
-            if tmp:
+            if (
+                "~" in variable
+            ):  # it is only possible for ICON variables to have '~' in them, because a level has to be specified.
+                var, level = (variable.split(sep="~"))[0], (variable.split(sep="~"))[1]
                 variable = var
+                model = True
 
             variable = vdf[variable]
             unit = variable.unit
-            var_short = variable.short_name
+            var_long = variable.long_name
             y = columnData.values
-            label = f"{var_short}: {device}"
 
-            if tmp:
-                label = f"{var_short}: {device} (level: {level})"
+            if model:
+                if device.split("~")[1] != "0":
+                    if not level:
+                        label = f"{var_long}: {device.split('~')[0].upper()} {device.split('~')[1].upper()}"
+                    else:
+                        label = f"{var_long}: {device.split('~')[0].upper()} {device.split('~')[1].upper()} (Level: {level})"
+                else:
+                    if not level:
+                        label = f"{var_long}: {device.split('~')[0].upper()}"
+                    else:
+                        label = f"{var_long}: {device.split('~')[0].upper()} (Level: {level})"
 
+            # for observations, the label looks a bit differently
+            if not model:  # 'icon' not in device and 'arome' not in device:
+                if "_" in device:
+                    label = f"{var_long}: OBS @ {device.split('_')[0].upper()} {device.split('_')[1].upper()}"
+                else:
+                    label = f"{var_long}: OBS @ {device.upper()}"
             # define unit for the left axes
             if not left_unit:
                 left_unit = unit
@@ -185,6 +205,8 @@ def create_plot(
         left_ax.legend(h1 + h2, l1 + l2)
     else:
         left_ax.legend()
+
+    plt.legend(fontsize="x-small")
 
     # filename
     start_str = start.strftime("%y%m%d_%H")
