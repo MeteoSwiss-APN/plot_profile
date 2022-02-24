@@ -64,8 +64,8 @@ def parse_inputs(loc, var, device, add_model, add_obs, folder, init, verbose):
             print(f"---   {n_folder} folder specified")
             sys.exit(1)
 
-    # list containing model information as 5-item tuples
-    #   model-name, variable, level, input-folder, init-time
+    # list containing model information as 6-item tuples
+    #   model-name, variable, level, 'identification',input-folder, init-time
     l_model = []
     for t in range(n_model):
         l_model.append(add_model[t] + folders_inits[t])
