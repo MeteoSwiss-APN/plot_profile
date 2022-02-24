@@ -177,6 +177,9 @@ def main(
         loc, var, device, add_model, add_obs, model_src, verbose
     )
 
+    if verbose and multi_axes:
+        print("Employing two different axes: Left and right.")
+
     timeseries_dict = get_timeseries_dict(
         start=start,
         end=end,
