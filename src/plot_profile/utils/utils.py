@@ -194,6 +194,9 @@ colour_dict = {
     4: "cyan",
     5: "magenta",
     6: "yellow",
+    7: "grey",
+    8: "chartreuse",
+    9: "peru",
 }
 
 
