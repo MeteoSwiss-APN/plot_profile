@@ -17,6 +17,7 @@ import pandas as pd
 import xarray as xr
 
 # First-party
+from plot_profile.utils.utils import deaverage
 from plot_profile.utils.utils import get_dim_names
 from plot_profile.utils.utils import slice_top_bottom
 from plot_profile.utils.variables import vdf
@@ -382,6 +383,10 @@ def get_icon_timeseries(
         else:
             print("--- ! Dims do not make sense: {dim_time}, {dim_index}, {dim_level}!")
             continue
+
+        # de-average
+        if var.avg:
+            values = deaverage(values)
 
         df[column_label] = values * var.mult + var.plus
 

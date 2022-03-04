@@ -22,6 +22,8 @@ from plot_profile.utils.utils import colour_dict
 from plot_profile.utils.utils import save_fig
 from plot_profile.utils.variables import vdf
 
+# from ipdb import set_trace
+
 
 def create_plot(
     data,
@@ -64,6 +66,8 @@ def create_plot(
     fig, left_ax = plt.subplots(1, 1, figsize=(8, 5), constrained_layout=True)
     if multi_axes:
         right_ax = left_ax.twinx()
+        if verbose:
+            print("Creating right axis.")
     if grid:
         # align ticks by implementing ideas from:
         # https://stackoverflow.com/questions/20243683/matplotlib-align-twinx-tick-marks
@@ -100,7 +104,7 @@ def create_plot(
     left_ax.set_xlim(start, end)
     title = f"{loc.long_name}: {start.strftime('%d. %b, %H:%M')} - {end.strftime('%d. %b, %H:%M')}"
     left_ax.set_title(label=title)
-    left_unit, right_unit = "", ""
+    left_unit, right_unit = None, None
 
     # plotting
     colour_index = 0
@@ -108,7 +112,6 @@ def create_plot(
         model = False
         # 1) retrieve df
         df = data[device]
-        # df = pd.to_datetime(df["timestamp"], format="%Y-%m-%d %H:%M:%S")
         if verbose:
             print(i, device)
             pprint(df)
@@ -119,18 +122,17 @@ def create_plot(
         # check if there are more than one variable in this dataframe
         if verbose:
             if len(df.columns) > 2:
-                print(
-                    f"There are more than one variable ({len(df.columns)}) in the df for: {device}"
-                )
+                print(f"More than one variable in the df for {device}")
             else:
-                print(
-                    f"There is only one variable ({len(df.columns)}) in the df for: {device}"
-                )
+                print(f"Only one variable in the df for {device}")
 
         # iterate over the c
         for (variable, columnData) in df.iteritems():
             if variable == "timestamp":
                 continue
+
+            if verbose:
+                print(f"  Variable: {variable}")
 
             # extract current variable
             if "icon" in device:
@@ -138,9 +140,8 @@ def create_plot(
                 model = True
                 level = None
 
-            if (
-                "~" in variable
-            ):  # it is only possible for ICON variables to have '~' in them, because a level has to be specified.
+            # it is only possible for ICON variables to have '~' in them, because a level has to be specified.
+            if "~" in variable:
                 var, level = (variable.split(sep="~"))[0], (variable.split(sep="~"))[1]
                 variable = var
                 model = True
@@ -168,6 +169,7 @@ def create_plot(
                     label = f"{var_long}: OBS @ {device.split('_')[0].upper()} {device.split('_')[1].upper()}"
                 else:
                     label = f"{var_long}: OBS @ {device.upper()}"
+
             # define unit for the left axes
             if not left_unit:
                 left_unit = unit
@@ -202,21 +204,25 @@ def create_plot(
     if multi_axes:
         h1, l1 = left_ax.get_legend_handles_labels()
         h2, l2 = right_ax.get_legend_handles_labels()
-        left_ax.legend(h1 + h2, l1 + l2)
+        left_ax.legend(h1 + h2, l1 + l2, fontsize="small")
     else:
-        left_ax.legend()
-
-    plt.legend(fontsize="x-small")
+        left_ax.legend(fontsize="small")
 
     # filename
     start_str = start.strftime("%y%m%d_%H")
     end_str = end.strftime("%y%m%d_%H")
 
     var_dev = ""
-    for key in data:
+    for key, df in data.items():
+
+        # a) keys: "icon~0", "icon~1", "2m", "2m_tower"
+        # remove "0" for model-levels
+        if "~0" in key:
+            key = key.split(sep="~")[0]
         var_dev += f"_{key}"
-        df = data[key]
-        columns = df.columns.tolist()
+
+        # b) columns: "clct", "sw_up", "temp"
+        columns = df.columns
         for column in columns:
             if column != "timestamp":
                 var_dev += f"_{column}"
