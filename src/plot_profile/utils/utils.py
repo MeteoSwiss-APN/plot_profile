@@ -296,3 +296,25 @@ def deaverage(arr):
         de_arr[i] = arr[i] * (i) - arr[i - 1] * (i - 1)
 
     return de_arr
+
+
+def calc_qv_from_td(td, p):
+    """Calculate qv from dewpoint temperature.
+
+    Args:
+
+        td (array): dewpoint temp in °C
+        p (array):  pressure in hPa
+
+    Returns:
+        array (qv in g/kg)
+
+    """
+    e = 6.112 * np.exp((17.67 * td) / (td + 243.5))
+    qv = (0.622 * e) / (p - (0.378 * e)) * 1000  # to get g/kg
+    # equivalent formula would be:
+    # from calculating spec. hum. from dew point temperatures github-discussion
+    # after eq. 4.24 in Practical Meteorology from Stull
+    # td=td+273.15
+    # qv = (622*6.113*np.exp(5423*(td-273.15)/(td*273.15)))/p
+    return qv

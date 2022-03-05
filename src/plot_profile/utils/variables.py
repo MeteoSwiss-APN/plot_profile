@@ -20,6 +20,7 @@ vdf = pd.DataFrame(
         "ddt_t_sw",
         "dewp_temp",
         "hor_vis",
+        "press",
         "qc",
         "qc_dia",
         "qi_dia",
@@ -32,6 +33,7 @@ vdf = pd.DataFrame(
         "sw_up",
         "temp",
         "2m_temp",
+        "tqv",
         "ver_vis",
         "wind_dir",
         "wind_vel",
@@ -163,6 +165,14 @@ vdf["hor_vis"].min_value = 0
 vdf["hor_vis"].max_value = 5000
 vdf["hor_vis"].dwh_id = {"2m": "1547"}
 
+# pressure: press
+vdf["press"].short_name = "press"
+vdf["press"].long_name = "Pressure"
+vdf["press"].unit = "hPa"
+vdf["press"].short_name = "press"
+vdf["press"].dwh_id = {"rs": "744"}
+
+
 # cloud water: qc
 vdf["qc"].short_name = "qc"
 vdf["qc"].icon_name = "QC"
@@ -232,6 +242,8 @@ vdf["rel_hum"].dwh_id = {
 vdf["lw_down"].short_name = "lw_down"
 vdf["lw_down"].long_name = "Downward LW rad"
 vdf["lw_down"].unit = "W/m2"
+vdf["lw_down"].icon_name = "ATHU_S"  # "athu_s"
+vdf["lw_down"].avg = True
 vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
 # radiation: longwave upward
@@ -295,6 +307,13 @@ vdf["2m_temp"].linestyle = "-"
 vdf["2m_temp"].mult = 1
 vdf["2m_temp"].plus = -273
 vdf["2m_temp"].avg = False
+
+# total water vapour: tqv
+vdf["tqv"].short_name = "tqv"
+vdf["tqv"].icon_name = "TQV"
+vdf["tqv"].long_name = "Total water vapour"
+vdf["tqv"].unit = "kg/m2"
+vdf["tqv"].dwh_id = {"2m": "2537"}
 
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"
