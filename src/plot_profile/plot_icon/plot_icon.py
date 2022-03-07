@@ -8,6 +8,7 @@ Date: 25/11/2021.
 # Standard library
 import datetime
 import datetime as dt
+import sys
 from pprint import pprint
 
 # Third-party
@@ -20,20 +21,20 @@ import seaborn as sns
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
-# Local
-from ..plot_rs.plot_rs import plot_clouds
-from ..utils.stations import sdf
-from ..utils.utils import linestyle_dict
-from ..utils.utils import save_fig
-from ..utils.variables import vdf
-
-# import ipdb
-
+# First-party
+from plot_profile.plot_rs.plot_rs import plot_clouds
+from plot_profile.utils.stations import sdf
+from plot_profile.utils.utils import calc_qv_from_td
+from plot_profile.utils.utils import linestyle_dict
+from plot_profile.utils.utils import save_fig
+from plot_profile.utils.variables import vdf
 
 converter = mdates.ConciseDateConverter()
 munits.registry[np.datetime64] = converter
 munits.registry[datetime.date] = converter
 munits.registry[datetime.datetime] = converter
+
+# from ipdb import set_trace
 
 
 def get_yrange(alt_bot, alt_top, df_height):
@@ -82,8 +83,18 @@ def add_obs(ax, obs_dict, var, add_clouds, relhum_thresh, verbose=False):
         # loop over timestamps
         for i, (timestamp, sounding) in enumerate(rs_data.items()):
 
+            values = None
+
+            # for other radiosounding variables
             if var.short_name in ["temp", "dewp_temp", "wind_vel", "wind_dir"]:
                 values = sounding[var.short_name]
+
+            # calculate qv from td and pressure
+            if var.short_name == "qv":
+                values = calc_qv_from_td(sounding["dewp_temp"], sounding["press"])
+
+            # plot radiosounding profiles
+            if isinstance(values, pd.Series):
                 alt = sounding["altitude"]
                 ax.plot(
                     values,

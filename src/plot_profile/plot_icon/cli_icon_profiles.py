@@ -271,8 +271,12 @@ def main(
             rs_var = ("rel_hum",)
         elif var[0] in ["temp", "dewp_temp", "wind_dir", "wind_vel"]:
             rs_var = (var[0],)
+        elif var[0] == "qv":
+            rs_var = ("dewp_temp", "press")
+        elif var[0] == "qv" and add_clouds:
+            rs_var = ("dewp_temp", "press", "rel_hum")
         else:
-            print(f"--add_rs specified but no matching 1st variable: {var[0]}")
+            print(f"--add_rs specified but not matching 1st variable: {var[0]}")
             sys.exit(1)
 
         # loop over timestamps and fill data_dict
