@@ -127,6 +127,7 @@ from plot_profile.plot_profiles.plot_profiles import create_plot
     default=False,
     help="Output details on what is happening.",
 )
+@click.option("--colours", multiple=True, help="Overwrite default colours.")
 def main(
     *,
     # Mandatory
@@ -143,6 +144,7 @@ def main(
     xmin: float,
     xmax: float,
     # Various
+    colours: tuple,
     appendix: str,
     grid: bool,
     datatypes: tuple,
@@ -175,6 +177,7 @@ def main(
         location=loc,
         xlims=(xmin, xmax),
         ylims=(ymin, ymax),
+        colours=colours,
         grid=grid,
         appendix=appendix,
         datatypes=datatypes,

@@ -27,6 +27,7 @@ def create_plot(
     date,
     xlims,
     ylims,
+    colours,
     grid,
     datatypes,
     outpath,
@@ -36,6 +37,11 @@ def create_plot(
     # get location dataframe
     loc = sdf[location]
     devices = data_dict.keys()
+
+    # overwrite colour-dict with user-specified colours
+    if isinstance(colours, tuple):
+        for i, colour in enumerate(colours):
+            colour_dict[i] = colour
 
     # prepare figure
     fig, ax = plt.subplots(1, 1, figsize=(5, 8), tight_layout=True)
