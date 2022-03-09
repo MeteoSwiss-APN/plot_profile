@@ -98,6 +98,7 @@ from plot_profile.plot_timeseries.plot_timeseries import create_plot
     ],
     help="Choose data type(s) of final result. Def: png",
 )
+@click.option("--colours", multiple=True, help="Overwrite default colours.")
 @click.option(
     "--grid",
     is_flag=True,
@@ -157,6 +158,7 @@ def main(
     ymin: tuple,
     ymax: tuple,
     appendix: str,
+    colours: tuple,
     grid: bool,
     datatypes: tuple,
     outpath: str,
@@ -200,6 +202,7 @@ def main(
         end=end,
         ymin=ymin,
         ymax=ymax,
+        colours=colours,
         grid=grid,
         datatypes=datatypes,
         outpath=outpath,

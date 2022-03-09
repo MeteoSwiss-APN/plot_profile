@@ -33,6 +33,7 @@ def create_plot(
     end,
     ymin,
     ymax,
+    colours,
     grid,
     datatypes,
     outpath,
@@ -51,6 +52,7 @@ def create_plot(
         end (datetime obj): end time
         ymin (tuple): y-min values
         ymax (tuple): y-max values
+        colours (tuple): User-specified colours
         grid (bool): add grid to plot or not
         datatypes (tuple): output data types
         outpath (str): output folder path
@@ -61,6 +63,11 @@ def create_plot(
     # get location dataframe
     loc = sdf[location]
     devices = data.keys()
+
+    # overwrite colour-dict with user-specified colours
+    if isinstance(colours, tuple):
+        for i, colour in enumerate(colours):
+            colour_dict[i] = colour
 
     # prepare figure
     fig, left_ax = plt.subplots(1, 1, figsize=(8, 5), constrained_layout=True)

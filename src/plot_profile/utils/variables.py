@@ -20,6 +20,7 @@ vdf = pd.DataFrame(
         "ddt_t_sw",
         "dewp_temp",
         "hor_vis",
+        "press",
         "qc",
         "qc_dia",
         "qi_dia",
@@ -32,6 +33,7 @@ vdf = pd.DataFrame(
         "sw_up",
         "temp",
         "2m_temp",
+        "tqv",
         "ver_vis",
         "wind_dir",
         "wind_vel",
@@ -113,7 +115,7 @@ vdf["clcl"].max_value = 1.05
 
 # cloud cover: clct
 vdf["clct"].short_name = "clct"
-vdf["clct"].icon_name = "CLCT"
+vdf["clct"].icon_name = "CLCT"  # "clct"
 vdf["clct"].long_name = "Total cloud cover"
 vdf["clct"].unit = ""
 vdf["clct"].min_value = -0.05
@@ -162,6 +164,14 @@ vdf["hor_vis"].unit = "m"
 vdf["hor_vis"].min_value = 0
 vdf["hor_vis"].max_value = 5000
 vdf["hor_vis"].dwh_id = {"2m": "1547"}
+
+# pressure: press
+vdf["press"].short_name = "press"
+vdf["press"].long_name = "Pressure"
+vdf["press"].unit = "hPa"
+vdf["press"].short_name = "press"
+vdf["press"].dwh_id = {"rs": "744"}
+
 
 # cloud water: qc
 vdf["qc"].short_name = "qc"
@@ -232,6 +242,8 @@ vdf["rel_hum"].dwh_id = {
 vdf["lw_down"].short_name = "lw_down"
 vdf["lw_down"].long_name = "Downward LW rad"
 vdf["lw_down"].unit = "W/m2"
+vdf["lw_down"].icon_name = "ATHD_S"
+vdf["lw_down"].avg = True
 vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
 # radiation: longwave upward
@@ -249,7 +261,7 @@ vdf["sw_down"].short_name = "sw_down"
 vdf["sw_down"].long_name = "Downward SW rad"
 vdf["sw_down"].unit = "W/m2"
 vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
-vdf["sw_down"].icon_name = "GLOB"
+vdf["sw_down"].icon_name = "asod_s"  # "GLOB"
 vdf["sw_down"].avg = True
 
 
@@ -295,6 +307,13 @@ vdf["2m_temp"].linestyle = "-"
 vdf["2m_temp"].mult = 1
 vdf["2m_temp"].plus = -273
 vdf["2m_temp"].avg = False
+
+# total water vapour: tqv
+vdf["tqv"].short_name = "tqv"
+vdf["tqv"].icon_name = "TQV"
+vdf["tqv"].long_name = "Total water vapour"
+vdf["tqv"].unit = "kg/m2"
+vdf["tqv"].dwh_id = {"2m": "2537"}
 
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"
