@@ -16,9 +16,9 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
-# Local
-from .stations import sdf
-from .variables import vdf
+# First-party
+from plot_profile.utils.stations import sdf
+from plot_profile.utils.variables import vdf
 
 # import ipdb
 

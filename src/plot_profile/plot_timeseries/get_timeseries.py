@@ -1,8 +1,14 @@
 """Retrieve available data into dict for timeseries plots."""
-# Local
-from ..plot_icon.get_icon import get_icon_timeseries
-from ..utils.dwh_retrieve import dwh_retrieve
-from ..utils.stations import sdf
+# Standard library
+from pprint import pprint
+
+# Third-party
+import pandas as pd
+
+# First-party
+from plot_profile.plot_icon.get_icon import get_icon_timeseries
+from plot_profile.utils.dwh_retrieve import dwh_retrieve
+from plot_profile.utils.stations import sdf
 
 # from ipdb import set_trace
 
@@ -13,71 +19,96 @@ def get_arome():
     return print("should return AROME dataframe at this point")
 
 
-def get_timeseries_dict(
-    start, end, elements, loc, device, init, folder, grid_file, verbose
-):
-    if "icon" in device:  # ICON STUFF
-        # > icon_columns is a list, of column names for the icon-dataframe
-        # > icon_vars is a list of variables to retrieve for the icon model
-        # > icon_levels is a corresponding list of levels, for which these variables should be retrieved
-        icon_columns, icon_vars, icon_levels = [], [], []
-        sep = "~"
-        for element in elements:
-            if element[0] == "icon":
-                icon_vars.append(element[1])
-                icon_levels.append(element[2])
-                if element[2] != 0:
-                    icon_columns.append(element[1] + sep + str(element[2]))
-                else:
-                    icon_columns.append(element[1])
-
-    # if "arome" in device:
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~AROME STUFF~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-    # maybe some preliminary definitions and variables are necesary for the AROME model;
-    # define them here. TODO.
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-
-    # retrieve for each device one dataframe, containing all corresponding variables at all specified levels
+def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
     timeseries_dict = {}
-    # fill the timeseries_dict
-    for dev in list(set(device)):
-        if dev == "icon":
-            timeseries_dict["icon"] = get_icon_timeseries(
-                lat=sdf[loc].lat,
-                lon=sdf[loc].lon,
-                cols=icon_columns,
-                vars=icon_vars,
-                init=init,
-                level=icon_levels,
-                start_lt=int((start - init).total_seconds() / 3600),  # full hours!
-                end_lt=int((end - init).total_seconds() / 3600),  # full hours!
-                folder=folder,
-                grid_file=grid_file,
+
+    # to count elements from each group
+    ind_icon = 0
+    ind_arome = 0
+    ind_obs = 0
+
+    # loop over elements
+    for element in elements:
+
+        # retrieve variable name
+        var_name = element[1]
+
+        # ICON
+        if element[0] == "icon":
+
+            level = element[2]
+            id = element[3]
+            folder = element[4]
+            init = element[5]
+
+            # check if a key for this icon-instance (for example icon-ref or icon-exp,...) already exists.
+            # if yes --> retrieve df as usual, but instead of assigning it to a new key, only append/concatenate
+            # the variable column to the already existing dataframe.
+            if f"icon~{id}" in timeseries_dict:
+                df = get_icon_timeseries(
+                    lat=sdf[loc].lat,
+                    lon=sdf[loc].lon,
+                    vars=var_name,
+                    init=init,
+                    level=level,
+                    start_lt=int((start - init).total_seconds() / 3600),  # full hours!
+                    end_lt=int((end - init).total_seconds() / 3600),  # full hours!
+                    folder=folder,
+                    grid_file=grid_file,
+                    verbose=verbose,
+                )
+                del df["timestamp"]
+                timeseries_dict[f"icon~{id}"] = pd.concat(
+                    [timeseries_dict[f"icon~{id}"], df], axis=1
+                )
+
+                # print(id, timeseries_dict[f"icon~{id}"].columns.tolist(), df.columns.tolist())
+
+            else:
+                timeseries_dict[f"icon~{id}"] = get_icon_timeseries(
+                    lat=sdf[loc].lat,
+                    lon=sdf[loc].lon,
+                    vars=var_name,
+                    init=init,
+                    level=level,
+                    start_lt=int((start - init).total_seconds() / 3600),  # full hours!
+                    end_lt=int((end - init).total_seconds() / 3600),  # full hours!
+                    folder=folder,
+                    grid_file=grid_file,
+                    verbose=verbose,
+                )
+
+            # increase icon index
+            ind_icon += 1
+            continue
+
+        # AROME
+        elif element[0] == "arome":
+            print("Has to be implemented.")
+            continue
+
+        # OBS from DWH
+        else:
+            device = element[0]
+            data = dwh_retrieve(
+                device=device,
+                station=loc,
+                vars=var_name,
+                timestamps=[start, end],
                 verbose=verbose,
             )
-            continue  # go to next variable
 
-        if dev == "arome":
-            # call function, which returns a nice dataframe, containing the data from the arome model
-            timeseries_dict["arome"] = get_arome()
-            continue  # go to next variable
+            if not data.empty:
+                if device in timeseries_dict:
+                    # retrieve df and append to existing df in key
+                    del data["timestamp"]
+                    timeseries_dict[device] = pd.concat(
+                        [timeseries_dict[device], data], axis=1
+                    )
 
-        # collect variables that belong to current device
-        vars = []
-        for element in elements:
-            if element[0] == dev:
-                vars.append(element[1])
-
-        # all other devices apart from ICON which are retrievable from DWH
-        data = dwh_retrieve(
-            device=dev,
-            station=loc,
-            vars=vars,
-            timestamps=[start, end],
-            verbose=verbose,
-        )
-
-        if not data.empty:
-            timeseries_dict[dev] = data
+                else:
+                    # timeseries_dict[f"{device}~{ind_obs}"] = data
+                    timeseries_dict[device] = data
+                ind_obs += 1
 
     return timeseries_dict

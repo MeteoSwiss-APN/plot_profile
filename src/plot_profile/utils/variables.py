@@ -14,22 +14,26 @@ vdf = pd.DataFrame(
         "altitude",
         "cbh",
         "clc",
-        "ddt_t_rad_lw",
-        "ddt_t_rad_sw",
+        "clct",
+        "clcl",
+        "ddt_t_lw",
+        "ddt_t_sw",
         "dewp_temp",
         "hor_vis",
+        "press",
         "qc",
         "qc_dia",
         "qi_dia",
         "qv",
         "qv_dia",
         "rel_hum",
-        "rad_lw_down",
-        "rad_lw_up",
-        "rad_sw_down",
-        "rad_sw_up",
+        "lw_down",
+        "lw_up",
+        "sw_down",
+        "sw_up",
         "temp",
         "2m_temp",
+        "tqv",
         "ver_vis",
         "wind_dir",
         "wind_vel",
@@ -101,33 +105,49 @@ vdf["clc"].max_value = 1.05
 vdf["clc"].color = "yellowgreen"
 vdf["clc"].colormap = "bone"
 
+# cloud cover: clcl
+vdf["clcl"].short_name = "clcl"
+vdf["clcl"].icon_name = "CLCL"
+vdf["clcl"].long_name = "Low cloud cover"
+vdf["clcl"].unit = "%"
+vdf["clcl"].min_value = -0.05
+vdf["clcl"].max_value = 1.05
+
+# cloud cover: clct
+vdf["clct"].short_name = "clct"
+vdf["clct"].icon_name = "CLCT"  # "clct"
+vdf["clct"].long_name = "Total cloud cover"
+vdf["clct"].unit = ""
+vdf["clct"].min_value = -0.05
+vdf["clct"].max_value = 1.05
+
 # temperature tendency due to longwave radiative heating
-#  ddt_t_rad_lw
-vdf["ddt_t_rad_lw"].short_name = "ddt_t_rad_lw"
-# vdf["ddt_t_rad_lw"].icon_name = "THHR_RAD"
+#  ddt_t_lw
+vdf["ddt_t_lw"].short_name = "ddt_t_lw"
+# vdf["ddt_t_lw"].icon_name = "THHR_RAD"
 # TODO: various names from different configurations
-vdf["ddt_t_rad_lw"].icon_name = "ddt_temp_radlw"
-vdf["ddt_t_rad_lw"].long_name = "T-tend LW radiation"
-vdf["ddt_t_rad_lw"].unit = "K/h"
-vdf["ddt_t_rad_lw"].mult = 3600
-vdf["ddt_t_rad_lw"].min_value = -3.0
-vdf["ddt_t_rad_lw"].max_value = 3.0
-vdf["ddt_t_rad_lw"].color = "seagreen"
-vdf["ddt_t_rad_lw"].colormap = sns.color_palette("vlag", as_cmap=True)
+vdf["ddt_t_lw"].icon_name = "ddt_temp_radlw"
+vdf["ddt_t_lw"].long_name = "T-tend LW radiation"
+vdf["ddt_t_lw"].unit = "K/h"
+vdf["ddt_t_lw"].mult = 3600
+vdf["ddt_t_lw"].min_value = -3.0
+vdf["ddt_t_lw"].max_value = 3.0
+vdf["ddt_t_lw"].color = "seagreen"
+vdf["ddt_t_lw"].colormap = sns.color_palette("vlag", as_cmap=True)
 
 # temperature tendency due to shortwave radiative heating:
-#  ddt_t_rad_sw
-vdf["ddt_t_rad_sw"].short_name = "ddt_t_rad_sw"
-# vdf["ddt_t_rad_sw"].icon_name = "SOHR_RAD"
+#  ddt_t_sw
+vdf["ddt_t_sw"].short_name = "ddt_t_sw"
+# vdf["ddt_t_sw"].icon_name = "SOHR_RAD"
 # TODO: various names from different configurations
-vdf["ddt_t_rad_sw"].icon_name = "ddt_temp_radsw"
-vdf["ddt_t_rad_sw"].long_name = "T-tend SW radiation"
-vdf["ddt_t_rad_sw"].unit = "K/h"
-vdf["ddt_t_rad_sw"].mult = 3600
-vdf["ddt_t_rad_sw"].min_value = -3.0
-vdf["ddt_t_rad_sw"].max_value = 3.0
-vdf["ddt_t_rad_sw"].color = "goldenrod"
-vdf["ddt_t_rad_sw"].colormap = sns.light_palette("goldenrod", as_cmap=True)
+vdf["ddt_t_sw"].icon_name = "ddt_temp_radsw"
+vdf["ddt_t_sw"].long_name = "T-tend SW radiation"
+vdf["ddt_t_sw"].unit = "K/h"
+vdf["ddt_t_sw"].mult = 3600
+vdf["ddt_t_sw"].min_value = -3.0
+vdf["ddt_t_sw"].max_value = 3.0
+vdf["ddt_t_sw"].color = "goldenrod"
+vdf["ddt_t_sw"].colormap = sns.light_palette("goldenrod", as_cmap=True)
 
 # dewpoint temperature: dewp_temp
 vdf["dewp_temp"].short_name = "dewp_temp"
@@ -144,6 +164,14 @@ vdf["hor_vis"].unit = "m"
 vdf["hor_vis"].min_value = 0
 vdf["hor_vis"].max_value = 5000
 vdf["hor_vis"].dwh_id = {"2m": "1547"}
+
+# pressure: press
+vdf["press"].short_name = "press"
+vdf["press"].long_name = "Pressure"
+vdf["press"].unit = "hPa"
+vdf["press"].short_name = "press"
+vdf["press"].dwh_id = {"rs": "744"}
+
 
 # cloud water: qc
 vdf["qc"].short_name = "qc"
@@ -211,32 +239,37 @@ vdf["rel_hum"].dwh_id = {
 }
 
 # radiation: longwave downward
-vdf["rad_lw_down"].short_name = "rad_lw_down"
-vdf["rad_lw_down"].long_name = "Longwave radiation: Downward"
-vdf["rad_lw_down"].unit = "W/m2"
-vdf["rad_lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
+vdf["lw_down"].short_name = "lw_down"
+vdf["lw_down"].long_name = "Downward LW rad"
+vdf["lw_down"].unit = "W/m2"
+vdf["lw_down"].icon_name = "ATHD_S"
+vdf["lw_down"].avg = True
+vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
 # radiation: longwave upward
-vdf["rad_lw_up"].short_name = "rad_lw_up"
-vdf["rad_lw_up"].long_name = "Longwave radiation: Upward"
-vdf["rad_lw_up"].unit = "W/m2"
-vdf["rad_lw_up"].dwh_id = {
+vdf["lw_up"].short_name = "lw_up"
+vdf["lw_up"].long_name = "Upward LW rad"
+vdf["lw_up"].unit = "W/m2"
+vdf["lw_up"].dwh_id = {
     "2m": "1531",
     "2m_tower": "5118",  # no data yet in DWH
     "30m_tower": "5181",  # no data yet in DWH
 }
 
 # radiation: shortwave downward
-vdf["rad_sw_down"].short_name = "rad_sw_down"
-vdf["rad_sw_down"].long_name = "Shortwave radiation: Downward"
-vdf["rad_sw_down"].unit = "W/m2"
-vdf["rad_sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
+vdf["sw_down"].short_name = "sw_down"
+vdf["sw_down"].long_name = "Downward SW rad"
+vdf["sw_down"].unit = "W/m2"
+vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
+vdf["sw_down"].icon_name = "asod_s"  # "GLOB"
+vdf["sw_down"].avg = True
+
 
 # radiation: shortwave upward ("reflected")
-vdf["rad_sw_up"].short_name = "rad_sw_up"
-vdf["rad_sw_up"].long_name = "Shortwave radiation: Upward"
-vdf["rad_sw_up"].unit = "W/m2"
-vdf["rad_sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
+vdf["sw_up"].short_name = "sw_up"
+vdf["sw_up"].long_name = "Upward SW rad"
+vdf["sw_up"].unit = "W/m2"
+vdf["sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
 
 # temperature: temp
 vdf["temp"].short_name = "temp"
@@ -274,6 +307,13 @@ vdf["2m_temp"].linestyle = "-"
 vdf["2m_temp"].mult = 1
 vdf["2m_temp"].plus = -273
 vdf["2m_temp"].avg = False
+
+# total water vapour: tqv
+vdf["tqv"].short_name = "tqv"
+vdf["tqv"].icon_name = "TQV"
+vdf["tqv"].long_name = "Total water vapour"
+vdf["tqv"].unit = "kg/m2"
+vdf["tqv"].dwh_id = {"2m": "2537"}
 
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"

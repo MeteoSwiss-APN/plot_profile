@@ -8,11 +8,12 @@ from pathlib import Path
 
 # Third-party
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
-# Local
-from .stations import sdf
-from .variables import vdf
+# First-party
+from plot_profile.utils.stations import sdf
+from plot_profile.utils.variables import vdf
 
 # from ipdb import set_trace
 
@@ -193,6 +194,9 @@ colour_dict = {
     4: "cyan",
     5: "magenta",
     6: "yellow",
+    7: "grey",
+    8: "chartreuse",
+    9: "peru",
 }
 
 
@@ -216,7 +220,7 @@ def get_dim_names(ds_var, verbose):
     possible_time_names = [
         "time",
     ]
-    possible_index_names = ["cells", "ncells", "cells_1"]
+    possible_index_names = ["ncells", "cells_1", "cells"]
     possible_level_names = [
         "height",
         "height_1",
@@ -265,3 +269,52 @@ def get_dim_names(ds_var, verbose):
                 break
 
     return dim_time, dim_index, dim_level
+
+
+def deaverage(arr):
+    """De-average values in array.
+
+    Values of some variables have been averaged
+    since beginning of the model simulation.
+
+    Args:
+        arr (1d array): ICON output variable
+
+    Returns:
+        1d array: de-averaged output
+
+    """
+    # length of input
+    n = len(arr)
+
+    # fill with nan (first value will stay nan)
+    de_arr = np.empty(n)
+    de_arr[:] = np.nan
+
+    # calculate de-averaged values
+    for i in range(1, len(arr)):
+        de_arr[i] = arr[i] * (i) - arr[i - 1] * (i - 1)
+
+    return de_arr
+
+
+def calc_qv_from_td(td, p):
+    """Calculate qv from dewpoint temperature.
+
+    Args:
+
+        td (array): dewpoint temp in °C
+        p (array):  pressure in hPa
+
+    Returns:
+        array (qv in g/kg)
+
+    """
+    e = 6.112 * np.exp((17.67 * td) / (td + 243.5))
+    qv = (0.622 * e) / (p - (0.378 * e)) * 1000  # to get g/kg
+    # equivalent formula would be:
+    # from calculating spec. hum. from dew point temperatures github-discussion
+    # after eq. 4.24 in Practical Meteorology from Stull
+    # td=td+273.15
+    # qv = (622*6.113*np.exp(5423*(td-273.15)/(td*273.15)))/p
+    return qv

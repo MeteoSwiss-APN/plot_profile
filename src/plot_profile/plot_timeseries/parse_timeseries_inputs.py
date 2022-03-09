@@ -3,9 +3,11 @@
 # Standard library
 import sys
 
-# Local
-from ..utils.utils import check_inputs
-from ..utils.variables import vdf
+# First-party
+from plot_profile.utils.utils import check_inputs
+from plot_profile.utils.variables import vdf
+
+# from ipdb import set_trace
 
 
 def check_units(vars):
@@ -27,19 +29,51 @@ def check_units(vars):
     return multi_axes
 
 
-def parse_inputs(loc, var, device, add_model, add_obs, verbose):
-    # create timeseries_plots using the '--add_obs' & '--add_model' flags
-    if add_model or add_obs:
-        add = list(add_obs) + list(
-            add_model
-        )  # this list also stores all elements that should be plotted incl. levels for icon variables
-        elements = [
-            list(item) for item in add
-        ]  # convert list of tuples to list of lists
-        devs = list([list[0] for list in add])
-        vars = list([list[1] for list in add])
+def parse_inputs(loc, var, device, add_model, add_obs, model_src, verbose):
 
-    # create timeseries plots using the '--var' & '--device' flags
+    # create a dict out of model_src. each model id should be one key.
+    model_src_dict = {}
+    model_ids = []
+    for source in model_src:
+        id, dir, init_time = source[0], source[1], source[2]
+        model_src_dict[id] = [dir, init_time]
+        model_ids.append(id)
+
+    # iterate through list of models and add init & folder to it
+    l_model = []
+    for model in add_model:
+        if model[3] not in model_ids:
+            print(
+                f"--- No model source information provided for model w/ id: {model[3]}"
+            )
+            print(
+                f"--- (Could just be a typo. Make sure the model ids in the --add_model & --model_src flags match)"
+            )
+            sys.exit(1)
+        model = tuple(list(model) + (model_src_dict[model[3]]))
+        l_model.append(model)
+
+    if add_obs:
+        l_obs = list(add_obs)
+    else:
+        l_obs = []
+
+    elements = l_model + l_obs
+
+    devs = [ele[0] for ele in elements]
+    vars = [ele[1] for ele in elements]
+
+    # check, wheter all desired variables are available for the provided location and corresponding devices
+    for dev, var in zip(devs, vars):
+        # print('checking inputs for: ', dev, var)
+        check_inputs(var=var, dev=dev, loc=loc, verbose=verbose)
+
+    # check, that the provided variables at most require 2 units
+    multi_axes = check_units(vars)
+
+    #################################################################################################################
+    #################################################################################################################
+    # CREATE TIMESERIES PLOTS USING THE --VAR & --DEVICE FLAGS
     if device and var:
         device, variable = list(device), list(var)
 
@@ -70,12 +104,4 @@ def parse_inputs(loc, var, device, add_model, add_obs, verbose):
         for dev, var in zip(devs, vars):
             elements.append([dev, var])
 
-    # check, wheter all desired variables are available for the provided location and corresponding devices
-    for dev, var in zip(devs, vars):
-        # print('checking inputs for: ', dev, var)
-        check_inputs(var=var, dev=dev, loc=loc, verbose=verbose)
-
-    # check, that the provided variables at most require 2 units
-    multi_axes = check_units(vars)
-
-    return elements, devs, multi_axes
+    return elements, multi_axes
