@@ -115,7 +115,7 @@ vdf["clcl"].max_value = 1.05
 
 # cloud cover: clct
 vdf["clct"].short_name = "clct"
-vdf["clct"].icon_name = "CLCT"
+vdf["clct"].icon_name = "CLCT"  # "clct"
 vdf["clct"].long_name = "Total cloud cover"
 vdf["clct"].unit = ""
 vdf["clct"].min_value = -0.05
@@ -242,7 +242,7 @@ vdf["rel_hum"].dwh_id = {
 vdf["lw_down"].short_name = "lw_down"
 vdf["lw_down"].long_name = "Downward LW rad"
 vdf["lw_down"].unit = "W/m2"
-vdf["lw_down"].icon_name = "ATHU_S"  # "athu_s"
+vdf["lw_down"].icon_name = "ATHD_S"
 vdf["lw_down"].avg = True
 vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
@@ -261,7 +261,7 @@ vdf["sw_down"].short_name = "sw_down"
 vdf["sw_down"].long_name = "Downward SW rad"
 vdf["sw_down"].unit = "W/m2"
 vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
-vdf["sw_down"].icon_name = "GLOB"
+vdf["sw_down"].icon_name = "asod_s"  # "GLOB"
 vdf["sw_down"].avg = True
 
 
