@@ -35,6 +35,7 @@ def create_plot(
     ymax,
     colours,
     grid,
+    show_marker,
     datatypes,
     outpath,
     appendix,
@@ -54,6 +55,7 @@ def create_plot(
         ymax (tuple): y-max values
         colours (tuple): User-specified colours
         grid (bool): add grid to plot or not
+        show_marker (bool): add marker to model plots or not
         datatypes (tuple): output data types
         outpath (str): output folder path
         appendix (bool): add appendix to output name
@@ -189,22 +191,41 @@ def create_plot(
 
             # choose correct axes for the current variable and plot data
             if unit == left_unit:
-                left_ax.plot(
-                    dates,
-                    y,
-                    color=colour_dict[colour_index],
-                    linestyle="-",
-                    label=label,
-                )
+                if model and show_marker:
+                    left_ax.plot(
+                        dates,
+                        y,
+                        color=colour_dict[colour_index],
+                        linestyle="-",
+                        marker="d",
+                        label=label,
+                    )
+                else:
+                    left_ax.plot(
+                        dates,
+                        y,
+                        color=colour_dict[colour_index],
+                        linestyle="-",
+                        label=label,
+                    )
             if unit == right_unit:
-                right_ax.plot(
-                    dates,
-                    y,
-                    color=colour_dict[colour_index],
-                    linestyle="-",
-                    label=label,
-                )
-
+                if model and show_marker:
+                    right_ax.plot(
+                        dates,
+                        y,
+                        color=colour_dict[colour_index],
+                        linestyle="-",
+                        marker="d",
+                        label=label,
+                    )
+                else:
+                    right_ax.plot(
+                        dates,
+                        y,
+                        color=colour_dict[colour_index],
+                        linestyle="-",
+                        label=label,
+                    )
             colour_index += 1
 
     # add legends
