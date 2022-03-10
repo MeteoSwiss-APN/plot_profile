@@ -11,13 +11,13 @@ from pprint import pprint
 
 # Third-party
 import pandas as pd
-from matplotlib.pyplot import ylim
 
 # First-party
 from plot_profile.plot_icon.get_icon import get_icon
 from plot_profile.plot_timeseries.parse_timeseries_inputs import check_units
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
 from plot_profile.utils.stations import sdf
+from plot_profile.utils.utils import calc_qv_from_td
 from plot_profile.utils.utils import check_inputs
 from plot_profile.utils.utils import slice_top_bottom
 
@@ -60,7 +60,12 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
     for dev, var in zip(devs, vars):
         if verbose:
             print("checking inputs for: ", dev, var)
-        check_inputs(var=var, dev=dev, loc=loc, verbose=verbose)
+        if (
+            dev == "rs" and var == "qv"
+        ):  # qv is a variable, which does not actually exist for radiousoundings, but can be computed
+            continue
+        else:
+            check_inputs(var=var, dev=dev, loc=loc, verbose=verbose)
 
     # check, that the provided variables at most require 2 units
     multi_axes = check_units(vars)
@@ -104,7 +109,11 @@ def get_data(
             print(f"Specified lon: {lon}")
             print(f"Specified name for location: {loc}")
 
+    # collect data for various devices
     data_dict = {}
+
+    # collect leadtimes for various models
+    lt_dict = {}
 
     # loop over elements
     for element in elements:
@@ -129,7 +138,7 @@ def get_data(
                 # retrieve data from ICON forecasts
                 tmp_dict = get_icon(
                     folder=folder,
-                    date=date,
+                    date=init,
                     leadtime=[
                         int((date - init).total_seconds() / 3600)
                     ],  # full hours!; has to be a list,
@@ -146,6 +155,7 @@ def get_data(
                 tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                 tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
                 tmp_df = tmp_df.reset_index(drop=True)
+                tmp_df = tmp_df.dropna()
                 del tmp_df["height"]
 
                 if verbose:
@@ -164,10 +174,12 @@ def get_data(
                 continue
 
             else:
+                lt_dict[f"icon~{model_id}"] = int((date - init).total_seconds() / 3600)
+
                 # retrieve data from ICON forecasts
                 tmp_dict = get_icon(
                     folder=folder,
-                    date=date,
+                    date=init,
                     leadtime=[
                         int((date - init).total_seconds() / 3600)
                     ],  # full hours!; has to be a list,
@@ -184,6 +196,7 @@ def get_data(
                 tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                 tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
                 tmp_df = tmp_df.reset_index(drop=True)
+                tmp_df = tmp_df.dropna()
 
                 # add df w/ height & variable columns to data_dict
                 data_dict[f"icon~{model_id}"] = tmp_df
@@ -199,18 +212,19 @@ def get_data(
         # B) retrieve observational data
         ################################
         else:
-            if device not in data_dict:
+            if device == "rs" and var_name == "qv":
+                vars = "dewp_temp", "press"
+
                 unsliced_df = dwh_retrieve(
                     device=device,  # i.e. rs
                     station=loc,  # i.e. pay
-                    vars=var_name,
+                    vars=vars,
                     timestamps=date,
                     verbose=verbose,
                 )
-                del unsliced_df["timestamp"]
-
                 # if returned df is not empty add to obs_dict
                 if not unsliced_df.empty:
+                    del unsliced_df["timestamp"]
                     crit = slice_top_bottom(
                         df_height=unsliced_df["altitude"],
                         alt_bot=ylims[0],
@@ -220,6 +234,40 @@ def get_data(
                     sliced_df = unsliced_df[crit]
                     sliced_df = sliced_df.reset_index(drop=True)
                     sliced_df.rename(columns={"altitude": "height"}, inplace=True)
+                    sliced_df = sliced_df.dropna()
+
+                    # calculate qv from td and pressure
+                    sliced_df["qv"] = calc_qv_from_td(
+                        sliced_df["dewp_temp"], sliced_df["press"]
+                    )
+                    del sliced_df["dewp_temp"]
+                    del sliced_df["press"]
+                    data_dict[device] = sliced_df
+
+                continue
+
+            if device not in data_dict:
+                unsliced_df = dwh_retrieve(
+                    device=device,  # i.e. rs
+                    station=loc,  # i.e. pay
+                    vars=var_name,
+                    timestamps=date,
+                    verbose=verbose,
+                )
+
+                # if returned df is not empty add to obs_dict
+                if not unsliced_df.empty:
+                    del unsliced_df["timestamp"]
+                    crit = slice_top_bottom(
+                        df_height=unsliced_df["altitude"],
+                        alt_bot=ylims[0],
+                        alt_top=ylims[1],
+                        verbose=verbose,
+                    )
+                    sliced_df = unsliced_df[crit]
+                    sliced_df = sliced_df.reset_index(drop=True)
+                    sliced_df.rename(columns={"altitude": "height"}, inplace=True)
+                    sliced_df = sliced_df.dropna()
                     data_dict[device] = sliced_df
                 continue
 
@@ -231,10 +279,10 @@ def get_data(
                     timestamps=date,
                     verbose=verbose,
                 )
-                del unsliced_df["timestamp"]
 
                 # if returned df is not empty add to obs_dict
                 if not unsliced_df.empty:
+                    del unsliced_df["timestamp"]
                     crit = slice_top_bottom(
                         df_height=unsliced_df["altitude"],
                         alt_bot=ylims[0],
@@ -250,4 +298,4 @@ def get_data(
 
                 continue
 
-    return data_dict
+    return data_dict, lt_dict

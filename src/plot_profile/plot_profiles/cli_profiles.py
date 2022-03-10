@@ -10,8 +10,6 @@ from pprint import pprint
 
 # Third-party
 import click
-from black import out
-from numpy import append
 
 # First-party
 from plot_profile.plot_profiles.get_profiles import get_data
@@ -64,6 +62,7 @@ from plot_profile.plot_profiles.plot_profiles import create_plot
 )
 @click.option(
     "--ymax",
+    default=5000,
     type=float,
     multiple=False,
     help="Maximum value of y-axis/axes. Def: Fits values.",
@@ -71,13 +70,13 @@ from plot_profile.plot_profiles.plot_profiles import create_plot
 @click.option(
     "--xmin",
     type=float,
-    multiple=False,
+    multiple=True,
     help="Minimum value of x-axis/axes. Def: Fits values.",
 )
 @click.option(
     "--xmax",
     type=float,
-    multiple=False,
+    multiple=True,
     help="Maximum value of x-axis/axes. Def: Fits values.",
 )
 # OTHERS: appendix, datatypes, grid, outpath,
@@ -117,6 +116,12 @@ from plot_profile.plot_profiles.plot_profiles import create_plot
     help="Add grid to plot.",
 )
 @click.option(
+    "--show_marker",
+    is_flag=True,
+    default=False,
+    help="Add marker to model plots. Default: d (diamond)",
+)
+@click.option(
     "--outpath",
     type=str,
     help="Path to folder where the plots should be saved. Def: /scratch/USER/tmp",
@@ -141,12 +146,13 @@ def main(
     # Axes Limits
     ymin: float,
     ymax: float,
-    xmin: float,
-    xmax: float,
+    xmin: tuple,
+    xmax: tuple,
     # Various
     colours: tuple,
     appendix: str,
     grid: bool,
+    show_marker: bool,
     datatypes: tuple,
     outpath: str,
     verbose: bool,
@@ -162,7 +168,7 @@ def main(
     if verbose and multi_axes:
         print("Employing two different axes: Bottom and Top.")
 
-    data_dict = get_data(
+    data_dict, lt_dict = get_data(
         date=date,
         loc=loc,
         grid=grid_file,
@@ -173,11 +179,13 @@ def main(
 
     create_plot(
         data_dict=data_dict,
+        lt_dict=lt_dict,
         date=date,
         location=loc,
         xlims=(xmin, xmax),
         ylims=(ymin, ymax),
         colours=colours,
+        show_marker=show_marker,
         grid=grid,
         appendix=appendix,
         datatypes=datatypes,
@@ -187,5 +195,3 @@ def main(
     )
 
     return
-
-    print("--- hello world")
