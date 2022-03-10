@@ -35,6 +35,7 @@ def create_plot(
     ymax,
     colours,
     grid,
+    show_marker,
     datatypes,
     outpath,
     appendix,
@@ -54,6 +55,7 @@ def create_plot(
         ymax (tuple): y-max values
         colours (tuple): User-specified colours
         grid (bool): add grid to plot or not
+        show_marker (bool): add marker to model plots or not
         datatypes (tuple): output data types
         outpath (str): output folder path
         appendix (bool): add appendix to output name
@@ -147,6 +149,12 @@ def create_plot(
                 model = True
                 level = None
 
+            # specify marker
+            if model and show_marker:
+                marker = "d"
+            else:
+                marker = None
+
             # it is only possible for ICON variables to have '~' in them, because a level has to be specified.
             if "~" in variable:
                 var, level = (variable.split(sep="~"))[0], (variable.split(sep="~"))[1]
@@ -194,6 +202,7 @@ def create_plot(
                     y,
                     color=colour_dict[colour_index],
                     linestyle="-",
+                    marker=marker,
                     label=label,
                 )
             if unit == right_unit:
@@ -202,9 +211,9 @@ def create_plot(
                     y,
                     color=colour_dict[colour_index],
                     linestyle="-",
+                    marker=marker,
                     label=label,
                 )
-
             colour_index += 1
 
     # add legends

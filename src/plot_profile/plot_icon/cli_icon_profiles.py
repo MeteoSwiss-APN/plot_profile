@@ -11,15 +11,13 @@ from pprint import pprint
 # Third-party
 import click
 
-# Local
-from ..utils.dwh_retrieve import dwh_retrieve
-from ..utils.stations import sdf
-from ..utils.utils import slice_top_bottom
-from ..utils.utils import validtime_from_leadtime
-from .get_icon import get_icon
-from .plot_icon import create_plot
-
-# import ipdb
+# First-party
+from plot_profile.plot_icon.get_icon import get_icon
+from plot_profile.plot_icon.plot_icon import create_plot
+from plot_profile.utils import dwh_retrieve
+from plot_profile.utils.stations import sdf
+from plot_profile.utils.utils import slice_top_bottom
+from plot_profile.utils.utils import validtime_from_leadtime
 
 
 @click.command()

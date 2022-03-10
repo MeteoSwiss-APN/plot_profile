@@ -100,6 +100,12 @@ from plot_profile.plot_timeseries.plot_timeseries import create_plot
 )
 @click.option("--colours", multiple=True, help="Overwrite default colours.")
 @click.option(
+    "--show_marker",
+    is_flag=True,
+    default=False,
+    help="Add marker to model plots. Default: d (diamond)",
+)
+@click.option(
     "--grid",
     is_flag=True,
     default=False,
@@ -160,6 +166,7 @@ def main(
     appendix: str,
     colours: tuple,
     grid: bool,
+    show_marker: bool,
     datatypes: tuple,
     outpath: str,
     verbose: bool,
@@ -204,6 +211,7 @@ def main(
         ymax=ymax,
         colours=colours,
         grid=grid,
+        show_marker=show_marker,
         datatypes=datatypes,
         outpath=outpath,
         appendix=appendix,
