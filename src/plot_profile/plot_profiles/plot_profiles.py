@@ -10,8 +10,6 @@ from pprint import pprint
 
 # Third-party
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 
 # First-party
 from plot_profile.utils.stations import sdf
@@ -22,6 +20,7 @@ from plot_profile.utils.variables import vdf
 
 def create_plot(
     data_dict,
+    lt_dict,
     multi_axes,
     location,
     date,
@@ -29,6 +28,7 @@ def create_plot(
     ylims,
     colours,
     grid,
+    show_marker,
     datatypes,
     outpath,
     appendix,
@@ -37,6 +37,13 @@ def create_plot(
     # get location dataframe
     loc = sdf[location]
     devices = data_dict.keys()
+
+    # get ymin, ymax
+    ymin = ylims[0]
+    ymax = ylims[1]
+
+    # determine ymin_dynamic from data & apply if ymin=None
+    ymin_dynamic = None
 
     # overwrite colour-dict with user-specified colours
     if isinstance(colours, tuple):
@@ -47,26 +54,34 @@ def create_plot(
     fig, ax = plt.subplots(1, 1, figsize=(5, 8), tight_layout=True)
     if multi_axes:
         top_ax = ax.twiny()
-        top_ax.set_ylim(ylims[0], ylims[1])
 
-        if verbose:
-            print("Creating top axis.")
-    if True:  # grid:
+    if grid:
         ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
         ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.5)
         ax.minorticks_on()
 
-    # apply limits to the y-axis/axes if some have been specified
-    ax.set_ylim(ylims[0], ylims[1])
+    # xlims = (xmin, xmax) & xmin = (xmin1, xmin2) & xmax = (xmax1, xmax2)
+    if xlims:
+        xmins = xlims[0]
+        xmaxs = xlims[1]
+        if len(xmins) == len(xmaxs):
+            if len(xmins) == 1:
+                ax.set_xlim(xmins[0], xmaxs[0])
+            if len(xmins) == 2:  # have xmins for two x-axes
+                ax.set_xlim(xmins[0], xmaxs[0])
+                top_ax.set_xlim(xmins[1], xmaxs[1])
+        else:
+            print(
+                f"Check xmin/xmax values again. Got {len(xmins)} x-min values and {len(xmaxs)} x-max values."
+            )
+            print(f"Warning: No x-limits have been applied.")
 
-    if xlims[0] and xlims[1]:
-        ax.set_xlim(xlims[0], xlims[1])
-        # TODO: implement xlims s.t. several xlims can be provided for
-        # the top and bottom x-axis (w/ two different units)
-
-    title = f"{loc.long_name}, {date.strftime('%d. %b, %H:%M')}"
-    ax.set_title(label=title, bbox=dict(boxstyle="round", facecolor="none"), loc="left")
-    ax.set_ylabel(f"Altitude [m] (asl)")
+    title = f"{loc.long_name}, {date.strftime('%d. %b, %Y, %H:%M')} UTC"
+    if multi_axes:
+        ax.set_title(label=title, bbox=dict(facecolor="none"), x=0.5, y=1.07)
+    else:
+        ax.set_title(label=title, bbox=dict(facecolor="none"), x=0.5, y=1.02)
+    ax.set_ylabel(f"Altitude [m asl]")
     first_unit, second_unit = None, None
 
     # plotting
@@ -81,6 +96,13 @@ def create_plot(
 
         # y-axis information: altitude
         altitude = df["height"]
+        altitude_min = altitude.min()
+
+        if ymin_dynamic == None:
+            ymin_dynamic = altitude_min
+
+        elif (ymin_dynamic is not None) and (altitude_min < ymin_dynamic):
+            ymin_dynamic = altitude_min
 
         # check if there are more than one variable in this dataframe
         if verbose:
@@ -89,7 +111,7 @@ def create_plot(
             else:
                 print(f"Only one variable in the df for {device}")
 
-        # iterate over the c
+        # iterate over the columns
         for (variable, columnData) in df.iteritems():
             if variable == "height":
                 continue
@@ -103,9 +125,15 @@ def create_plot(
             var_long = variable.long_name
             x = columnData.values
 
-            if "~" in device:
-                label = f"{var_long}: {device.split('~')[0].upper()} {device.split('~')[1].upper()}"
-            else:
+            if device in lt_dict:
+                lt = lt_dict[device]
+
+            if "~" in device:  # this means it must be a model (model~model_id)
+                if device.split("~")[1] != "0":
+                    label = f"{var_long}: {device.split('~')[0].upper()} {device.split('~')[1].upper()} ({lt}h)"
+                else:
+                    label = f"{var_long}: {device.split('~')[0].upper()} ({lt}h)"
+            else:  # else it is a device
                 label = f"{var_long}: {device.upper()}"
 
             # define unit for the bottom axis
@@ -120,23 +148,49 @@ def create_plot(
 
             # choose correct axes for the current variable and plot data
             if unit == first_unit:
-                ax.plot(
-                    x,
-                    altitude,
-                    color=colour_dict[colour_index],
-                    linestyle="-",
-                    label=label,
-                )
-            if unit == second_unit:
-                top_ax.plot(
-                    x,
-                    altitude,
-                    color=colour_dict[colour_index],
-                    linestyle="-",
-                    label=label,
-                )
+                if ("icon" in device) and show_marker:
+                    ax.plot(
+                        x,
+                        altitude,
+                        color=colour_dict[colour_index],
+                        linestyle="-",
+                        marker="d",
+                        label=label,
+                    )
+                else:
+                    ax.plot(
+                        x,
+                        altitude,
+                        color=colour_dict[colour_index],
+                        linestyle="-",
+                        label=label,
+                    )
 
+            if unit == second_unit:
+                if ("icon" in device) and show_marker:
+                    top_ax.plot(
+                        x,
+                        altitude,
+                        color=colour_dict[colour_index],
+                        linestyle="-",
+                        marker="d",
+                        label=label,
+                    )
+                else:
+                    top_ax.plot(
+                        x,
+                        altitude,
+                        color=colour_dict[colour_index],
+                        linestyle="-",
+                        label=label,
+                    )
             colour_index += 1
+
+    # add ylim
+    if ymin == None:
+        ax.set_ylim(ymin_dynamic, ymax)
+    else:
+        ax.set_ylim(ymin, ymax)
 
     # add legends
     if multi_axes:
@@ -161,10 +215,10 @@ def create_plot(
         # b) columns: "clct", "sw_up", "temp"
         columns = df.columns
         for column in columns:
-            if column != "timestamp":
+            if column != "height":
                 var_dev += f"_{column}"
 
-    filename = f"timeseries_{start_str}_{loc.short_name}{var_dev}"
+    filename = f"profiles_{start_str}_{loc.short_name}{var_dev}"
     save_fig(filename, datatypes, outpath, fig=fig)
     plt.clf()
     first_unit, second_unit = None, None
