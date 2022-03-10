@@ -149,6 +149,12 @@ def create_plot(
                 model = True
                 level = None
 
+            # specify marker
+            if model and show_marker:
+                marker = "d"
+            else:
+                marker = None
+
             # it is only possible for ICON variables to have '~' in them, because a level has to be specified.
             if "~" in variable:
                 var, level = (variable.split(sep="~"))[0], (variable.split(sep="~"))[1]
@@ -191,41 +197,23 @@ def create_plot(
 
             # choose correct axes for the current variable and plot data
             if unit == left_unit:
-                if model and show_marker:
-                    left_ax.plot(
-                        dates,
-                        y,
-                        color=colour_dict[colour_index],
-                        linestyle="-",
-                        marker="d",
-                        label=label,
-                    )
-                else:
-                    left_ax.plot(
-                        dates,
-                        y,
-                        color=colour_dict[colour_index],
-                        linestyle="-",
-                        label=label,
-                    )
+                left_ax.plot(
+                    dates,
+                    y,
+                    color=colour_dict[colour_index],
+                    linestyle="-",
+                    marker=marker,
+                    label=label,
+                )
             if unit == right_unit:
-                if model and show_marker:
-                    right_ax.plot(
-                        dates,
-                        y,
-                        color=colour_dict[colour_index],
-                        linestyle="-",
-                        marker="d",
-                        label=label,
-                    )
-                else:
-                    right_ax.plot(
-                        dates,
-                        y,
-                        color=colour_dict[colour_index],
-                        linestyle="-",
-                        label=label,
-                    )
+                right_ax.plot(
+                    dates,
+                    y,
+                    color=colour_dict[colour_index],
+                    linestyle="-",
+                    marker=marker,
+                    label=label,
+                )
             colour_index += 1
 
     # add legends

@@ -146,44 +146,32 @@ def create_plot(
                 second_unit = unit
                 top_ax.set_xlabel(f"{second_unit}")
 
+            # specify marker
+            if ("icon" in device) and show_marker:
+                marker = "d"
+            else:
+                marker = None
+
             # choose correct axes for the current variable and plot data
             if unit == first_unit:
-                if ("icon" in device) and show_marker:
-                    ax.plot(
-                        x,
-                        altitude,
-                        color=colour_dict[colour_index],
-                        linestyle="-",
-                        marker="d",
-                        label=label,
-                    )
-                else:
-                    ax.plot(
-                        x,
-                        altitude,
-                        color=colour_dict[colour_index],
-                        linestyle="-",
-                        label=label,
-                    )
+                ax.plot(
+                    x,
+                    altitude,
+                    color=colour_dict[colour_index],
+                    linestyle="-",
+                    marker=marker,
+                    label=label,
+                )
 
             if unit == second_unit:
-                if ("icon" in device) and show_marker:
-                    top_ax.plot(
-                        x,
-                        altitude,
-                        color=colour_dict[colour_index],
-                        linestyle="-",
-                        marker="d",
-                        label=label,
-                    )
-                else:
-                    top_ax.plot(
-                        x,
-                        altitude,
-                        color=colour_dict[colour_index],
-                        linestyle="-",
-                        label=label,
-                    )
+                top_ax.plot(
+                    x,
+                    altitude,
+                    color=colour_dict[colour_index],
+                    linestyle="-",
+                    marker=marker,
+                    label=label,
+                )
             colour_index += 1
 
     # add ylim
