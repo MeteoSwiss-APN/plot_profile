@@ -22,11 +22,6 @@ def get_arome():
 def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
     timeseries_dict = {}
 
-    # to count elements from each group
-    ind_icon = 0
-    ind_arome = 0
-    ind_obs = 0
-
     # loop over elements
     for element in elements:
 
@@ -79,7 +74,6 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 )
 
             # increase icon index
-            ind_icon += 1
             continue
 
         # AROME
@@ -99,16 +93,6 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
             )
 
             if not data.empty:
-                if device in timeseries_dict:
-                    # retrieve df and append to existing df in key
-                    del data["timestamp"]
-                    timeseries_dict[device] = pd.concat(
-                        [timeseries_dict[device], data], axis=1
-                    )
-
-                else:
-                    # timeseries_dict[f"{device}~{ind_obs}"] = data
-                    timeseries_dict[device] = data
-                ind_obs += 1
+                timeseries_dict[f"{device}~{var_name}"] = data
 
     return timeseries_dict
