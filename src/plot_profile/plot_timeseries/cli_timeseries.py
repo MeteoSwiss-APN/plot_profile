@@ -100,6 +100,12 @@ from plot_profile.plot_timeseries.plot_timeseries import create_plot
 )
 @click.option("--colours", multiple=True, help="Overwrite default colours.")
 @click.option(
+    "--show_marker",
+    is_flag=True,
+    default=False,
+    help="Add marker to model plots. Default: d (diamond)",
+)
+@click.option(
     "--grid",
     is_flag=True,
     default=False,
@@ -160,6 +166,7 @@ def main(
     appendix: str,
     colours: tuple,
     grid: bool,
+    show_marker: bool,
     datatypes: tuple,
     outpath: str,
     verbose: bool,
@@ -172,8 +179,10 @@ def main(
 
     # ICON + OBS w/ new flags
     plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111906 --add_model icon temp 1 ref --add_model icon temp 10 exp --add_model icon temp 2 ref --add_model icon temp 20 exp --add_obs 2m temp --add_obs 2m_tower temp --add_obs 2m dewp_temp --add_model icon 2m_temp 0 ref --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812
-
-
+    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111912 --add_obs 2m cbh
+    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111912 --add_obs 2m ver_vis
+    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111912 --add_obs 2m cbh --add_obs 2m ver_vis
+    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111912 --add_obs 2m ver_vis --add_obs 2m cbh
     """
     elements, multi_axes = parse_inputs(
         loc, var, device, add_model, add_obs, model_src, verbose
@@ -204,6 +213,7 @@ def main(
         ymax=ymax,
         colours=colours,
         grid=grid,
+        show_marker=show_marker,
         datatypes=datatypes,
         outpath=outpath,
         appendix=appendix,

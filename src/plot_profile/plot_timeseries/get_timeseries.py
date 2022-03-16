@@ -4,6 +4,7 @@ from pprint import pprint
 
 # Third-party
 import pandas as pd
+import glob
 
 # First-party
 from plot_profile.plot_icon.get_icon import get_icon_timeseries
@@ -12,20 +13,28 @@ from plot_profile.utils.stations import sdf
 
 # from ipdb import set_trace
 
+# TODO: implement function to retrieve data from AROME model (.csv, .nc, whatever)
+# and parse into pandas dataframe
+def get_arome(lat, lon, vars, init, level, start_lt, end_lt, folder, verbose):
+    """Retrieve timeseries from AROME output.
+    Args:
+        lat (float): latitude
+        lon (float): longitude
+        vars (list of strings or string): icon variables
+        init (datetime object): init date of simulation
+        level (int): model level ("1" = lowest model level)
+        start_lt (int): start leadtime
+        end_lt (int): end leadtime
+        folder (str): folder containing subfolders with icon runs
+        verbose (bool): print details
+    """
 
-def get_arome():
-    # TODO: implement function to retrieve data from AROME model (.csv, .nc, whatever)
-    # and parse into pandas dataframe
+    print('aaaa')
     return print("should return AROME dataframe at this point")
 
 
 def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
     timeseries_dict = {}
-
-    # to count elements from each group
-    ind_icon = 0
-    ind_arome = 0
-    ind_obs = 0
 
     # loop over elements
     for element in elements:
@@ -79,7 +88,6 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 )
 
             # increase icon index
-            ind_icon += 1
             continue
 
         # AROME
@@ -99,16 +107,6 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
             )
 
             if not data.empty:
-                if device in timeseries_dict:
-                    # retrieve df and append to existing df in key
-                    del data["timestamp"]
-                    timeseries_dict[device] = pd.concat(
-                        [timeseries_dict[device], data], axis=1
-                    )
-
-                else:
-                    # timeseries_dict[f"{device}~{ind_obs}"] = data
-                    timeseries_dict[device] = data
-                ind_obs += 1
+                timeseries_dict[f"{device}~{var_name}"] = data
 
     return timeseries_dict

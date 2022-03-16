@@ -46,6 +46,7 @@ vdf = pd.DataFrame(
         "unit",
         # general
         "icon_name",
+        "arome_name",
         "min_value",
         "max_value",
         "dwh_id",
@@ -63,6 +64,7 @@ vdf = pd.DataFrame(
 
 # set default values for certain attributes
 vdf.loc["icon_name"] = None
+vdf.loc["arome_name"] = None
 vdf.loc["min_value"][:] = None
 vdf.loc["max_value"][:] = None
 vdf.loc["dwh_id"][:] = None
@@ -98,6 +100,7 @@ vdf["cbh"].dwh_id = {"2m": "1541"}
 # cloud cover: clc
 vdf["clc"].short_name = "clc"
 vdf["clc"].icon_name = "clc"
+vdf["clc"].arome_name = "fCV"
 vdf["clc"].long_name = "Cloud cover"
 vdf["clc"].unit = ""
 vdf["clc"].min_value = -0.05
@@ -108,6 +111,7 @@ vdf["clc"].colormap = "bone"
 # cloud cover: clcl
 vdf["clcl"].short_name = "clcl"
 vdf["clcl"].icon_name = "CLCL"
+vdf["clcl"].arome_name = "LCV"
 vdf["clcl"].long_name = "Low cloud cover"
 vdf["clcl"].unit = "%"
 vdf["clcl"].min_value = -0.05
@@ -115,7 +119,8 @@ vdf["clcl"].max_value = 1.05
 
 # cloud cover: clct
 vdf["clct"].short_name = "clct"
-vdf["clct"].icon_name = "CLCT"
+vdf["clct"].icon_name = "CLCT"  # "clct"
+vdf["clct"].arome_name = "fCV"
 vdf["clct"].long_name = "Total cloud cover"
 vdf["clct"].unit = ""
 vdf["clct"].min_value = -0.05
@@ -242,7 +247,7 @@ vdf["rel_hum"].dwh_id = {
 vdf["lw_down"].short_name = "lw_down"
 vdf["lw_down"].long_name = "Downward LW rad"
 vdf["lw_down"].unit = "W/m2"
-vdf["lw_down"].icon_name = "ATHU_S"  # "athu_s"
+vdf["lw_down"].icon_name = "ATHD_S"
 vdf["lw_down"].avg = True
 vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
@@ -261,7 +266,7 @@ vdf["sw_down"].short_name = "sw_down"
 vdf["sw_down"].long_name = "Downward SW rad"
 vdf["sw_down"].unit = "W/m2"
 vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
-vdf["sw_down"].icon_name = "GLOB"
+vdf["sw_down"].icon_name = "asod_s"  # "GLOB"
 vdf["sw_down"].avg = True
 
 
@@ -274,6 +279,7 @@ vdf["sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
 # temperature: temp
 vdf["temp"].short_name = "temp"
 vdf["temp"].icon_name = "T"
+vdf["temp"].arome_name = "T"
 vdf["temp"].long_name = "Temperature"
 vdf["temp"].unit = "°C"
 vdf["temp"].min_value = -3.0  # 275
@@ -297,6 +303,7 @@ vdf["temp"].dwh_id = {
 # 2m temperature: 2m_temp
 vdf["2m_temp"].short_name = "2m_temp"
 vdf["2m_temp"].icon_name = "T_2M"
+vdf["2m_temp"].arome_name = "T2m"
 vdf["2m_temp"].long_name = "2m Temperature"
 vdf["2m_temp"].unit = "°C"
 vdf["2m_temp"].min_value = -3.0  # 275

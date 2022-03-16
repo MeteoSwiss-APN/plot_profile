@@ -35,6 +35,7 @@ def create_plot(
     ymax,
     colours,
     grid,
+    show_marker,
     datatypes,
     outpath,
     appendix,
@@ -54,6 +55,7 @@ def create_plot(
         ymax (tuple): y-max values
         colours (tuple): User-specified colours
         grid (bool): add grid to plot or not
+        show_marker (bool): add marker to model plots or not
         datatypes (tuple): output data types
         outpath (str): output folder path
         appendix (bool): add appendix to output name
@@ -115,6 +117,7 @@ def create_plot(
 
     # plotting
     colour_index = 0
+    actual_devices = []
     for i, device in enumerate(devices):
         model = False
         # 1) retrieve df
@@ -147,6 +150,12 @@ def create_plot(
                 model = True
                 level = None
 
+            # specify marker
+            if model and show_marker:
+                marker = "d"
+            else:
+                marker = None
+
             # it is only possible for ICON variables to have '~' in them, because a level has to be specified.
             if "~" in variable:
                 var, level = (variable.split(sep="~"))[0], (variable.split(sep="~"))[1]
@@ -172,6 +181,7 @@ def create_plot(
 
             # for observations, the label looks a bit differently
             if not model:  # 'icon' not in device and 'arome' not in device:
+                device = device.split("~")[0]
                 if "_" in device:
                     label = f"{var_long}: OBS @ {device.split('_')[0].upper()} {device.split('_')[1].upper()}"
                 else:
@@ -194,6 +204,7 @@ def create_plot(
                     y,
                     color=colour_dict[colour_index],
                     linestyle="-",
+                    marker=marker,
                     label=label,
                 )
             if unit == right_unit:
@@ -202,9 +213,9 @@ def create_plot(
                     y,
                     color=colour_dict[colour_index],
                     linestyle="-",
+                    marker=marker,
                     label=label,
                 )
-
             colour_index += 1
 
     # add legends
@@ -233,6 +244,29 @@ def create_plot(
         for column in columns:
             if column != "timestamp":
                 var_dev += f"_{column}"
+        if "icon" in key:
+            # a) keys: "icon~ref", "icon~0", "2m~cbh", "2m_tower~temp"
+            # remove "0" for model-levels
+            if "~0" in key:
+                key = key.split(sep="~")[0]
+            var_dev += f"_{key}"
+
+            # b) columns: "clct", "sw_up", "temp"
+            columns = df.columns
+            for column in columns:
+                if column != "timestamp":
+                    var_dev += f"_{column}"
+
+        # elif 'arome' in key:
+
+        else:  # now its actually a device --> remove variable from key
+            var_dev += f"_{key.split('~')[0]}_{key.split('~')[1]}"
+
+        # # b) columns: "clct", "sw_up", "temp"
+        # columns = df.columns
+        # for column in columns:
+        #     if column != "timestamp":
+        #         var_dev += f"_{column}"
 
     filename = f"timeseries_{start_str}-{end_str}_{loc.short_name}{var_dev}"
     save_fig(filename, datatypes, outpath, fig=fig)
