@@ -20,7 +20,7 @@ munits.registry[datetime.datetime] = converter
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.utils import colour_dict
 from plot_profile.utils.utils import save_fig
-from plot_profile.utils.variables import vdf
+from plot_profile.plot_arome.variables_tmp import vdf
 
 # from ipdb import set_trace
 
@@ -257,7 +257,18 @@ def create_plot(
                 if column != "timestamp":
                     var_dev += f"_{column}"
 
-        # elif 'arome' in key:
+#        elif "arome" in key:
+#            print("changement ici")
+#            # same as icon
+#            if "~0" in key:
+#                key = key.split(sep="~")[0]
+#            var_dev += f"_{key}"
+#
+#            # b) columns: "clct", "sw_up", "temp"
+#            columns = df.columns
+#            for column in columns:
+#                if column != "timestamp":
+#                    var_dev += f"_{column}"
 
         else:  # now its actually a device --> remove variable from key
             var_dev += f"_{key.split('~')[0]}_{key.split('~')[1]}"
