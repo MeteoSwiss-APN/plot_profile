@@ -46,6 +46,7 @@ vdf = pd.DataFrame(
         "unit",
         # general
         "icon_name",
+        "arome_name",
         "min_value",
         "max_value",
         "dwh_id",
@@ -56,23 +57,30 @@ vdf = pd.DataFrame(
         "colormap",
         # value transformations
         "mult",
+        "mult_arome",
         "plus",
+        "plus_arome",
         "avg",
+        "avg_arome",
     ],
 )
 
 # set default values for certain attributes
 vdf.loc["icon_name"] = None
+vdf.loc["arome_name"] = None
 vdf.loc["min_value"][:] = None
 vdf.loc["max_value"][:] = None
 vdf.loc["dwh_id"][:] = None
-vdf.loc["color"] = "black"
+vdf.loc["color"] = "blue"
 vdf.loc["marker"][:] = "o"
 vdf.loc["linestyle"] = "solid"
 vdf.loc["colormap"] = sns.color_palette("viridis", as_cmap=True)
 vdf.loc["mult"][:] = 1
+vdf.loc["mult_arome"][:] = 1
 vdf.loc["plus"][:] = 0
+vdf.loc["plus_arome"][:] = 0
 vdf.loc["avg"][:] = False
+vdf.loc["avg_arome"][:] = False
 
 
 # fill variable dataframe with specific values
@@ -98,6 +106,7 @@ vdf["cbh"].dwh_id = {"2m": "1541"}
 # cloud cover: clc
 vdf["clc"].short_name = "clc"
 vdf["clc"].icon_name = "clc"
+vdf["clc"].arome_name = "fCV"
 vdf["clc"].long_name = "Cloud cover"
 vdf["clc"].unit = ""
 vdf["clc"].min_value = -0.05
@@ -108,10 +117,13 @@ vdf["clc"].colormap = "bone"
 # cloud cover: clcl
 vdf["clcl"].short_name = "clcl"
 vdf["clcl"].icon_name = "CLCL"
+vdf["clcl"].arome_name = "LCV"
 vdf["clcl"].long_name = "Low cloud cover"
 vdf["clcl"].unit = "%"
 vdf["clcl"].min_value = -0.05
 vdf["clcl"].max_value = 1.05
+vdf["clcl"].mult_arome = 0.01
+
 
 # cloud cover: clct
 vdf["clct"].short_name = "clct"
@@ -274,6 +286,7 @@ vdf["sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
 # temperature: temp
 vdf["temp"].short_name = "temp"
 vdf["temp"].icon_name = "T"
+vdf["temp"].arome_name = "T"
 vdf["temp"].long_name = "Temperature"
 vdf["temp"].unit = "°C"
 vdf["temp"].min_value = -3.0  # 275
@@ -283,6 +296,7 @@ vdf["temp"].marker = "o"
 vdf["temp"].linestyle = "-"
 vdf["temp"].mult = 1
 vdf["temp"].plus = -273
+vdf["temp"].plus_arome = -273
 vdf["temp"].avg = False
 vdf["temp"].dwh_id = {
     "rs": "745",
@@ -297,6 +311,7 @@ vdf["temp"].dwh_id = {
 # 2m temperature: 2m_temp
 vdf["2m_temp"].short_name = "2m_temp"
 vdf["2m_temp"].icon_name = "T_2M"
+vdf["2m_temp"].arome_name = "T2m"
 vdf["2m_temp"].long_name = "2m Temperature"
 vdf["2m_temp"].unit = "°C"
 vdf["2m_temp"].min_value = -3.0  # 275
@@ -306,6 +321,7 @@ vdf["2m_temp"].marker = "o"
 vdf["2m_temp"].linestyle = "-"
 vdf["2m_temp"].mult = 1
 vdf["2m_temp"].plus = -273
+vdf["2m_temp"].plus_arome = -273
 vdf["2m_temp"].avg = False
 
 # total water vapour: tqv

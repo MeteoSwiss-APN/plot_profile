@@ -147,6 +147,7 @@ def check_inputs(var, loc, dev, verbose):
         verbose (bool): add print statements to output or not
 
     """
+    print(dev)
     # 1) check if location is available
     try:
         station = sdf[loc]
@@ -155,11 +156,23 @@ def check_inputs(var, loc, dev, verbose):
         sys.exit(1)
 
     # 2) check if variables are defined for given devices
+
+    # for icon
     if dev == "icon":
         if isinstance(vdf[var].icon_name, str):
             return
         else:
             print(f"--- selected variable: {vdf[var].long_name} not available for icon")
+            sys.exit(1)
+
+    # for arome
+    if dev == "arome":
+        if isinstance(vdf[var].arome_name, str):
+            return
+        else:
+            print(
+                f"--- selected variable: {vdf[var].long_name} not available for arome"
+            )
             sys.exit(1)
 
     # only for DWH variables

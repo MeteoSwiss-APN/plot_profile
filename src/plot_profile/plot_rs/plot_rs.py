@@ -566,7 +566,7 @@ def create_plot(
 
         # add legends
         ax[0].legend(handles=handles_left)
-        print("save figure here")
+
         save_fig(
             filename=filename,
             datatypes=[

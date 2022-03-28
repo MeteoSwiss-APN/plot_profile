@@ -200,7 +200,9 @@ def main(
         verbose=verbose,
     )
 
-    # dbg - stop script here
+
+    # set_trace()
+
     # sys.exit(1)
 
     create_plot(
