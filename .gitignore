@@ -113,3 +113,6 @@ plots/*
 src/plot_profile/scratch/scratch_save_plot.py
 src/plot_profile/scratch/various.py
 src/plot_profile/commands.sh
+src/plot_profile/*ipynb
+src/plot_profile/plot_arome/*ipynb
+PFE
