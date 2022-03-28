@@ -145,7 +145,9 @@ def create_plot(
                 print(f"  Variable: {variable}")
 
             # extract current variable
+
             if "icon" or "arome" in device:
+
                 # i.e. 2m_temp could be an icon variable w/o '~'; so make sure the model variable has the correct value!
                 model = True
                 level = None
@@ -235,6 +237,7 @@ def create_plot(
     var_dev = ""
     for key, df in data.items():
 
+
         # a) keys: "icon~0", "icon~1", "2m", "2m_tower"
         # remove "0" for model-levels
         if "~0" in key:
@@ -246,6 +249,7 @@ def create_plot(
         for column in columns:
             if column != "timestamp":
                 var_dev += f"_{column}"
+
         if "icon" in key:
             # a) keys: "icon~ref", "icon~0", "2m~cbh", "2m_tower~temp"
             # remove "0" for model-levels
@@ -259,6 +263,7 @@ def create_plot(
                 if column != "timestamp":
                     var_dev += f"_{column}"
 
+
         elif "arome" in key:
             print("changement ici")
             # same as icon
@@ -271,6 +276,7 @@ def create_plot(
             for column in columns:
                 if column != "timestamp":
                     var_dev += f"_{column}"
+
 
         else:  # now its actually a device --> remove variable from key
             var_dev += f"_{key.split('~')[0]}_{key.split('~')[1]}"

@@ -6,6 +6,7 @@ from datetime import datetime
 from datetime import timedelta
 from pprint import pprint
 
+
 # Third-party
 import netCDF4 as nc
 import pandas as pd
@@ -128,6 +129,7 @@ def get_arome_timeseries(
     return df
 
 
+
 def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
     timeseries_dict = {}
 
@@ -243,5 +245,6 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
 
     if verbose:
         pprint(timeseries_dict)
+
 
     return timeseries_dict

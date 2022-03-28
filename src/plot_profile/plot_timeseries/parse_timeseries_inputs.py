@@ -65,12 +65,14 @@ def parse_inputs(loc, var, device, add_model, add_obs, model_src, verbose):
 
     # check, wheter all desired variables are available for the provided location and corresponding devices
     for dev, var in zip(devs, vars):
+
         if verbose:
             print('checking inputs for: ', dev, var)
         check_inputs(var=var, dev=dev, loc=loc, verbose=verbose)
 
     # check, that the provided variables at most require 2 units
     multi_axes = check_units(vars)
+
 
     #################################################################################################################
     #################################################################################################################
