@@ -6,7 +6,6 @@ from datetime import datetime
 from datetime import timedelta
 from pprint import pprint
 
-
 # Third-party
 import netCDF4 as nc
 import pandas as pd
@@ -17,6 +16,7 @@ from plot_profile.plot_icon.get_icon import get_icon_timeseries
 from plot_profile.utils.arome_tools import coord_2_arome_pts
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
 from plot_profile.utils.stations import sdf
+from plot_profile.utils.utils import decumulate
 from plot_profile.utils.variables import vdf
 
 # from ipdb import set_trace
@@ -30,12 +30,12 @@ def get_arome_timeseries(
     Args:
         lat (float): latitude
         lon (float): longitude
-        vars (list of strings or string): icon variables
+        vars (list of strings or string): arome variables
         init (datetime object): init date of simulation
         level (int): model level ("1" = lowest model level)
         start_lt (int): start leadtime
         end_lt (int): end leadtime
-        folder (str): folder containing subfolders with icon runs
+        folder (str): folder containing subfolders with arome runs
         verbose (bool): print details
 
     """
@@ -115,19 +115,25 @@ def get_arome_timeseries(
         if (level == 0) or (xr_data["z"].size < 2):
             column_label = var
             values = xr_data.variables[var_aro][:, 0, dy, dx]
+
         # 3D var -> add level to column name
         else:
             column_label = f"{var}~{level}"
             values = xr_data.variables[var_aro][:, level, dy, dx]
 
-        # add deaveraging here for some arome vars ? here :)
-        # ...
+        # decumulating vars
+        if vdf.loc["acc"][var] == True:
+            if verbose:
+                print("Decumalating arome vars")
 
+            values = decumulate(values)
+
+        # add factor or values
         mult, plus = vdf.loc["mult_arome"][var], vdf.loc["plus_arome"][var]
+
         df[column_label] = values * mult + plus
 
     return df
-
 
 
 def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
@@ -137,7 +143,11 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
     for element in elements:
 
         # retrieve variable name
-        var_name = element[1]
+        if element[1] == "wind_vel" or "wind_dir":
+            var_name = ["U", "V"]
+
+        else:
+            var_name = element[1]
 
         # ICON
         if element[0] == "icon":
@@ -183,7 +193,6 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                     grid_file=grid_file,
                     verbose=verbose,
                 )
-
             # increase icon index
             continue
 
@@ -227,6 +236,8 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                     verbose=verbose,
                 )
 
+            # calc new vars from here !!!
+
             continue
 
         # OBS from DWH
@@ -245,6 +256,5 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
 
     if verbose:
         pprint(timeseries_dict)
-
 
     return timeseries_dict

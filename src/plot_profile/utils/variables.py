@@ -29,8 +29,10 @@ vdf = pd.DataFrame(
         "rel_hum",
         "lw_down",
         "lw_up",
+        "lw_net",
         "sw_down",
         "sw_up",
+        "sw_net",
         "temp",
         "2m_temp",
         "tqv",
@@ -62,6 +64,7 @@ vdf = pd.DataFrame(
         "plus_arome",
         "avg",
         "avg_arome",
+        "acc",
     ],
 )
 
@@ -81,6 +84,7 @@ vdf.loc["plus"][:] = 0
 vdf.loc["plus_arome"][:] = 0
 vdf.loc["avg"][:] = False
 vdf.loc["avg_arome"][:] = False
+vdf.loc["acc"][:] = True
 
 
 # fill variable dataframe with specific values
@@ -254,7 +258,7 @@ vdf["rel_hum"].dwh_id = {
 vdf["lw_down"].short_name = "lw_down"
 vdf["lw_down"].long_name = "Downward LW rad"
 vdf["lw_down"].unit = "W/m2"
-vdf["lw_down"].icon_name = "ATHD_S"
+vdf["lw_down"].icon_name = "athd_s"
 vdf["lw_down"].avg = True
 vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
@@ -262,11 +266,24 @@ vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 vdf["lw_up"].short_name = "lw_up"
 vdf["lw_up"].long_name = "Upward LW rad"
 vdf["lw_up"].unit = "W/m2"
+vdf["lw_up"].icon_name = "athu_s"
+vdf["lw_up"].avg = True
 vdf["lw_up"].dwh_id = {
     "2m": "1531",
     "2m_tower": "5118",  # no data yet in DWH
     "30m_tower": "5181",  # no data yet in DWH
 }
+
+# radiation: longwave net
+vdf["lw_net"].short_name = "lw_net"
+vdf["lw_net"].long_name = "Net LW rad"
+vdf["lw_net"].unit = "W/m2"
+vdf["lw_net"].icon_name = "athb_s"
+vdf["lw_net"].arome_name = "LW"
+vdf["lw_net"].mult_arome = 1 / 3600
+vdf["lw_net"].avg = True
+vdf["lw_net"].acc = True
+vdf["lw_net"].dwh_id = {"2m": "net_calc:175:1531:"}
 
 # radiation: shortwave downward
 vdf["sw_down"].short_name = "sw_down"
@@ -276,12 +293,22 @@ vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
 vdf["sw_down"].icon_name = "asod_s"  # "GLOB"
 vdf["sw_down"].avg = True
 
-
 # radiation: shortwave upward ("reflected")
 vdf["sw_up"].short_name = "sw_up"
 vdf["sw_up"].long_name = "Upward SW rad"
 vdf["sw_up"].unit = "W/m2"
 vdf["sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
+
+# radiation: shortwave net
+vdf["sw_net"].short_name = "sw_net"
+vdf["sw_net"].long_name = "Net SW rad"
+vdf["sw_net"].unit = "W/m2"
+vdf["sw_net"].icon_name = "asob_s"
+vdf["sw_net"].arome_name = "SW"
+vdf["sw_net"].mult_arome = 1 / 3600
+vdf["sw_net"].avg = True
+vdf["sw_net"].acc = True
+vdf["sw_net"].dwh_id = {"2m": "net_calc:96:1871:"}
 
 # temperature: temp
 vdf["temp"].short_name = "temp"
