@@ -182,7 +182,7 @@ def get_icon(
 
     """
     if verbose:
-        print("--- retrieving & filtering data")
+        print("--- retrieving & filtering icon data")
 
     # create dictionary to collect data of height and variables
     data_dict = {}
