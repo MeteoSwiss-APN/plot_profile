@@ -201,7 +201,7 @@ def main(
     If 2 variables are given, they will be shown in the same figure.
 
     Example command:
-    plot_icon_profiles --date 21111812 --outpath plots --folder /scratch/swester/output_icon/ICON-1/ --var temp --leadtime 11 --leadtime 12 --loc pay
+    plot_icon_profiles --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var qc --var qc_dia --leadtime 18  --loc pay
 
     Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 
