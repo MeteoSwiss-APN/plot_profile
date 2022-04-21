@@ -174,15 +174,10 @@ def main(
     """Plot timeseries of variables retrieved from various differend measurement devices.
 
     Example commands:
-    plot_timeseries --start 21111900 --end 21111902 --loc gla --device 5cm --device 2m --var temp
-    plot_timeseries --outpath plots --start 21111900 --end 21111902 --loc pay --device 5cm --device 2m --device 2m_tower --device 10m_tower --device 30m_tower --var temp
-
-    # ICON + OBS w/ new flags
-    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111906 --add_model icon temp 1 ref --add_model icon temp 10 exp --add_model icon temp 2 ref --add_model icon temp 20 exp --add_obs 2m temp --add_obs 2m_tower temp --add_obs 2m dewp_temp --add_model icon 2m_temp 0 ref --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812
-    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111912 --add_obs 2m cbh
-    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111912 --add_obs 2m ver_vis
-    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111912 --add_obs 2m cbh --add_obs 2m ver_vis
-    plot_timeseries --outpath plots --loc pay --start 21111900 --end 21111912 --add_obs 2m ver_vis --add_obs 2m cbh
+    plot_timeseries --loc pay --start 21111900 --end 21111912 --add_obs 2m ver_vis --add_obs 2m cbh
+    plot_timeseries --loc pay --start 21111900 --end 21111906 --add_model icon temp 1 ref --add_model icon temp 10 exp --add_model icon temp 2 ref --add_model icon temp 20 exp --add_obs 2m temp --add_obs 2m_tower temp --add_obs 2m dewp_temp --add_model icon 2m_temp 0 ref --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812
+    old way:
+    plot_timeseries --loc gla --start 21111900 --end 21111902 --device 5cm --device 2m --var temp
     """
     elements, multi_axes = parse_inputs(
         loc, var, device, add_model, add_obs, model_src, verbose
@@ -199,7 +194,6 @@ def main(
         grid_file=grid_file,
         verbose=verbose,
     )
-
 
     # set_trace()
 

@@ -16,13 +16,14 @@ munits.registry[np.datetime64] = converter
 munits.registry[datetime.date] = converter
 munits.registry[datetime.datetime] = converter
 
+# Third-party
+# from ipdb import set_trace
+
 # First-party
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.utils import colour_dict
 from plot_profile.utils.utils import save_fig
 from plot_profile.utils.variables import vdf
-
-# from ipdb import set_trace
 
 
 def create_plot(
@@ -73,6 +74,7 @@ def create_plot(
 
     # prepare figure
     fig, left_ax = plt.subplots(1, 1, figsize=(8, 5), constrained_layout=True)
+    print(f"swester: {multi_axes}")
     if multi_axes:
         right_ax = left_ax.twinx()
         if verbose:
@@ -237,7 +239,6 @@ def create_plot(
     var_dev = ""
     for key, df in data.items():
 
-
         # a) keys: "icon~0", "icon~1", "2m", "2m_tower"
         # remove "0" for model-levels
         if "~0" in key:
@@ -263,7 +264,6 @@ def create_plot(
                 if column != "timestamp":
                     var_dev += f"_{column}"
 
-
         elif "arome" in key:
             print("changement ici")
             # same as icon
@@ -276,7 +276,6 @@ def create_plot(
             for column in columns:
                 if column != "timestamp":
                     var_dev += f"_{column}"
-
 
         else:  # now its actually a device --> remove variable from key
             var_dev += f"_{key.split('~')[0]}_{key.split('~')[1]}"

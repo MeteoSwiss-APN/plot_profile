@@ -6,12 +6,12 @@ from pprint import pprint
 import pandas as pd
 
 # First-party
-from plot_profile.plot_arome.get_arome import get_arome_timeseries
 from plot_profile.plot_icon.get_icon import get_icon_timeseries
-from plot_profile.plot_timeseries.calc_new_vars import calc_new_var_timeseries
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
 from plot_profile.utils.stations import sdf
 
+# from plot_profile.plot_timeseries.calc_new_vars import calc_new_var_timeseries
+# from plot_profile.plot_arome.get_arome import get_arome_timeseries
 # from ipdb import set_trace
 
 
@@ -59,17 +59,17 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 )
 
                 # calculate new variables
-                if (
-                    var_name != var_open_icon
-                ):  # equivalent to "if var needs to be calculated"
-                    df = calc_new_var_timeseries(df, var_name, [level], verbose)
+                # if (
+                #    var_name != var_open_icon
+                # ):  # equivalent to "if var needs to be calculated"
+                #    df = calc_new_var_timeseries(df, var_name, [level], verbose)
 
-                del df["timestamp"]
-                timeseries_dict[f"icon~{id}"] = pd.concat(
-                    [timeseries_dict[f"icon~{id}"], df], axis=1
-                )
+                # del df["timestamp"]
+                # timeseries_dict[f"icon~{id}"] = pd.concat(
+                #    [timeseries_dict[f"icon~{id}"], df], axis=1
+                # )
 
-                # print(id, timeseries_dict[f"icon~{id}"].columns.tolist(), df.columns.tolist())
+                ## print(id, timeseries_dict[f"icon~{id}"].columns.tolist(), df.columns.tolist())
 
             else:
                 df = timeseries_dict[f"icon~{id}"] = get_icon_timeseries(
@@ -86,10 +86,10 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 )
 
                 # calculate new variables
-                if (
-                    var_name != var_open_icon
-                ):  # equivalent to "if var needs to be calculated"
-                    df = calc_new_var_timeseries(df, var_name, [level], verbose)
+                # if (
+                #    var_name != var_open_icon
+                # ):  # equivalent to "if var needs to be calculated"
+                #    df = calc_new_var_timeseries(df, var_name, [level], verbose)
 
                 timeseries_dict[f"icon~{id}"] = df
             # increase icon index
