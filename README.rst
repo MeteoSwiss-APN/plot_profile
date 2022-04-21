@@ -74,5 +74,3 @@ TO DO's
 - output filename of plot_timeseries is funky
 - heatmap x-axis tick labeling ignores --start_leadtime
 - if dwh-dataframe is empty, (icon-)plot should still be produced, just without data
-- allow for multiple icon_names in variables.py
-- allow different filename-formats for ICON-files
