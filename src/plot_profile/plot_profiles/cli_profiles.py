@@ -157,10 +157,10 @@ def main(
     outpath: str,
     verbose: bool,
 ):
-    """INSERT TEXT HERE.
+    """Plot vertical profiles.
 
     Example:
-        plot_profiles --loc pay --date 21111812 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812
+        plot_profiles --loc pay --date 21111900 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812
 
     """
     elements, multi_axes = parse_inputs(loc, add_model, add_obs, model_src, verbose)
