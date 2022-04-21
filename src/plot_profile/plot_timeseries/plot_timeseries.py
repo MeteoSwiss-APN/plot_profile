@@ -16,14 +16,13 @@ munits.registry[np.datetime64] = converter
 munits.registry[datetime.date] = converter
 munits.registry[datetime.datetime] = converter
 
-# Third-party
-# from ipdb import set_trace
-
 # First-party
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.utils import colour_dict
 from plot_profile.utils.utils import save_fig
 from plot_profile.utils.variables import vdf
+
+# from ipdb import set_trace
 
 
 def create_plot(
@@ -74,7 +73,6 @@ def create_plot(
 
     # prepare figure
     fig, left_ax = plt.subplots(1, 1, figsize=(8, 5), constrained_layout=True)
-    print(f"swester: {multi_axes}")
     if multi_axes:
         right_ax = left_ax.twinx()
         if verbose:
@@ -147,9 +145,7 @@ def create_plot(
                 print(f"  Variable: {variable}")
 
             # extract current variable
-
-            if "icon" or "arome" in device:
-
+            if "icon" in device:
                 # i.e. 2m_temp could be an icon variable w/o '~'; so make sure the model variable has the correct value!
                 model = True
                 level = None
@@ -172,9 +168,7 @@ def create_plot(
             y = columnData.values
 
             if model:
-
                 if device.split("~")[1] != "0":
-
                     if not level:
                         label = f"{var_long}: {device.split('~')[0].upper()} {device.split('~')[1].upper()}"
                     else:
@@ -239,18 +233,6 @@ def create_plot(
     var_dev = ""
     for key, df in data.items():
 
-        # a) keys: "icon~0", "icon~1", "2m", "2m_tower"
-        # remove "0" for model-levels
-        if "~0" in key:
-            key = key.split(sep="~")[0]
-        var_dev += f"_{key}"
-
-        # b) columns: "clct", "sw_up", "temp"
-        columns = df.columns
-        for column in columns:
-            if column != "timestamp":
-                var_dev += f"_{column}"
-
         if "icon" in key:
             # a) keys: "icon~ref", "icon~0", "2m~cbh", "2m_tower~temp"
             # remove "0" for model-levels
@@ -264,18 +246,7 @@ def create_plot(
                 if column != "timestamp":
                     var_dev += f"_{column}"
 
-        elif "arome" in key:
-            print("changement ici")
-            # same as icon
-            if "~0" in key:
-                key = key.split(sep="~")[0]
-            var_dev += f"_{key}"
-
-            # b) columns: "clct", "sw_up", "temp"
-            columns = df.columns
-            for column in columns:
-                if column != "timestamp":
-                    var_dev += f"_{column}"
+        # elif 'arome' in key:
 
         else:  # now its actually a device --> remove variable from key
             var_dev += f"_{key.split('~')[0]}_{key.split('~')[1]}"

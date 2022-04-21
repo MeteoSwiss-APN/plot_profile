@@ -413,43 +413,15 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
     # surface-based data
     elif device in ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower"]:
-        # if net lw/sw radiation is required we need to calculate it
-        if "net_calc" in vars_str:
 
-            # downward, upward radiation DWH ids
-            dwn_id, up_id = vars_str.split(":")[1:3]
-
-            print(dwn_id, up_id)
-
-            # adding lw_down and lw_up DWH ids to vars_str"
-            vars_str = f"{vars_str.split('net_calc')[0]}{dwn_id},{up_id}{vars_str.split(':')[3]}"
-
-            print(vars_str)
-
-            # call dwh retrieve for surface-based data
-            raw_data = dwh_surface(
-                station_name=sdf[station].dwh_name,
-                vars_str=vars_str,
-                start=t1,
-                end=t2,
-                verbose=verbose,
-            )
-            print(raw_data)
-            if verbose:
-                print("Subtracting downward and upward radiations")
-
-            # lw_net = lw_down - lw_up
-            raw_data[f"net_calc:{dwn_id}:{up_id}:"] = raw_data[dwn_id] - raw_data[up_id]
-            print(raw_data)
-        else:
-            # call dwh retrieve for surface-based data
-            raw_data = dwh_surface(
-                station_name=sdf[station].dwh_name,
-                vars_str=vars_str,
-                start=t1,
-                end=t2,
-                verbose=verbose,
-            )
+        # call dwh retrieve for surface-based data
+        raw_data = dwh_surface(
+            station_name=sdf[station].dwh_name,
+            vars_str=vars_str,
+            start=t1,
+            end=t2,
+            verbose=verbose,
+        )
 
         if raw_data.empty:
             return raw_data
@@ -467,7 +439,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             relevant_vars.append(short_name)
 
         data = raw_data[relevant_vars]
-        print(data)
 
         return data
 
