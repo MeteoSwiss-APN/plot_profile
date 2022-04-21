@@ -152,7 +152,7 @@ def main(
     """Plot heatmap (time-height crosssection) of variable from ICON simulation.
 
     Example command:
-    plot_icon_heatmap --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --alt_top 2000 --start_leadtime 0 --end_leadtime 12 --outpath plots --verbose
+    plot_icon_heatmap --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --alt_top 2000 --start_leadtime 0 --end_leadtime 12
 
     """
     leadtimes = list(range(start_leadtime, end_leadtime + 1, step))
