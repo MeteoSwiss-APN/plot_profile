@@ -1,133 +1,18 @@
 """Retrieve available data into dict for timeseries plots."""
 # Standard library
-import glob
-import sys
-from datetime import datetime
-from datetime import timedelta
 from pprint import pprint
 
-
 # Third-party
-import netCDF4 as nc
 import pandas as pd
-import xarray as xr
 
 # First-party
+from plot_profile.plot_arome.get_arome import get_arome_timeseries
 from plot_profile.plot_icon.get_icon import get_icon_timeseries
-from plot_profile.utils.arome_tools import coord_2_arome_pts
+from plot_profile.plot_timeseries.calc_new_vars import calc_new_var_timeseries
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
 from plot_profile.utils.stations import sdf
-from plot_profile.utils.variables import vdf
 
 # from ipdb import set_trace
-
-
-def get_arome_timeseries(
-    lat, lon, vars, init, level, start_lt, end_lt, folder, verbose
-):
-    """Retrieve timeseries from AROME output.
-
-    Args:
-        lat (float): latitude
-        lon (float): longitude
-        vars (list of strings or string): icon variables
-        init (datetime object): init date of simulation
-        level (int): model level ("1" = lowest model level)
-        start_lt (int): start leadtime
-        end_lt (int): end leadtime
-        folder (str): folder containing subfolders with icon runs
-        verbose (bool): print details
-
-    """
-    df = pd.DataFrame()
-    dy, dx = coord_2_arome_pts(lat, lon)  # timeseries location in arome coords
-
-    # folder containing the arome files
-    nc_path = folder + datetime.strftime(init, "%Y%m%dT%H%MP")
-    if verbose:
-        print(f"Looking for files in {str(nc_path)}")
-
-    # if string, transform it to a 1 element list
-    if isinstance(vars, str):
-        lst_tmp = []
-        vars = lst_tmp.append(vars)
-        vars = lst_tmp
-    print(vars)
-
-    for var in vars:
-        # is var availible in our Arome files ?
-        if vdf.loc["arome_name"][var] == None:
-            print(f"--- ! No {var} in arome files")
-            sys.exit(1)
-        else:
-            var_aro = vdf.loc["arome_name"][var]  # name of variables in arome
-            if verbose:
-                print(f"Searching for {var} (called {var_aro}) in Arome.")
-
-        # looking for nc files
-        files = sorted(glob.glob(f"{nc_path}/{var_aro}.arome-forecast.payerne+00*.nc"))[
-            start_lt : end_lt + 2
-        ]
-
-        if verbose:
-            print("files:")
-            for f in files:
-                print(f"  {f}")
-
-        # load nc files as xarray dataset
-        if verbose:
-            print("Loading files into xarray dataset.")
-
-        nc_data = nc.Dataset(files[0], "r")
-        ncgrp = nc_data.groups[var_aro]  # selecting the right group (ensembles)
-        xr_data = xr.open_dataset(
-            xr.backends.NetCDF4DataStore(ncgrp)
-        )  # nc to xarray dataset
-
-        for i in files[1:-1]:  # all the files except the first wich is already openend
-            nc_data = nc.Dataset(i, "r")  # open DS with netDCF4 modules
-            ncgrp = nc_data.groups[var_aro]  # selecting the group we need
-            xr_data_tmp = xr.open_dataset(
-                xr.backends.NetCDF4DataStore(ncgrp)
-            )  # converting it to xarray Dataset
-
-            xr_data = xr.concat(
-                [xr_data, xr_data_tmp], dim="time"
-            )  # adding our new DS to the big old one
-
-        if verbose:
-            print("Finished loading files into xarray dataset.")
-
-        # timestamp column
-        if "timestamp" not in df.columns:  # only the first loop time
-            date_list = []
-            for date in xr_data["Time"]:
-                # from POSIX to string format
-                date_list.append(
-                    (
-                        datetime.utcfromtimestamp(int(date)) + timedelta(hours=1)
-                    ).strftime("%Y-%m-%d %H:%M:%S")
-                )
-            df["timestamp"] = date_list
-
-        # var column
-        # 2D var or level = 0
-        if (level == 0) or (xr_data["z"].size < 2):
-            column_label = var
-            values = xr_data.variables[var_aro][:, 0, dy, dx]
-        # 3D var -> add level to column name
-        else:
-            column_label = f"{var}~{level}"
-            values = xr_data.variables[var_aro][:, level, dy, dx]
-
-        # add deaveraging here for some arome vars ? here :)
-        # ...
-
-        mult, plus = vdf.loc["mult_arome"][var], vdf.loc["plus_arome"][var]
-        df[column_label] = values * mult + plus
-
-    return df
-
 
 
 def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
@@ -137,6 +22,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
     for element in elements:
 
         # retrieve variable name
+
         var_name = element[1]
 
         # ICON
@@ -147,6 +33,14 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
             folder = element[4]
             init = element[5]
 
+            # some parameters aren't in icon and therefore needs to be calculated from other parameters
+
+            if var_name == "wind_dir" or "wind_vel":
+                var_open_icon = ["u", "v"]
+
+            else:
+                var_open_icon = var_name
+
             # check if a key for this icon-instance (for example icon-ref or icon-exp,...) already exists.
             # if yes --> retrieve df as usual, but instead of assigning it to a new key, only append/concatenate
             # the variable column to the already existing dataframe.
@@ -154,7 +48,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 df = get_icon_timeseries(
                     lat=sdf[loc].lat,
                     lon=sdf[loc].lon,
-                    vars=var_name,
+                    vars=var_open_icon,
                     init=init,
                     level=level,
                     start_lt=int((start - init).total_seconds() / 3600),  # full hours!
@@ -163,6 +57,13 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                     grid_file=grid_file,
                     verbose=verbose,
                 )
+
+                # calculate new variables
+                if (
+                    var_name != var_open_icon
+                ):  # equivalent to "if var needs to be calculated"
+                    df = calc_new_var_timeseries(df, var_name, [level], verbose)
+
                 del df["timestamp"]
                 timeseries_dict[f"icon~{id}"] = pd.concat(
                     [timeseries_dict[f"icon~{id}"], df], axis=1
@@ -171,10 +72,10 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 # print(id, timeseries_dict[f"icon~{id}"].columns.tolist(), df.columns.tolist())
 
             else:
-                timeseries_dict[f"icon~{id}"] = get_icon_timeseries(
+                df = timeseries_dict[f"icon~{id}"] = get_icon_timeseries(
                     lat=sdf[loc].lat,
                     lon=sdf[loc].lon,
-                    vars=var_name,
+                    vars=var_open_icon,
                     init=init,
                     level=level,
                     start_lt=int((start - init).total_seconds() / 3600),  # full hours!
@@ -184,29 +85,53 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                     verbose=verbose,
                 )
 
+                # calculate new variables
+                if (
+                    var_name != var_open_icon
+                ):  # equivalent to "if var needs to be calculated"
+                    df = calc_new_var_timeseries(df, var_name, [level], verbose)
+
+                timeseries_dict[f"icon~{id}"] = df
             # increase icon index
             continue
 
         # AROME
         elif element[0] == "arome":
 
-            level = element[2]
+            levels = [element[2]]
             id = element[3]
             folder = element[4]
             init = element[5]
+
+            # some parameters aren't in arome and therefore needs to be calculated from other parameters
+            if var_name == "qv":
+                var_open_arome = ["press", "dewp_temp"]
+
+            elif var_name == "wind_dir" or "wind_vel":
+                var_open_arome = ["u", "v"]
+
+            else:
+                var_open_arome = var_name
 
             if f"arome~{id}" in timeseries_dict:
                 df = get_arome_timeseries(
                     lat=sdf[loc].lat,
                     lon=sdf[loc].lon,
-                    vars=var_name,
+                    vars=var_open_arome,
                     init=init,
-                    level=level,
+                    levels=levels,
                     start_lt=int((start - init).total_seconds() / 3600),  # full hours!
                     end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                     folder=folder,
                     verbose=verbose,
                 )
+
+                # calculate new variables
+                if (
+                    var_name != var_open_arome
+                ):  # equivalent to "if var needs to be calculated"
+                    df = calc_new_var_timeseries(df, var_name, levels, verbose)
+
                 del df["timestamp"]
                 timeseries_dict[f"arome~{id}"] = pd.concat(
                     [timeseries_dict[f"arome~{id}"], df], axis=1
@@ -215,17 +140,25 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 # print(id, timeseries_dict[f"icon~{id}"].columns.tolist(), df.columns.tolist())
 
             else:
-                timeseries_dict[f"arome~{id}"] = get_arome_timeseries(
+                df = get_arome_timeseries(
                     lat=sdf[loc].lat,
                     lon=sdf[loc].lon,
-                    vars=var_name,
+                    vars=var_open_arome,
                     init=init,
-                    level=level,
+                    levels=levels,
                     start_lt=int((start - init).total_seconds() / 3600),  # full hours!
                     end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                     folder=folder,
                     verbose=verbose,
                 )
+
+                # calculate new variables
+                if (
+                    var_name != var_open_arome
+                ):  # equivalent to "if var needs to be calculated"
+                    df = calc_new_var_timeseries(df, var_name, levels, verbose)
+
+                timeseries_dict[f"arome~{id}"] = df
 
             continue
 
@@ -245,6 +178,5 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
 
     if verbose:
         pprint(timeseries_dict)
-
 
     return timeseries_dict

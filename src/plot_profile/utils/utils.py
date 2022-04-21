@@ -284,6 +284,26 @@ def get_dim_names(ds_var, verbose):
     return dim_time, dim_index, dim_level
 
 
+def decumulate(arr):
+    """De-cumulate values in array.
+
+    Values of some variables have been cumulated
+    since beginning of the model simulation.
+
+    Args:
+        arr (1d array): arome output variable
+
+    Returns:
+        1d numpy nd array: de-averaged output
+
+    """
+    arr = arr.to_numpy()
+    arr = arr[1:] - arr[:-1]
+    arr = np.insert(arr, 0, np.nan)
+
+    return arr
+
+
 def deaverage(arr):
     """De-average values in array.
 

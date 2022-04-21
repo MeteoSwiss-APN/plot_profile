@@ -13,9 +13,10 @@ vdf = pd.DataFrame(
     columns=[
         "altitude",
         "cbh",
-        "clc",
-        "clct",
         "clcl",
+        "clcm",
+        "clch",
+        "clct",
         "ddt_t_lw",
         "ddt_t_sw",
         "dewp_temp",
@@ -29,11 +30,15 @@ vdf = pd.DataFrame(
         "rel_hum",
         "lw_down",
         "lw_up",
+        "lw_net",
         "sw_down",
         "sw_up",
+        "sw_net",
         "temp",
         "2m_temp",
         "tqv",
+        "u",
+        "v",
         "ver_vis",
         "wind_dir",
         "wind_vel",
@@ -62,6 +67,7 @@ vdf = pd.DataFrame(
         "plus_arome",
         "avg",
         "avg_arome",
+        "acc",
     ],
 )
 
@@ -81,6 +87,7 @@ vdf.loc["plus"][:] = 0
 vdf.loc["plus_arome"][:] = 0
 vdf.loc["avg"][:] = False
 vdf.loc["avg_arome"][:] = False
+vdf.loc["acc"][:] = False
 
 
 # fill variable dataframe with specific values
@@ -103,35 +110,52 @@ vdf["cbh"].max_value = 2000
 vdf["cbh"].mult = 0.3048
 vdf["cbh"].dwh_id = {"2m": "1541"}
 
-# cloud cover: clc
-vdf["clc"].short_name = "clc"
-vdf["clc"].icon_name = "clc"
-vdf["clc"].arome_name = "fCV"
-vdf["clc"].long_name = "Cloud cover"
-vdf["clc"].unit = ""
-vdf["clc"].min_value = -0.05
-vdf["clc"].max_value = 1.05
-vdf["clc"].color = "yellowgreen"
-vdf["clc"].colormap = "bone"
-
-# cloud cover: clcl
+# Cloud covers
+# cloud cover LOW: clcl
 vdf["clcl"].short_name = "clcl"
-vdf["clcl"].icon_name = "CLCL"
+vdf["clcl"].icon_name = "clcl"
 vdf["clcl"].arome_name = "LCV"
 vdf["clcl"].long_name = "Low cloud cover"
 vdf["clcl"].unit = "%"
 vdf["clcl"].min_value = -0.05
 vdf["clcl"].max_value = 1.05
 vdf["clcl"].mult_arome = 0.01
+vdf["clcl"].color = "peru"
+vdf["clcl"].colormap = "bone"
 
+# cloud cover MEDIUM: clcm
+vdf["clcm"].short_name = "clcm"
+vdf["clcm"].icon_name = "clcm"
+vdf["clcm"].arome_name = "MCV"
+vdf["clcm"].long_name = "Medium cloud cover"
+vdf["clcm"].unit = "%"
+vdf["clcm"].min_value = -0.05
+vdf["clcm"].max_value = 1.05
+vdf["clcm"].mult_arome = 0.01
+vdf["clcm"].color = "mediumorchid"
+vdf["clcm"].colormap = "bone"
 
-# cloud cover: clct
+# cloud cover HIGH: clch
+vdf["clch"].short_name = "clch"
+vdf["clch"].icon_name = "clch"
+vdf["clch"].arome_name = "HCV"
+vdf["clch"].long_name = "High cloud cover"
+vdf["clch"].unit = "%"
+vdf["clch"].min_value = -0.05
+vdf["clch"].max_value = 1.05
+vdf["clch"].mult_arome = 0.01
+vdf["clch"].color = "cornflowerblue"
+vdf["clch"].colormap = "bone"
+
+# cloud cover TOTAL: clct
 vdf["clct"].short_name = "clct"
-vdf["clct"].icon_name = "CLCT"  # "clct"
+vdf["clct"].icon_name = "clct"
+vdf["clcl"].arome_name = "LCV"
 vdf["clct"].long_name = "Total cloud cover"
-vdf["clct"].unit = ""
+vdf["clct"].unit = "%"
 vdf["clct"].min_value = -0.05
 vdf["clct"].max_value = 1.05
+vdf["clct"].mult_arome = 0.01
 
 # temperature tendency due to longwave radiative heating
 #  ddt_t_lw
@@ -163,8 +187,10 @@ vdf["ddt_t_sw"].colormap = sns.light_palette("goldenrod", as_cmap=True)
 
 # dewpoint temperature: dewp_temp
 vdf["dewp_temp"].short_name = "dewp_temp"
+vdf["dewp_temp"].arome_name = "Td"
 vdf["dewp_temp"].long_name = "Dew point temperature"
 vdf["dewp_temp"].unit = "°C"
+vdf["dewp_temp"].plus_arome = -273.15
 vdf["dewp_temp"].min_value = -5
 vdf["dewp_temp"].max_value = 15
 vdf["dewp_temp"].dwh_id = {"rs": "747", "2m": "194"}
@@ -179,11 +205,11 @@ vdf["hor_vis"].dwh_id = {"2m": "1547"}
 
 # pressure: press
 vdf["press"].short_name = "press"
+vdf["press"].arome_name = "P"
 vdf["press"].long_name = "Pressure"
 vdf["press"].unit = "hPa"
-vdf["press"].short_name = "press"
+vdf["press"].mult_arome = 0.01
 vdf["press"].dwh_id = {"rs": "744"}
-
 
 # cloud water: qc
 vdf["qc"].short_name = "qc"
@@ -219,6 +245,7 @@ vdf["qi_dia"].mult = 1000
 # specific humidity: qv
 vdf["qv"].short_name = "qv"
 vdf["qv"].icon_name = "QV"
+vdf["qv"].arome_name = "qv"
 vdf["qv"].long_name = "Specific humidity"
 vdf["qv"].unit = "g/kg"
 vdf["qv"].min_value = 0
@@ -226,6 +253,7 @@ vdf["qv"].max_value = 6
 vdf["qv"].color = "skyblue"
 vdf["qv"].colormap = "PuBu"
 vdf["qv"].mult = 1000
+vdf["qv"].arome_mult = 1000
 
 # diagnostic humidity: qv_dia
 vdf["qv_dia"].short_name = "qv_dia"
@@ -254,7 +282,7 @@ vdf["rel_hum"].dwh_id = {
 vdf["lw_down"].short_name = "lw_down"
 vdf["lw_down"].long_name = "Downward LW rad"
 vdf["lw_down"].unit = "W/m2"
-vdf["lw_down"].icon_name = "ATHD_S"
+vdf["lw_down"].icon_name = "athd_s"
 vdf["lw_down"].avg = True
 vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
@@ -262,11 +290,24 @@ vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 vdf["lw_up"].short_name = "lw_up"
 vdf["lw_up"].long_name = "Upward LW rad"
 vdf["lw_up"].unit = "W/m2"
+vdf["lw_up"].icon_name = "athu_s"
+vdf["lw_up"].avg = True
 vdf["lw_up"].dwh_id = {
     "2m": "1531",
     "2m_tower": "5118",  # no data yet in DWH
     "30m_tower": "5181",  # no data yet in DWH
 }
+
+# radiation: longwave net
+vdf["lw_net"].short_name = "lw_net"
+vdf["lw_net"].long_name = "Net LW rad"
+vdf["lw_net"].unit = "W/m2"
+vdf["lw_net"].icon_name = "athb_s"
+vdf["lw_net"].arome_name = "LW"
+vdf["lw_net"].mult_arome = 1 / 3600
+vdf["lw_net"].avg = True
+vdf["lw_net"].acc = True
+vdf["lw_net"].dwh_id = {"2m": "net_calc:175:1531:"}
 
 # radiation: shortwave downward
 vdf["sw_down"].short_name = "sw_down"
@@ -276,12 +317,22 @@ vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
 vdf["sw_down"].icon_name = "asod_s"  # "GLOB"
 vdf["sw_down"].avg = True
 
-
 # radiation: shortwave upward ("reflected")
 vdf["sw_up"].short_name = "sw_up"
 vdf["sw_up"].long_name = "Upward SW rad"
 vdf["sw_up"].unit = "W/m2"
 vdf["sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
+
+# radiation: shortwave net
+vdf["sw_net"].short_name = "sw_net"
+vdf["sw_net"].long_name = "Net SW rad"
+vdf["sw_net"].unit = "W/m2"
+vdf["sw_net"].icon_name = "asob_s"
+vdf["sw_net"].arome_name = "SW"
+vdf["sw_net"].mult_arome = 1 / 3600
+vdf["sw_net"].avg = True
+vdf["sw_net"].acc = True
+vdf["sw_net"].dwh_id = {"2m": "net_calc:96:1871:"}
 
 # temperature: temp
 vdf["temp"].short_name = "temp"
@@ -331,6 +382,20 @@ vdf["tqv"].long_name = "Total water vapour"
 vdf["tqv"].unit = "kg/m2"
 vdf["tqv"].dwh_id = {"2m": "2537"}
 
+# x wind
+vdf["u"].short_name = "u"
+vdf["u"].long_name = "x wind velocity"
+vdf["u"].icon_name = "U"
+vdf["u"].arome_name = "U"
+vdf["u"].unit = "m/s"
+
+# y wind
+vdf["v"].short_name = "v"
+vdf["v"].long_name = "y wind velocity"
+vdf["v"].icon_name = "V"
+vdf["v"].arome_name = "V"
+vdf["v"].unit = "m/s"
+
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"
 vdf["ver_vis"].long_name = "Vertical visibility"
@@ -342,19 +407,23 @@ vdf["ver_vis"].dwh_id = {"2m": "6199"}
 
 # wind direction: wind_dir
 vdf["wind_dir"].short_name = "wind_dir"
+vdf["wind_dir"].icon_name = "wind_dir"
+vdf["wind_dir"].arome_name = "wind_dir"
 vdf["wind_dir"].long_name = "Wind direction"
 vdf["wind_dir"].unit = "°"
 vdf["wind_dir"].min_value = 0
 vdf["wind_dir"].max_value = 360
-vdf["wind_dir"].dwh_id = {"rs": "743"}
+vdf["wind_dir"].dwh_id = {"rs": "743", "10m_tower": "197"}
 
 # wind velocity: wind_vel
 vdf["wind_vel"].short_name = "wind_vel"
+vdf["wind_vel"].icon_name = "wind_vel"
+vdf["wind_vel"].arome_name = "wind_vel"
 vdf["wind_vel"].long_name = "Wind velocity"
 vdf["wind_vel"].unit = "m/s"
 vdf["wind_vel"].min_value = 0
 vdf["wind_vel"].max_value = 30
-vdf["wind_vel"].dwh_id = {"rs": "748"}
+vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196"}
 
 # !!! if adding new variable: don't forget to add at the top and in cli-file!!!
 

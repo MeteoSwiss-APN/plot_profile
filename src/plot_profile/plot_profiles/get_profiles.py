@@ -13,6 +13,7 @@ from pprint import pprint
 import pandas as pd
 
 # First-party
+from plot_profile.plot_arome.get_arome import get_arome_profiles
 from plot_profile.plot_icon.get_icon import get_icon
 from plot_profile.plot_timeseries.parse_timeseries_inputs import check_units
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
@@ -205,8 +206,77 @@ def get_data(
 
         # A.2) retrieve data from AROME forecasts
         #########################################
-        elif device == "arome":
-            print("Has to be implemented.")
+        if device == "arome":
+            model_id = element[2]
+            folder = element[3]
+            init = element[4]
+
+            # check if a key for this arome-instance (for example arome-ref or arome-exp,...) already exists.
+            # if yes --> retrieve df as usual, but instead of assigning it to a new key, only append/concatenate
+            # the variable column to the already existing dataframe.
+            if f"arome~{model_id}" in data_dict:
+                # retrieve data from AROME forecasts
+                tmp_dict = get_arome_profiles(
+                    folder=folder,
+                    date=init,
+                    leadtime=[
+                        int((date - init).total_seconds() / 3600)
+                    ],  # full hours!; has to be a list,
+                    lat=lat,
+                    lon=lon,
+                    variables_list=[var_name],
+                    alt_bot=ylims[0],
+                    alt_top=ylims[1],
+                    verbose=verbose,
+                )
+                # re-format output from get_arome_profiles slightly
+                tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+                tmp_df = tmp_df.reset_index(drop=True)
+                tmp_df = tmp_df.dropna()
+                del tmp_df["height"]
+
+                if verbose:
+                    print("Should add this df to the existing df: ")
+                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                    pprint(tmp_df)
+                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                    pprint(data_dict[f"arome~{model_id}"])
+                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                    pprint(pd.concat([data_dict[f"arome~{model_id}"], tmp_df], axis=1))
+                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+                data_dict[f"arome~{model_id}"] = pd.concat(
+                    [data_dict[f"arome~{model_id}"], tmp_df], axis=1
+                )
+                continue
+
+            else:
+                lt_dict[f"arome~{model_id}"] = int((date - init).total_seconds() / 3600)
+
+                # retrieve data from AROME forecasts
+                tmp_dict = get_arome_profiles(
+                    folder=folder,
+                    date=init,
+                    leadtime=[
+                        int((date - init).total_seconds() / 3600)
+                    ],  # full hours!; has to be a list,
+                    lat=lat,
+                    lon=lon,
+                    variables_list=[var_name],
+                    alt_bot=ylims[0],
+                    alt_top=ylims[1],
+                    verbose=verbose,
+                )
+                # re-format output from get_icon slightly
+                tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+                tmp_df = tmp_df.reset_index(drop=True)
+                tmp_df = tmp_df.dropna()
+
+                # add df w/ height & variable columns to data_dict
+                data_dict[f"arome~{model_id}"] = tmp_df
+
             continue
 
         # B) retrieve observational data
