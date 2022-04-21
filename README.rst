@@ -28,6 +28,12 @@ Usage
   ``plot_rs --date 2022011112 --params temp --clouds --relhum_thresh 95 --grid``
   
   ``plot_rs --date 2022041912 --params temp --params dewp_temp --params wind_vel --params wind_dir``
+  
+- ``plot_profiles``: compare vertical profiles of radiosounding and models for 1 specific valid time
+
+  ``plot_profiles --loc pay --date 21111900 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812``
+  
+  ! "exp" and "ref" serve as identifiers to connect an add_model-statement to the model_src
 
 - ``plot_icon_profiles``: plot vertical profiles of variables from ICON simulations
 
