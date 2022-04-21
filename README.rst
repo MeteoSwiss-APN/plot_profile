@@ -20,8 +20,14 @@ Usage
 2. Available entry-points (show available options with ``--help``)
 
 - ``plot_rs``: plot radiousounding
-
+  
+  Example commands:
+  
   ``plot_rs --date 2021111912 --params temp --params dewp_temp --alt_top 2500``
+  
+  ``plot_rs --date 2022011112 --params temp --clouds --relhum_thresh 95 --grid``
+  
+  ``plot_rs --date 2022041912 --params temp --params dewp_temp --params wind_vel --params wind_dir``
 
 - ``plot_icon_profiles``: plot vertical profiles of variables from ICON simulations
 
