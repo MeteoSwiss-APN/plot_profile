@@ -34,6 +34,12 @@ Usage
   ``plot_profiles --loc pay --date 21111900 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812``
   
   ! "exp" and "ref" serve as identifiers to connect an add_model-statement to the model_src
+  
+- ``plot_timeseries``: timeseries of observed and modelled variables
+
+  ``plot_timeseries --loc pay --start 21111900 --end 21111912 --add_obs 2m ver_vis --add_obs 2m cbh``
+  
+  ``plot_timeseries --loc pay --start 21111900 --end 21111906 --add_model icon temp 1 ref --add_model icon temp 1 exp --add_obs 10m_tower temp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812``
 
 - ``plot_icon_profiles``: plot vertical profiles of variables from ICON simulations at *multiple* leadtimes
 
@@ -63,10 +69,10 @@ This package was created with `Cookiecutter`_ and the `MeteoSwiss-APN/mch-python
 
 TO DO's
 -------
+- allow for multiple icon_names in variables.py
+- allow different filename-formats for ICON-files
+- output filename of plot_timeseries is funky
+- heatmap x-axis tick labeling ignores --start_leadtime
 - if dwh-dataframe is empty, (icon-)plot should still be produced, just without data
 - allow for multiple icon_names in variables.py
-- plot timeseries of DWH-surface variables
-- add timeseries of simulated surface variables for 1 or more configurations
-- labelling of leadtimes and radiosoundings in icon_profiles-plot
-- support read-in of ICON files in GRIB2-format
 - allow different filename-formats for ICON-files
