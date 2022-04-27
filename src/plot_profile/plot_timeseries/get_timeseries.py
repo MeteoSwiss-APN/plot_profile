@@ -6,11 +6,11 @@ from pprint import pprint
 import pandas as pd
 
 # First-party
-
 from plot_profile.plot_arome.get_arome import get_arome_hm
 from plot_profile.plot_arome.get_arome import get_arome_timeseries
 from plot_profile.plot_icon.get_icon import get_icon_hm
 from plot_profile.plot_icon.get_icon import get_icon_timeseries
+from plot_profile.utils.calc_new_vars import calc_new_var_timeseries
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
 from plot_profile.utils.stations import sdf
 
@@ -58,7 +58,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
 
             else:
                 var_open_icon = var_name
-                
+
             # check if a key for this icon-instance (for example icon-ref or icon-exp,...) already exists.
             # if yes --> retrieve df as usual, but instead of assigning it to a new key, only append/concatenate
             # the variable column to the already existing dataframe.
@@ -158,7 +158,6 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
 
         # AROME
         elif element[0] == "arome":
-
 
             levels = element[2]
             id = element[3]
