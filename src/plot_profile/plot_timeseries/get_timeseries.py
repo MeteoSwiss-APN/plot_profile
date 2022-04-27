@@ -6,15 +6,21 @@ from pprint import pprint
 import pandas as pd
 
 # First-party
+
 from plot_profile.plot_arome.get_arome import get_arome_hm
 from plot_profile.plot_arome.get_arome import get_arome_timeseries
 from plot_profile.plot_icon.get_icon import get_icon_hm
 from plot_profile.plot_icon.get_icon import get_icon_timeseries
-from plot_profile.plot_timeseries.calc_new_vars import calc_new_var_timeseries
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
 from plot_profile.utils.stations import sdf
 
 # from ipdb import set_trace
+
+
+def get_arome():
+    # TODO: implement function to retrieve data from AROME model (.csv, .nc, whatever)
+    # and parse into pandas dataframe
+    return print("should return AROME dataframe at this point")
 
 
 def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
@@ -24,7 +30,6 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
     for element in elements:
 
         # retrieve variable name
-
         var_name = element[1]
 
         # ICON
@@ -53,7 +58,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
 
             else:
                 var_open_icon = var_name
-
+                
             # check if a key for this icon-instance (for example icon-ref or icon-exp,...) already exists.
             # if yes --> retrieve df as usual, but instead of assigning it to a new key, only append/concatenate
             # the variable column to the already existing dataframe.
@@ -106,6 +111,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 # print(id, timeseries_dict[f"icon~{id}"].columns.tolist(), df.columns.tolist())
 
             else:
+
                 if do_interpolation == True:
                     df = get_icon_hm(
                         lat=sdf[loc].lat,
@@ -146,11 +152,13 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                     df = calc_new_var_timeseries(df, var_name, levels, verbose)
 
                 timeseries_dict[f"icon~{id}"] = df
+
             # increase icon index
             continue
 
         # AROME
         elif element[0] == "arome":
+
 
             levels = element[2]
             id = element[3]
@@ -262,6 +270,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                     df = calc_new_var_timeseries(df, var_name, levels, verbose)
 
                 timeseries_dict[f"arome~{id}"] = df
+
             continue
 
         # OBS from DWH
@@ -277,8 +286,5 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
 
             if not data.empty:
                 timeseries_dict[f"{device}~{var_name}"] = data
-
-    if verbose:
-        pprint(timeseries_dict)
 
     return timeseries_dict

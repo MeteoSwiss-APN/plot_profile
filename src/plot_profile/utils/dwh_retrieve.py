@@ -494,7 +494,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             relevant_vars.append(short_name)
 
         data = raw_data[relevant_vars]
-        print(data)
 
         return data
 

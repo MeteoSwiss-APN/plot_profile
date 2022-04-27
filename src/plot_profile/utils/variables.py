@@ -13,6 +13,7 @@ vdf = pd.DataFrame(
     columns=[
         "altitude",
         "cbh",
+        "clc",
         "clcl",
         "clcm",
         "clch",
@@ -112,6 +113,17 @@ vdf["cbh"].mult = 0.3048
 vdf["cbh"].dwh_id = {"2m": "1541"}
 
 # Cloud covers
+
+# cloud cover: clc
+vdf["clc"].short_name = "clc"
+vdf["clc"].icon_name = "clc"
+vdf["clc"].long_name = "Cloud cover"
+vdf["clc"].unit = ""
+vdf["clc"].min_value = -0.05
+vdf["clc"].max_value = 1.05
+vdf["clc"].color = "yellowgreen"
+vdf["clc"].colormap = "bone"
+
 # cloud cover LOW: clcl
 vdf["clcl"].short_name = "clcl"
 vdf["clcl"].icon_name = "clcl"

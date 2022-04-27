@@ -126,10 +126,10 @@ def main(
 ) -> None:
     """Plot vertical profiles of balloon radiosounding data.
 
-    Available variables are: windvel/winddir/temp/dewp_temp.
+    Available variables are: wind_vel/wind_dir/temp/dewp_temp.
 
-    If (wind or windvel) AND (temp or dewp_temp) are plottet, two plots side by side will be created.
-    Otherwise one plot containing up to two variables (wind/windvel or temp/dewp_temp).
+    If (wind_dir or wind_vel) AND (temp or dewp_temp) are plottet, two plots side by side will be created.
+    Otherwise one plot containing up to two variables.
 
     Personal axis limits can be specified by using the '--personal_settings' flag in conjunction with the
     axis limits one wants to define.
@@ -140,7 +140,9 @@ def main(
     Otherwise the axes limits will be fitted to the data.
 
     Example command:
-    plot_rs --date 2021111012 --outpath plots --grid --clouds --relhum_thresh 99 --params dewp_temp --params temp
+    plot_rs --date 2021111912 --params temp --params dewp_temp --alt_top 2500
+    plot_rs --date 2022011112 --params temp --clouds --relhum_thresh 95 --grid
+    plot_rs --date 2022041912 --params temp --params dewp_temp --params wind_vel --params wind_dir
 
     """
     # Preparations:
@@ -149,7 +151,7 @@ def main(
     if station in ["06610", "pay", "payerne"]:
         station = sdf["pay"]
     else:
-        print(f"{station} not defined!")
+        print(f"{station} not yet defined!")
         sys.exit(1)
 
     # define lower altitude if None is specified by user

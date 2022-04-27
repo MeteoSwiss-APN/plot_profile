@@ -50,7 +50,7 @@ def save_fig(filename, datatypes, outpath, fig=None):
             username = getpass.getuser()
             filepath = Path(f"/scratch/{username}/tmp/{filename}.{datatype}")
             Path(filepath).parents[0].mkdir(parents=True, exist_ok=True)
-            plt.savefig(filepath)
+            plt.savefig(filepath, dpi=200)
             print(f"--- file saved @ {filepath}")
         return
     else:
