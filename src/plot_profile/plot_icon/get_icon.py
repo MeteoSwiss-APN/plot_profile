@@ -8,12 +8,14 @@ Date: 11/11/2021
 # Standard library
 import datetime as dt
 import sys
+from doctest import DocFileCase
 from pathlib import Path
 from pprint import pprint
 
 # Third-party
 import numpy as np
 import pandas as pd
+import scipy
 import xarray as xr
 
 # First-party
@@ -88,6 +90,25 @@ def calc_hhl(hfl):
         sys.exit(1)
 
     return hhl
+
+
+def calc_hfl(hhl):
+    """Interpolate from half levels to full levels.
+
+    Args:
+        hhl (1d array): values of a variable defined on N half model levels
+
+    Returns:
+        1d array        values of this variable interpolated to N-1 full model levels
+
+    """
+    if hhl.ndim == 1:
+        hfl = hhl[1:] + (hhl[:-1] - hhl[1:]) / 2
+    else:
+        print("height field has too many dimensions")
+        sys.exit(1)
+
+    return hfl
 
 
 def index_height_from_grid_file(lat, lon, grid, verbose):
@@ -344,6 +365,7 @@ def get_icon_timeseries(
         vars = [
             vars,
         ]
+
     for i, variable in enumerate(vars):
 
         # for variables without level, e.g. 2m_temperature
@@ -381,7 +403,9 @@ def get_icon_timeseries(
         ):
             values = ds_var.isel(**{dim_index: ind})
         else:
-            print("--- ! Dims do not make sense: {dim_time}, {dim_index}, {dim_level}!")
+            print(
+                f"--- ! Dims do not make sense: {dim_time}, {dim_index}, {dim_level}!"
+            )
             continue
 
         # de-average
@@ -389,5 +413,113 @@ def get_icon_timeseries(
             values = deaverage(values)
 
         df[column_label] = values * var.mult + var.plus
+    return df
+
+
+def get_icon_hm(
+    lat, lon, var, init, height_list, start_lt, end_lt, folder, grid_file, verbose
+):
+    """Retrieve timeseries of an interpolated var for Arome outputs.
+
+    Args:
+        lat (float):                   latitude in degrees
+        lon (float):                   longitude in degrees
+        var (str):                     variable name
+        init (datetime object):        init date of simulation
+        height_list (list of floats):  list of heights on where to do the interpolation
+        start_lt (int):                start leadtime
+        end_lt (int):                  end leadtime
+        folder (str):                  folder containing subfolders with icon runs
+        grid_file (str):               icon-1 grid file
+        verbose (bool):                print details
+
+    Returns:
+        pandas dataframe:              icon simulation values
+
+    """
+    # create df which collects icon variables
+    df = pd.DataFrame()
+
+    ind, height, size = index_height_from_grid_file(lat, lon, grid_file, verbose)
+
+    hfl = calc_hfl(height)
+
+    # directory with forecast files
+    init_str = init.strftime("%y%m%d%H")
+    icon_dir = Path(folder, init_str)
+
+    if not icon_dir.is_dir():
+        print(f"--- ! {icon_dir} does not exist!")
+        sys.exit(1)
+
+    if verbose:
+        print(f"Looking for files in {str(icon_dir)}")
+
+    # retrieve lfff-files
+    leadtimes = np.arange(start_lt, end_lt + 1)
+    files = [Path(icon_dir, lfff_name(lt)) for lt in leadtimes]
+
+    if verbose:
+        print("files:")
+        for f in files:
+            print(f"  {f}")
+
+    # load forecast files as xarray dataset
+    if verbose:
+        print("Loading files into xarray dataset.")
+    ds = xr.open_mfdataset(files).squeeze()
+    if verbose:
+        print("Finished loading files into xarray dataset.")
+
+    # select variable
+    ds_var = ds[vdf.loc["icon_name"][var]]
+
+    dim_time, dim_index, dim_level = get_dim_names(ds_var, verbose)
+
+    # checking that variable is 3D
+    if (
+        isinstance(dim_time, str)
+        and isinstance(dim_index, str)
+        and isinstance(dim_level, str)
+    ):
+        values = ds_var.isel(**{dim_index: ind})  # , dim_level: np.negative(level)})
+
+    elif isinstance(dim_time, str) and isinstance(dim_index, str) and dim_level is None:
+        print(f"--- ! {var} is 2D. Need a 3D variable.")
+        sys.exit(1)
+
+    else:
+        print(f"--- ! Dims do not make sense: {dim_time}, {dim_index}, {dim_level}!")
+        sys.exit(1)
+
+    # creating f_interpolate_ico function thanks to scipy
+    if verbose:
+        print(f"Interpolating icon {var} and heights on: {height_list}...")
+
+    f_interpolate_ico = scipy.interpolate.interp1d(
+        hfl, values, axis=1, fill_value="extrapolate"
+    )
+
+    # interoplating icon over requested height levels
+    values = f_interpolate_ico(height_list)
+
+    if verbose:
+        print(f"Finished interpolating.")
+
+    ## timestamps column
+    timestamps = []
+    for lt in leadtimes:
+        timestamps.append(init + dt.timedelta(hours=int(lt)))
+
+    df["timestamp"] = timestamps
+
+    ## variables columns
+
+    # add factor or values
+    mult, plus = vdf.loc["mult"][var], vdf.loc["plus"][var]
+
+    for k in range(len(height_list)):
+        col_name = f"{var}~{str(height_list[k])}"
+        df[col_name] = values[:, k] * mult + plus
 
     return df
