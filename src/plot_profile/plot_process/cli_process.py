@@ -21,6 +21,17 @@ from plot_profile.plot_timeseries.plot_timeseries import create_plot
 
 
 @click.command()
+# mandatory click options
+@click.option(
+    "--start",
+    type=click.DateTime(formats=["%y%m%d%H"]),
+    help="MANDATORY: Start timestamp: yymmddHH",
+)
+@click.option(
+    "--end",
+    type=click.DateTime(formats=["%y%m%d%H"]),
+    help="MANDATORY: End timestamp: yymmddHH",
+)
 @click.option("--dummy", type=str, help="this is a test")
 def main(*, dummy: str):
     print(f"{dummy}")

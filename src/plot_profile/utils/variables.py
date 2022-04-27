@@ -21,6 +21,7 @@ vdf = pd.DataFrame(
         "ddt_t_lw",
         "ddt_t_sw",
         "dewp_temp",
+        "grad_temp",
         "hor_vis",
         "press",
         "qc",
@@ -207,6 +208,14 @@ vdf["dewp_temp"].min_value = -5
 vdf["dewp_temp"].max_value = 15
 vdf["dewp_temp"].dwh_id = {"rs": "747", "2m": "194"}
 
+# gradient tempearture vertical
+vdf["grad_temp"].short_name = "grad_temp"
+vdf["grad_temp"].icon_name = "grad_temp"
+vdf["grad_temp"].arome_name = "grad_temp"
+vdf["grad_temp"].long_name = "Vertical temperature gradient"
+vdf["grad_temp"].unit = "°C/m"
+vdf["grad_temp"].dwh_id = {"30m_tower": "grad_temp:4957:4949"}
+
 # horizontal visiblity: hor_vis
 vdf["hor_vis"].short_name = "hor_vis"
 vdf["hor_vis"].long_name = "Horizontal visibility"
@@ -265,7 +274,7 @@ vdf["qv"].max_value = 6
 vdf["qv"].color = "skyblue"
 vdf["qv"].colormap = "PuBu"
 vdf["qv"].mult = 1000
-vdf["qv"].arome_mult = 1000
+vdf["qv"].mult_arome = 1000
 
 # diagnostic humidity: qv_dia
 vdf["qv_dia"].short_name = "qv_dia"
@@ -280,6 +289,24 @@ vdf["qv_dia"].mult = 1000
 # relative humidity: rel_hum
 vdf["rel_hum"].short_name = "rel_hum"
 vdf["rel_hum"].long_name = "Relative humidity"
+vdf["rel_hum"].icon_name = "rel_hum"
+vdf["rel_hum"].arome_name = "Hu"
+vdf["rel_hum"].unit = "%"
+vdf["rel_hum"].min_value = 0
+vdf["rel_hum"].max_value = 100
+vdf["rel_hum"].mult = 100
+vdf["rel_hum"].dwh_id = {
+    "rs": "746",
+    "2m_tower": "3698",
+    "10m_tower": "4953",
+    "30m_tower": "4961",
+}
+
+# relative humidity: rel_hum
+vdf["rel_hum"].short_name = "rel_hum"
+vdf["rel_hum"].long_name = "Relative humidity"
+vdf["rel_hum"].icon_name = "rel_hum"
+vdf["rel_hum"].arome_name = "Hu"
 vdf["rel_hum"].unit = "%"
 vdf["rel_hum"].min_value = 0
 vdf["rel_hum"].max_value = 100

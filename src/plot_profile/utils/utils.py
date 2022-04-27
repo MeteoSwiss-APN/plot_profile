@@ -81,6 +81,8 @@ def slice_top_bottom(df_height, alt_top, alt_bot, verbose=False):
 
     # get index values to slice the dataframe
     tmp = True
+    upper_cut_off_index = len(df_height)  # default
+
     for i, height in enumerate(df_height):
         if alt_bot:  # if a bottom altitude has been specified
             if height > alt_bot:
@@ -90,8 +92,8 @@ def slice_top_bottom(df_height, alt_top, alt_bot, verbose=False):
                     )  # include first value below bottom altitude as well
                     tmp = False
         else:
-            if verbose:
-                print("No bottom specified, use minimal height.")
+            # if verbose:
+            #    print("No bottom specified, use minimal height.")
             lower_cut_off_index = 0
 
         if height > alt_top:

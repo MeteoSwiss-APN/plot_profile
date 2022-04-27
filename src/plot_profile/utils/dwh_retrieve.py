@@ -366,6 +366,10 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
         for var in vars:
             dwh_id = vdf[var].dwh_id[device]
             short_name = vdf[var].short_name
+
+            if dwh_id == "3147":  # convert mwr output to deg Celsius
+                raw_data[dwh_id] = raw_data[dwh_id] - 273
+
             raw_data.rename(columns={dwh_id: short_name}, inplace=True)
             relevant_vars.append(short_name)
 
@@ -414,14 +418,64 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
     # surface-based data
     elif device in ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower"]:
 
-        # call dwh retrieve for surface-based data
-        raw_data = dwh_surface(
-            station_name=sdf[station].dwh_name,
-            vars_str=vars_str,
-            start=t1,
-            end=t2,
-            verbose=verbose,
-        )
+        # if net lw/sw radiation is required we need to calculate it
+        if "net_calc" in vars_str:
+
+            # downward, upward radiation DWH ids
+            dwn_id, up_id = vars_str.split(":")[1:3]
+
+            # adding lw_down and lw_up DWH ids to vars_str"
+            vars_str = f"{vars_str.split('net_calc')[0]}{dwn_id},{up_id}{vars_str.split(':')[3]}"
+
+            # call dwh retrieve for surface-based data
+            raw_data = dwh_surface(
+                station_name=sdf[station].dwh_name,
+                vars_str=vars_str,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
+
+            if verbose:
+                print("Subtracting downward and upward radiations")
+
+            # lw_net = lw_down - lw_up
+            raw_data[f"net_calc:{dwn_id}:{up_id}:"] = raw_data[dwn_id] - raw_data[up_id]
+
+        # if vertical temperature gradient we need to calculate it (between 30m and 10m)
+        if "grad_temp" in vars_str:
+
+            top_id, bot_id = vars_str.split(":")[1:3]
+            open_vars = f"{top_id},{bot_id}"
+
+            # call dwh retrieve for surface-based data
+            raw_data = dwh_surface(
+                station_name=sdf[station].dwh_name,
+                vars_str=open_vars,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
+
+            # gradT = (Ttop - Tbot)/(alt_top - alt_bot)
+            raw_data[f"grad_temp:{top_id}:{bot_id}"] = (
+                raw_data[f"{top_id}"] - raw_data[f"{bot_id}"]
+            ) / 20
+
+            if verbose:
+                print(
+                    f"Calculating observed vertical temperature gradient ({vars_str})."
+                )
+
+        else:
+            # call dwh retrieve for surface-based data
+            raw_data = dwh_surface(
+                station_name=sdf[station].dwh_name,
+                vars_str=vars_str,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
 
         if raw_data.empty:
             return raw_data
@@ -432,6 +486,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
         relevant_vars = [
             "timestamp",
         ]
+
         for var in vars:
             dwh_id = vdf[var].dwh_id[device]
             short_name = vdf[var].short_name
