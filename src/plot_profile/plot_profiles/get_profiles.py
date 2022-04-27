@@ -13,6 +13,7 @@ from pprint import pprint
 import pandas as pd
 
 # First-party
+from plot_profile.plot_arome.get_arome import get_arome_profiles
 # from plot_profile.plot_arome.get_arome import get_arome_profiles
 from plot_profile.plot_icon.get_icon import get_icon
 from plot_profile.plot_timeseries.parse_timeseries_inputs import check_units
