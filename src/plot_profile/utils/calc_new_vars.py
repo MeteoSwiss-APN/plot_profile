@@ -95,8 +95,8 @@ def calculate_wind_velocity(u, v, verbose=False):
     """Calculate wind velocity from U, V components.
 
     Args:
-        u (pd series)
-        v (pd series)
+        u (pd series) u wind component in m/s
+        v (pd series) u wind component in m/s
 
     Returns:
         pd series: wind velocity in m/s
@@ -116,8 +116,8 @@ def calculate_wind_direction(u, v, verbose=False):
     """Calculate wind direction from U, V components.
 
     Args:
-        u (pd series)
-        v (pd series)
+        u (pd series) u wind component in m/s
+        v (pd series) v wind component in m/s
 
     Returns:
         pd series: wind direction in °
@@ -128,18 +128,17 @@ def calculate_wind_direction(u, v, verbose=False):
             "Calculating wind direction (wind_dir) from meridian and zonal wind velocity."
         )
 
-    wind_dir = np.arctan2(u, v)
+    # convert to wind direction coordinate, different from trig unit circle coords
+    # if the wind directin is 360 then returns zero (by %360)
+    # inspired from wind_uv_to_dir function in:
+    # https://github.com/blaylockbk/Ute_WRF/blob/master/functions/wind_calcs.py
 
-    # from radian between [-pi, pi] to ° between [0, 360]
-    for i in range(len(wind_dir)):
-        if wind_dir[i] > 0:
-            wind_dir[i] = wind_dir[i] * 180 / np.pi
-        else:
-            wind_dir[i] = 360 + (wind_dir[i] * 180 / np.pi)
+    wind_dir = (270 - np.rad2deg(np.arctan2(v, u))) % 360
 
     return wind_dir
 
 
+# TODO: a tester !!! je ne sais pas si ca marche
 def calc_rho_arome(p, t, qc, qv, verbose=False):
     """Calculate air density.
 
@@ -153,7 +152,6 @@ def calc_rho_arome(p, t, qc, qv, verbose=False):
         pd series :      air density (kg/m**3)
 
     """
-    # TODO: a tester !!! je ne sais pas si ca marche
     if verbose:
         print("Calculating air density (RHO) from press, temp, qc and qv")
 
