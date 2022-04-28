@@ -88,6 +88,7 @@ sdf = pd.DataFrame(
         "hoe",  # Hörnli
         "ilz",  # Ilanz
         "int",  # Interlaken
+        "ins",  # Ins
         "jun",  # Jungfraujoch
         "klo",  # Zurich Kloten
         "kop",  # Koppigen
@@ -668,6 +669,15 @@ sdf["int"].dwh_name = "INT"
 sdf["int"].lat = 46.672233
 sdf["int"].lon = 7.870194
 sdf["int"].elevation = 577
+
+# Ins
+sdf["int"].short_name = "ins"
+sdf["int"].long_name = "Ins"
+sdf["int"].dwh_id = None
+sdf["int"].dwh_name = None
+sdf["int"].lat = 47.00640
+sdf["int"].lon = 7.10621
+sdf["int"].elevation = 480
 
 # Langnau i.E.
 sdf["lag"].short_name = "lag"
