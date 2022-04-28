@@ -17,10 +17,11 @@ import numpy as np
 import pandas as pd
 
 # First-party
+from plot_profile.utils.calc_new_vars import calculate_qv
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.variables import vdf
 
-# import ipdb
+# from ipdb import set_trace
 
 
 def yy2yyyy(yy):

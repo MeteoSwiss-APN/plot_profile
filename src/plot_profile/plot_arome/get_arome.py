@@ -78,7 +78,7 @@ def slice_top_bottom_V2(df_height, alt_top=None, alt_bot=None, verbose=False):
         alt_top = 1e6
 
     for i, height in enumerate(df_height):
-        print(height)
+
         if alt_bot < height < alt_top:
             crit[i - 1 : i + 2] = True
 
@@ -171,6 +171,12 @@ def get_arome_profiles(
 
     data_dict["height"] = df_height[crit]
 
+    # if var is string transform it to a 1 element list
+    if isinstance(variables_list, str):
+        variables_list = [
+            variables_list,
+        ]
+
     ## Create values Data Frame
 
     for var in variables_list:
@@ -237,7 +243,7 @@ def get_arome_profiles(
         # only extract the relevant altitude levels (encoded in the crit series; True --> relevant)
         df_values = df_values[crit]
 
-        # add ti dictionary
+        # add to dictionary
         data_dict[var] = df_values
 
     return data_dict

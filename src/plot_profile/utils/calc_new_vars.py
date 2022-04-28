@@ -174,8 +174,73 @@ def calc_rho_arome(p, t, qc, qv, verbose=False):
     return rho
 
 
+def calc_new_var_profiles(df, new_var, verbose=False):
+    """Calculate vert. profile of requested variable from model output variables.
+
+    Args:
+        df (DataFrame):            model output variables
+        new_var (str):             name of the variable to be calculated
+        verbose (bool, optional):  print details. Defaults to False.
+
+    Returns:
+        DataFrame: same format as the input but with newly calculated variable
+
+    """
+    if verbose:
+        print(f"{new_var} needs to be calculated.")
+
+    # parameters to calculate (alphabetical order):
+
+    ## Relative humidity
+    if new_var == "rel_hum":
+        values = calculate_rh(
+            T=df["temp"],
+            qv=df["qv"],
+            verbose=verbose,
+        )
+        # delete remaining columns
+        del df["temp"], df["qv"]
+
+    ## Specific humidity
+    elif new_var == "qv":
+        values = calculate_qv(
+            P=df["press"],
+            Td=df["dewp_temp"],
+            verbose=verbose,
+        )
+        # delete remaining columns
+        del df["press"], df["dewp_temp"]
+
+    ## Wind velocity
+    elif new_var == "wind_vel":
+        values = calculate_wind_velocity(u=df["u"], v=df["v"], verbose=verbose)
+        # delete remaining columns
+        del df["u"], df["v"]
+
+    ## Wind direction
+    elif new_var == "wind_dir":
+        values = calculate_wind_direction(u=df["u"], v=df["v"], verbose=verbose)
+        # delete remaining columns
+        del df["u"], df["v"]
+
+    else:
+        print(f"{new_var} not available for calculation yet.")
+
+    # convert values to pandas series
+    values = pd.Series(values, name=new_var)
+
+    # TODO si jamais icon detecter et appliquer les convertisseurs d'icon
+    # do some unity conversions
+    values = values * vdf.loc["mult_arome"][new_var] + vdf.loc["plus_arome"][new_var]
+
+    # add values column to the dataframe
+    df = pd.concat([df, values], axis=1)
+
+    return df
+
+
 def calc_new_var_timeseries(df, new_var, levels, verbose=False):
-    """Calculate requested variable from model output variables.
+    """Calculate timeseries of requested variable from model output variables.
 
     Args:
         df (DataFrame):            model output variables

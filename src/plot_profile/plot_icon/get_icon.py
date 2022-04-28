@@ -254,11 +254,16 @@ def get_icon(
     if verbose:
         print("Finished loading files into xarray dataset.")
 
+    # if var is string transform it to a 1 element list
+    if isinstance(variables_list, str):
+        variables_list = [
+            variables_list,
+        ]
+
     for variable in variables_list:
 
         # specify variable (pandas dataframe with attributes)
         var = vdf[variable]
-
         # subselect values from column
         try:
             values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus

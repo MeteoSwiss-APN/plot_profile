@@ -17,11 +17,14 @@ from plot_profile.plot_arome.get_arome import get_arome_profiles
 # from plot_profile.plot_arome.get_arome import get_arome_profiles
 from plot_profile.plot_icon.get_icon import get_icon
 from plot_profile.plot_timeseries.parse_timeseries_inputs import check_units
+from plot_profile.utils.calc_new_vars import calc_new_var_profiles
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.utils import calc_qv_from_td
 from plot_profile.utils.utils import check_inputs
 from plot_profile.utils.utils import slice_top_bottom
+
+# from ipdb import set_trace
 
 
 def parse_inputs(loc, add_model, add_obs, model_src, verbose):
@@ -133,6 +136,15 @@ def get_data(
             folder = element[3]
             init = element[4]
 
+            if var_name == "wind_vel" or var_name == "wind_dir":
+                var_open_icon = ["u", "v"]
+
+            elif var_name == "rel_hum":
+                var_open_icon = ["temp", "qv"]
+
+            else:
+                var_open_icon = var_name
+
             # check if a key for this icon-instance (for example icon-ref or icon-exp,...) already exists.
             # if yes --> retrieve df as usual, but instead of assigning it to a new key, only append/concatenate
             # the variable column to the already existing dataframe.
@@ -148,14 +160,22 @@ def get_data(
                     lon=lon,
                     ind=None,
                     grid=grid,
-                    variables_list=[var_name],
+                    variables_list=var_open_icon,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
                     verbose=verbose,
                 )
-                # re-format output from get_icon slightly
-                tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
-                tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+
+                if var_open_icon != var_name:
+                    tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                    tmp_df.set_axis(["height"] + var_open_icon, axis=1, inplace=True)
+                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+
+                else:
+                    # re-format output from get_icon slightly
+                    tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                    tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+
                 tmp_df = tmp_df.reset_index(drop=True)
                 tmp_df = tmp_df.dropna()
                 del tmp_df["height"]
@@ -189,14 +209,22 @@ def get_data(
                     lon=lon,
                     ind=None,
                     grid=grid,
-                    variables_list=[var_name],
+                    variables_list=var_open_icon,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
                     verbose=verbose,
                 )
-                # re-format output from get_icon slightly
-                tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
-                tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+
+                if var_open_icon != var_name:
+                    tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                    tmp_df.set_axis(["height"] + var_open_icon, axis=1, inplace=True)
+                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+
+                else:
+                    # re-format output from get_icon slightly
+                    tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                    tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+
                 tmp_df = tmp_df.reset_index(drop=True)
                 tmp_df = tmp_df.dropna()
 
@@ -212,6 +240,17 @@ def get_data(
             folder = element[3]
             init = element[4]
 
+            # some parameters are not in arome and therefore need to be calculated from other parameters
+
+            if var_name == "qv":
+                var_open_arome = ["press", "dewp_temp"]
+
+            elif var_name == "wind_vel" or var_name == "wind_dir":
+                var_open_arome = ["u", "v"]
+
+            else:
+                var_open_arome = var_name
+
             # check if a key for this arome-instance (for example arome-ref or arome-exp,...) already exists.
             # if yes --> retrieve df as usual, but instead of assigning it to a new key, only append/concatenate
             # the variable column to the already existing dataframe.
@@ -225,14 +264,25 @@ def get_data(
                     ],  # full hours!; has to be a list,
                     lat=lat,
                     lon=lon,
-                    variables_list=[var_name],
+                    variables_list=var_open_arome,  # list of str or str
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
                     verbose=verbose,
                 )
-                # re-format output from get_arome_profiles slightly
-                tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
-                tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+
+                # calculate new variables
+                if (
+                    var_name != var_open_arome
+                ):  # equivalent to "if var needs to be calculated"
+                    tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                    tmp_df.set_axis(["height"] + var_open_arome, axis=1, inplace=True)
+                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+
+                else:
+                    # re-format output from get_arome_profiles slightly
+                    tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                    tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+
                 tmp_df = tmp_df.reset_index(drop=True)
                 tmp_df = tmp_df.dropna()
                 del tmp_df["height"]
@@ -264,14 +314,26 @@ def get_data(
                     ],  # full hours!; has to be a list,
                     lat=lat,
                     lon=lon,
-                    variables_list=[var_name],
+                    variables_list=var_open_arome,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
                     verbose=verbose,
                 )
-                # re-format output from get_icon slightly
-                tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
-                tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+
+                if (
+                    var_name != var_open_arome
+                ):  # equivalent to "if var needs to be calculated"
+
+                    tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                    tmp_df.set_axis(["height"] + var_open_arome, axis=1, inplace=True)
+                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+
+                else:
+
+                    # re-format output from get_icon slightly
+                    tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
+                    tmp_df.rename(columns={0: "height", 1: var_name}, inplace=True)
+
                 tmp_df = tmp_df.reset_index(drop=True)
                 tmp_df = tmp_df.dropna()
 
