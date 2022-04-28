@@ -95,8 +95,8 @@ def calculate_wind_velocity(u, v, verbose=False):
     """Calculate wind velocity from U, V components.
 
     Args:
-        u (pd series)
-        v (pd series)
+        u (pd series) u wind component in m/s
+        v (pd series) u wind component in m/s
 
     Returns:
         pd series: wind velocity in m/s
@@ -116,8 +116,8 @@ def calculate_wind_direction(u, v, verbose=False):
     """Calculate wind direction from U, V components.
 
     Args:
-        u (pd series)
-        v (pd series)
+        u (pd series) u wind component in m/s
+        v (pd series) v wind component in m/s
 
     Returns:
         pd series: wind direction in °
@@ -128,18 +128,17 @@ def calculate_wind_direction(u, v, verbose=False):
             "Calculating wind direction (wind_dir) from meridian and zonal wind velocity."
         )
 
-    wind_dir = np.arctan2(u, v)
+    # convert to wind direction coordinate, different from trig unit circle coords
+    # if the wind directin is 360 then returns zero (by %360)
+    # inspired from wind_uv_to_dir function in:
+    # https://github.com/blaylockbk/Ute_WRF/blob/master/functions/wind_calcs.py
 
-    # from radian between [-pi, pi] to ° between [0, 360]
-    for i in range(len(wind_dir)):
-        if wind_dir[i] > 0:
-            wind_dir[i] = wind_dir[i] * 180 / np.pi
-        else:
-            wind_dir[i] = 360 + (wind_dir[i] * 180 / np.pi)
+    wind_dir = (270 - np.rad2deg(np.arctan2(v, u))) % 360
 
     return wind_dir
 
 
+# TODO: a tester !!! je ne sais pas si ca marche
 def calc_rho_arome(p, t, qc, qv, verbose=False):
     """Calculate air density.
 
@@ -153,7 +152,6 @@ def calc_rho_arome(p, t, qc, qv, verbose=False):
         pd series :      air density (kg/m**3)
 
     """
-    # TODO: a tester !!! je ne sais pas si ca marche
     if verbose:
         print("Calculating air density (RHO) from press, temp, qc and qv")
 
@@ -174,8 +172,73 @@ def calc_rho_arome(p, t, qc, qv, verbose=False):
     return rho
 
 
+def calc_new_var_profiles(df, new_var, verbose=False):
+    """Calculate vert. profile of requested variable from model output variables.
+
+    Args:
+        df (DataFrame):            model output variables
+        new_var (str):             name of the variable to be calculated
+        verbose (bool, optional):  print details. Defaults to False.
+
+    Returns:
+        DataFrame: same format as the input but with newly calculated variable
+
+    """
+    if verbose:
+        print(f"{new_var} needs to be calculated.")
+
+    # parameters to calculate (alphabetical order):
+
+    ## Relative humidity
+    if new_var == "rel_hum":
+        values = calculate_rh(
+            T=df["temp"],
+            qv=df["qv"],
+            verbose=verbose,
+        )
+        # delete remaining columns
+        del df["temp"], df["qv"]
+
+    ## Specific humidity
+    elif new_var == "qv":
+        values = calculate_qv(
+            P=df["press"],
+            Td=df["dewp_temp"],
+            verbose=verbose,
+        )
+        # delete remaining columns
+        del df["press"], df["dewp_temp"]
+
+    ## Wind velocity
+    elif new_var == "wind_vel":
+        values = calculate_wind_velocity(u=df["u"], v=df["v"], verbose=verbose)
+        # delete remaining columns
+        del df["u"], df["v"]
+
+    ## Wind direction
+    elif new_var == "wind_dir":
+        values = calculate_wind_direction(u=df["u"], v=df["v"], verbose=verbose)
+        # delete remaining columns
+        del df["u"], df["v"]
+
+    else:
+        print(f"{new_var} not available for calculation yet.")
+
+    # convert values to pandas series
+    values = pd.Series(values, name=new_var)
+
+    # TODO si jamais icon detecter et appliquer les convertisseurs d'icon
+    # do some unity conversions
+    values = values * vdf.loc["mult_arome"][new_var] + vdf.loc["plus_arome"][new_var]
+
+    # add values column to the dataframe
+    df = pd.concat([df, values], axis=1)
+
+    return df
+
+
 def calc_new_var_timeseries(df, new_var, levels, verbose=False):
-    """Calculate requested variable from model output variables.
+    """Calculate timeseries of requested variable from model output variables.
 
     Args:
         df (DataFrame):            model output variables

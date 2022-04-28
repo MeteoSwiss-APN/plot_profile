@@ -117,10 +117,12 @@ vdf["cbh"].dwh_id = {"2m": "1541"}
 # cloud cover: clc
 vdf["clc"].short_name = "clc"
 vdf["clc"].icon_name = "clc"
+vdf["clc"].arome_name = "fCV"
 vdf["clc"].long_name = "Cloud cover"
-vdf["clc"].unit = ""
+vdf["clc"].unit = "%"
 vdf["clc"].min_value = -0.05
 vdf["clc"].max_value = 1.05
+vdf["clcl"].mult_arome = 100
 vdf["clc"].color = "yellowgreen"
 vdf["clc"].colormap = "bone"
 
@@ -163,7 +165,6 @@ vdf["clch"].colormap = "bone"
 # cloud cover TOTAL: clct
 vdf["clct"].short_name = "clct"
 vdf["clct"].icon_name = "clct"
-vdf["clcl"].arome_name = "LCV"
 vdf["clct"].long_name = "Total cloud cover"
 vdf["clct"].unit = "%"
 vdf["clct"].min_value = -0.05
@@ -235,6 +236,7 @@ vdf["press"].dwh_id = {"rs": "744"}
 # cloud water: qc
 vdf["qc"].short_name = "qc"
 vdf["qc"].icon_name = "QC"
+vdf["qc"].arome_name = "LWC"
 vdf["qc"].long_name = "Cloud water"
 vdf["qc"].unit = "g/kg"
 vdf["qc"].min_value = -0.01
@@ -295,21 +297,6 @@ vdf["rel_hum"].unit = "%"
 vdf["rel_hum"].min_value = 0
 vdf["rel_hum"].max_value = 100
 vdf["rel_hum"].mult = 100
-vdf["rel_hum"].dwh_id = {
-    "rs": "746",
-    "2m_tower": "3698",
-    "10m_tower": "4953",
-    "30m_tower": "4961",
-}
-
-# relative humidity: rel_hum
-vdf["rel_hum"].short_name = "rel_hum"
-vdf["rel_hum"].long_name = "Relative humidity"
-vdf["rel_hum"].icon_name = "rel_hum"
-vdf["rel_hum"].arome_name = "Hu"
-vdf["rel_hum"].unit = "%"
-vdf["rel_hum"].min_value = 0
-vdf["rel_hum"].max_value = 100
 vdf["rel_hum"].dwh_id = {
     "rs": "746",
     "2m_tower": "3698",
