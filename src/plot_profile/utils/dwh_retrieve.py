@@ -444,7 +444,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             raw_data[f"net_calc:{dwn_id}:{up_id}:"] = raw_data[dwn_id] - raw_data[up_id]
 
         # if vertical temperature gradient we need to calculate it (between 30m and 10m)
-        if "grad_temp" in vars_str:
+        elif "grad_temp" in vars_str:
 
             top_id, bot_id = vars_str.split(":")[1:3]
             open_vars = f"{top_id},{bot_id}"
