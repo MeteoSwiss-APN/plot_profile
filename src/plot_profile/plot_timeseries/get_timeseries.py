@@ -171,6 +171,9 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
             if var_name == "qv":
                 var_open_arome = ["press", "dewp_temp"]
 
+            elif var_name == "2m_qv":
+                var_open_arome = ["press", "2m_dewp_temp"]
+
             elif var_name == "wind_dir" or var_name == "wind_vel":
                 var_open_arome = ["u", "v"]
 
