@@ -291,7 +291,13 @@ vdf["qv"].color = "skyblue"
 vdf["qv"].colormap = "PuBu"
 vdf["qv"].mult = 1000
 vdf["qv"].mult_arome = 1000
-vdf["qv"].dwh_id = {"2m": "qv", "ralmo": "4919"}
+vdf["qv"].dwh_id = {
+    "2m": "qv",
+    "2m_tower": "qv",
+    "10m_tower": "qv",
+    "30m_tower": "qv",
+    "ralmo": "4919",
+}
 
 # 2m specific humidity: 2m_qv
 vdf["2m_qv"].short_name = "2m_qv"
