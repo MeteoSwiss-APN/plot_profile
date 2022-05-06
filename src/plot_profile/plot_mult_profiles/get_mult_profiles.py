@@ -47,7 +47,7 @@ def parse_inputs(variable, model, model_src, add_obs, loc, verbose=False):
         # if no obs specified
         if add_obs == None or add_obs == ():
             print(
-                f"! --- Neither model nor observation device have been specified. Use --model or --add_obs."
+                f"! --- Neither model nor observation device have been specified. Use --add_model or --add_obs."
             )
             sys.exit(1)
         l_devices = []
