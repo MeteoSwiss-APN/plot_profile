@@ -21,6 +21,7 @@ vdf = pd.DataFrame(
         "ddt_t_lw",
         "ddt_t_sw",
         "dewp_temp",
+        "2m_dewp_temp",
         "grad_temp",
         "hor_vis",
         "press",
@@ -28,6 +29,7 @@ vdf = pd.DataFrame(
         "qc_dia",
         "qi_dia",
         "qv",
+        "2m_qv",
         "qv_dia",
         "rel_hum",
         "lw_down",
@@ -219,6 +221,18 @@ vdf["dewp_temp"].min_value = -5
 vdf["dewp_temp"].max_value = 15
 vdf["dewp_temp"].dwh_id = {"rs": "747", "2m": "194"}
 
+# 2m temperature: 2m_dewp_temp
+vdf["2m_dewp_temp"].short_name = "2m_dewp_temp"
+vdf["2m_dewp_temp"].icon_name = "td_2m"
+vdf["2m_dewp_temp"].arome_name = "Td2m"
+vdf["2m_dewp_temp"].long_name = "2m dew point temperature"
+vdf["2m_dewp_temp"].unit = "°C"
+vdf["2m_dewp_temp"].color = "orangered"
+vdf["2m_dewp_temp"].marker = "o"
+vdf["2m_dewp_temp"].linestyle = "-"
+vdf["2m_dewp_temp"].plus = -273
+vdf["2m_dewp_temp"].plus_arome = -273
+
 # gradient tempearture vertical
 vdf["grad_temp"].short_name = "grad_temp"
 vdf["grad_temp"].icon_name = "grad_temp"
@@ -245,7 +259,7 @@ vdf["press"].arome_name = "P"
 vdf["press"].long_name = "Pressure"
 vdf["press"].unit = "hPa"
 vdf["press"].mult_arome = 0.01
-vdf["press"].dwh_id = {"rs": "744"}
+vdf["press"].dwh_id = {"rs": "744", "2m": "90"}
 
 # cloud water: qc
 vdf["qc"].short_name = "qc"
@@ -299,6 +313,26 @@ vdf["qv"].color = "skyblue"
 vdf["qv"].colormap = "PuBu"
 vdf["qv"].mult = 1000
 vdf["qv"].mult_arome = 1000
+vdf["qv"].dwh_id = {
+    "2m": "qv",
+    "2m_tower": "qv",
+    "10m_tower": "qv",
+    "30m_tower": "qv",
+    "ralmo": "4919",
+}
+
+# 2m specific humidity: 2m_qv
+vdf["2m_qv"].short_name = "2m_qv"
+vdf["2m_qv"].icon_name = "qv_2m"
+vdf["2m_qv"].arome_name = "2m_qv"
+vdf["2m_qv"].long_name = "2m specific humidity"
+vdf["2m_qv"].unit = "g/kg"
+vdf["2m_qv"].min_value = 0
+vdf["2m_qv"].max_value = 6
+vdf["2m_qv"].color = "skyblue"
+vdf["2m_qv"].colormap = "PuBu"
+vdf["2m_qv"].mult = 1000
+vdf["2m_qv"].mult_arome = 1000
 
 # diagnostic humidity: qv_dia
 vdf["qv_dia"].short_name = "qv_dia"
@@ -429,7 +463,7 @@ vdf["2m_temp"].short_name = "2m_temp"
 vdf["2m_temp"].icon_name = "T_2M"
 vdf["2m_temp"].icon_names = ["T_2M", "t_2m"]
 vdf["2m_temp"].arome_name = "T2m"
-vdf["2m_temp"].long_name = "2m Temperature"
+vdf["2m_temp"].long_name = "2m temperature"
 vdf["2m_temp"].unit = "°C"
 vdf["2m_temp"].min_value = -3.0  # 275
 vdf["2m_temp"].max_value = 5  # 287
@@ -489,7 +523,7 @@ vdf["wind_dir"].long_name = "Wind direction"
 vdf["wind_dir"].unit = "°"
 vdf["wind_dir"].min_value = 0
 vdf["wind_dir"].max_value = 360
-vdf["wind_dir"].dwh_id = {"rs": "743", "10m_tower": "197"}
+vdf["wind_dir"].dwh_id = {"rs": "743", "10m_tower": "197", "lidar": "743"}
 
 # wind velocity: wind_vel
 vdf["wind_vel"].short_name = "wind_vel"
@@ -499,7 +533,7 @@ vdf["wind_vel"].long_name = "Wind velocity"
 vdf["wind_vel"].unit = "m/s"
 vdf["wind_vel"].min_value = 0
 vdf["wind_vel"].max_value = 30
-vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196"}
+vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196", "lidar": "748"}
 
 # !!! if adding new variable: don't forget to add at the top and in cli-file!!!
 
