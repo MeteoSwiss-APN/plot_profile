@@ -24,32 +24,22 @@ from plot_profile.utils.variables import vdf
 
 def create_mult_plot(
     data_dict,
+    variable,
+    leadtimes,
     date_ref,
-    multi_axes,
     location,
     xlims,
     ylims,
     grid,
-    show_marker,
     datatypes,
     outpath,
-    appendix,
     verbose=False,
 ):
     # get location dataframe
     loc = sdf[location]
 
-    # if leadtimes is string transform it to a 1 element list
-    # if isinstance(leadtimes, str):
-    #    leadtimes = [
-    #        leadtimes,
-    #    ]
-
-    # get leadtimes
-    leadtimes = list(data_dict.keys())
-
     # get devices
-    devices = data_dict[str(leadtimes[0])].keys()
+    devices = data_dict.keys()
 
     # get ymin, ymax
     ymin = ylims[0]
@@ -60,8 +50,6 @@ def create_mult_plot(
 
     # prepare figure
     fig, ax = plt.subplots(1, 1, figsize=(5, 8), tight_layout=True)
-    if multi_axes:
-        top_ax = ax.twiny()
 
     if grid:
         ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
@@ -77,117 +65,121 @@ def create_mult_plot(
                 ax.set_xlim(xmins[0], xmaxs[0])
             if len(xmins) == 2:  # have xmins for two x-axes
                 ax.set_xlim(xmins[0], xmaxs[0])
-                top_ax.set_xlim(xmins[1], xmaxs[1])
         else:
             print(
                 f"Check xmin/xmax values again. Got {len(xmins)} x-min values and {len(xmaxs)} x-max values."
             )
             print(f"Warning: No x-limits have been applied.")
 
-    title = f"{loc.long_name}, Ref: {date_ref.strftime('%d. %b, %Y, %H:%M')} UTC"
-    if multi_axes:
-        ax.set_title(label=title, bbox=dict(facecolor="none"), x=0.5, y=1.07)
-    else:
-        ax.set_title(label=title, bbox=dict(facecolor="none"), x=0.5, y=1.02)
-    ax.set_ylabel(f"Altitude [m asl]")
-    first_unit, second_unit = None, None
+    first_unit = None
+
+    # variable informations
+    variable = vdf[variable]
+    unit = variable.unit
+    var_long = variable.long_name
+
+    color = variable.color
+
+    device_namelist = []
+    device_title = None
 
     # plotting
-    for k, lt in enumerate(leadtimes):
-        for i, device in enumerate(devices):
-            # model = False
-            # 1) retrieve df
-            try:
-                df = data_dict[str(lt)][device]
-            except KeyError:
-                print(f"! no data for: {device} at leadtime: {lt} :(")
-                # sys.exit(1)
-                df = pd.DataFrame()
-                continue
+    for i, device in enumerate(devices):
 
-            if verbose:
-                print(i, device)
-                pprint(df)
+        if "~" in device:
+            device_name = device.split("~")[0]
+            device_lt = device.split("~")[1]
+        else:
+            device_name, device_title = device, device
+            device_lt = None
 
-            # y-axis information: altitude
-            altitude = df["height"]
-            altitude_min = altitude.min()
+        if device_name not in device_namelist:
+            device_namelist.append(device_name)
 
-            if ymin_dynamic == None:
-                ymin_dynamic = altitude_min
+        # 1) retrieve df
+        try:
+            df = data_dict[device]
+        except KeyError:
+            print(f"! no data for: {device_name} at leadtime: {device_lt} :(")
+            # sys.exit(1)
+            df = pd.DataFrame()
+            continue
 
-            elif (ymin_dynamic is not None) and (altitude_min < ymin_dynamic):
-                ymin_dynamic = altitude_min
+        if verbose:
+            print(i, device)
+            pprint(df)
 
-            # check if there are more than one variable in this dataframe
-            if verbose:
-                if len(df.columns) > 2:
-                    print(f"More than one variable in the df for {device}")
-                else:
-                    print(f"Only one variable in the df for {device}")
+        # y-axis information: altitude
+        altitude = df["height"]
+        altitude_min = altitude.min()
 
-            # iterate over the columns
-            for (variable, columnData) in df.iteritems():
-                if variable == "height":
-                    continue
+        if ymin_dynamic == None:
+            ymin_dynamic = altitude_min
 
-                if verbose:
-                    print(f"  Variable: {variable}")
+        elif (ymin_dynamic is not None) and (altitude_min < ymin_dynamic):
+            ymin_dynamic = altitude_min
 
-                # extract current variable
-                variable = vdf[variable]
-                unit = variable.unit
-                var_long = variable.long_name
-                x = columnData.values
-                color = variable.color
+        # check if there are more than one variable in this dataframe
+        if verbose:
+            if len(df.columns) > 2:
+                print(f"More than one variable in the df for {device}")
+            else:
+                print(f"Only one variable in the df for {device}")
 
-                # if device in lt_dict:
-                #    lt = lt_dict[device]
+        # equivalent to if observations
+        if device_name != device:
+            lt = device.split("~")[1]
+            index = list(leadtimes).index(int(lt))
+            label = f"{var_long}: {device_name.upper()} (+{lt}h)"
 
-                if "~" in device:  # this means it must be a model (model~model_id)
-                    if device.split("~")[1] != "0":
-                        label = f"{var_long}: {device.split('~')[0].upper()} {device.split('~')[1].upper()} (+{lt}h)"
-                    else:
-                        label = f"{var_long}: {device.split('~')[0].upper()} (+{lt}h)"
-                else:  # else it is a device
-                    label = f"{var_long}: {device.upper()} (+{lt}h)"
+            # define unit for the bottom axis
+            if not first_unit:
+                first_unit = unit
+                ax.set_xlabel(f"{first_unit}")
+
+            # avoid KeyError if column name is "0"
+            columns = df.columns
+            x = df[columns[1]]
+
+            # choose correct axes for the current variable and plot data
+            ax.plot(
+                x,
+                altitude,
+                color=color,
+                linestyle=linestyle_dict[index],
+                label=label,
+            )
+
+        # if model, a df column for each leadtime
+        else:
+            for k, lt in enumerate(leadtimes):
+
+                label = f"{var_long}: {device_name.upper()} (+{lt}h)"
 
                 # define unit for the bottom axis
                 if not first_unit:
                     first_unit = unit
                     ax.set_xlabel(f"{first_unit}")
 
-                # define unit for the right axes
-                if (not second_unit) and (unit is not first_unit):
-                    second_unit = unit
-                    top_ax.set_xlabel(f"{second_unit}")
-
-                # specify marker
-                if (("icon" or "arome") in device) and show_marker:
-                    marker = "d"
-                else:
-                    marker = None
+                # avoid KeyError if column name is "0"
+                columns = df.columns
+                x = df[columns[k + 1]]
 
                 # choose correct axes for the current variable and plot data
-                if unit == first_unit:
-                    ax.plot(
-                        x,
-                        altitude,
-                        color=color,
-                        linestyle=linestyle_dict[k],
-                        marker=marker,
-                        label=label,
-                    )
+                ax.plot(
+                    x,
+                    altitude,
+                    color=color,
+                    linestyle=linestyle_dict[k],
+                    label=label,
+                )
+    # title
+    if device_title == None:
+        device_title = "OBS"
+    title = f"{device_title.upper()}, {loc.short_name}, ref: {date_ref.strftime('%d. %b, %Y, %H:%M')} UTC"
 
-                if unit == second_unit:
-                    top_ax.plot(
-                        x,
-                        altitude,
-                        color=color,
-                        linestyle=linestyle_dict[k],
-                        marker=marker,
-                        label=label,
-                    )
+    ax.set_title(label=title, bbox=dict(facecolor="none"), x=0.5, y=1.02)
+    ax.set_ylabel(f"Altitude [m asl]")
 
     # add ylim
     if ymin == None:
@@ -195,34 +187,22 @@ def create_mult_plot(
     else:
         ax.set_ylim(ymin, ymax)
 
-    # add legends
-    if multi_axes:
-        h1, l1 = ax.get_legend_handles_labels()
-        h2, l2 = top_ax.get_legend_handles_labels()
-        ax.legend(h1 + h2, l1 + l2, fontsize="small")
-    else:
-        ax.legend(fontsize="small")
+    ax.legend(fontsize="small")
 
     # filename
     start_str = date_ref.strftime("%y%m%d_%H")
 
-    var_dev = "_lt"
+    var_dev = f"{variable.short_name}_lt"
 
     for lt in leadtimes:
         var_dev += f"~{str(lt)}"
 
-    for device in devices:
-        df = data_dict[str(leadtimes[0])][device]
-        if "~" in device:
-            device = device.split(sep="~")[0]
-        columns = df.columns
-        for column in columns:
-            if column != "height":
-                var_dev += f"_{device}~{column}"
+    for devname in device_namelist:
+        var_dev += f"~{devname}"
 
-    filename = f"profiles_{start_str}_{loc.short_name}{var_dev}"
+    filename = f"profiles_{start_str}_{loc.short_name}_{var_dev}"
     save_fig(filename, datatypes, outpath, fig=fig)
     plt.clf()
-    first_unit, second_unit = None, None
+    first_unit = None
 
     return

@@ -4,44 +4,52 @@ Author: Arthur Dandoy
 
 Date: 03/05/2022.
 """
+
 # Standard library
-from datetime import timedelta
+from pprint import pprint
 
 # Third-party
 import click
 
 # First-party
 from plot_profile.plot_mult_profiles.get_mult_profiles import get_mult_data
+from plot_profile.plot_mult_profiles.get_mult_profiles import parse_inputs
 from plot_profile.plot_mult_profiles.plot_mult_profiles import create_mult_plot
-from plot_profile.plot_profiles.get_profiles import parse_inputs
+
+# from ipdb import set_trace
 
 
 @click.command()
 # options without default value (mandatory to specify by user)
 @click.option(
-    "--date_ref",
+    "--init",
     type=click.DateTime(formats=["%y%m%d%H"]),
-    help="MANDATORY: Reference date from which leadtimes are determined. (ex: 21111812)",
+    help="MANDATORY: Init date of model. Reference date from which leadtimes are determined. I.e. <%y%m%d%H> ex: 21111812",
 )
-
-# ADD MODELS AND OBSERVATIONS TO PLOT W/: add_model, model_src, add_obs
 @click.option(
-    "--add_model",
-    type=(str, str, str),
-    multiple=True,
-    help="Specify which model/variable/model_id should be added to plot.",
+    "--variable",
+    type=str,
+    help="MANDATORY: Specify variable name.",
+)
+# add model output to plot ! ex: arome, icon
+@click.option(
+    "--model",
+    required=False,
+    type=str,
+    help="Model name (ex: arome, icon)",
 )
 @click.option(
     "--model_src",
-    type=(str, click.Path(exists=True), click.DateTime(formats=["%y%m%d%H"])),
-    multiple=True,
-    help="Specify for each model ID, one source flag. I.e. <model_id> <folder> <init>",
+    required=False,
+    type=click.Path(exists=True),
+    help="Specify for each model ID, one source flag. I.e. <folder>",
 )
+# add observation to plot ! ex: rs, mwr, lidar...
 @click.option(
     "--add_obs",
-    type=(str, str),
+    type=str,
     multiple=True,
-    help="Specify which device/variable should be added to plot.",
+    help="Specify which device should be added to plot.",
 )
 @click.option(
     "--leadtime",
@@ -50,7 +58,6 @@ from plot_profile.plot_profiles.get_profiles import parse_inputs
     default=(0,),
     help="Leadtime(s) to be shown in one plot. Def: 0.",
 )
-
 # options with default value
 @click.option(
     "--grid_file",
@@ -58,22 +65,8 @@ from plot_profile.plot_profiles.get_profiles import parse_inputs
     default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
     help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
 )
-@click.option(
-    "--add_clouds",
-    is_flag=True,
-    help="Show clouds on plot. Def: False",
-)
-@click.option(
-    "--relhum_thresh",
-    default=98,
-    type=float,
-    help="Relative humidity threshold for clouds. Def: 98",
-)
 @click.option("--ymin", type=int, help="Altitude bottom. Def: surface.")
 @click.option("--ymax", default=2000, type=int, help="Altitude top. Def: 2000")
-@click.option(
-    "--appendix", type=str, help="String to append to output filename. Def: None"
-)
 @click.option(
     "--datatypes",
     type=click.Choice(
@@ -100,15 +93,14 @@ from plot_profile.plot_profiles.get_profiles import parse_inputs
     ],
     help="Choose data type(s) of final result. Def: png",
 )
-@click.option("--ind", type=int, help="Index of location (known from previous runs).")
 @click.option(
     "--grid",
     type=str,
     default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
     help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
 )
-@click.option("--lat", type=float, help="Latitude of location.")
-@click.option("--lon", type=float, help="Longitude of location.")
+# @click.option("--lat", type=float, help="Latitude of location.")
+# @click.option("--lon", type=float, help="Longitude of location.")
 @click.option("--loc", type=str, help="Name of location.")
 @click.option(
     "--outpath",
@@ -119,11 +111,6 @@ from plot_profile.plot_profiles.get_profiles import parse_inputs
     "--grid",
     is_flag=True,
     help="Show grid on plot. Flag, def: False",
-)
-@click.option(
-    "--show_marker",
-    is_flag=True,
-    help="Add markers (o). Flag, def: False",
 )
 @click.option(
     "--verbose",
@@ -143,89 +130,65 @@ from plot_profile.plot_profiles.get_profiles import parse_inputs
     multiple=True,
     help="Maximum value of xaxis. Def: Fits values.",
 )
-@click.option(
-    "--xrange_fix",
-    is_flag=True,
-    help="Use fix xrange from variable dataframe. Overwrites specified xmin and xmax. Flag, def: False",
-)
-@click.option(
-    "--single_xaxis",
-    is_flag=True,
-    help="Plot two variables w/ the same unit only on one x-axis, not two. Flag, def: False",
-)
-@click.option(
-    "--zeroline",
-    is_flag=True,
-    help="Show grid on plot. Flag, def: False",
-)
 def main(
-    date_ref: click.DateTime,
-    add_model: tuple,
-    add_obs: tuple,
-    model_src: tuple,
+    init: click.DateTime,
+    variable: str,
+    model: str,
+    model_src: str,
     leadtime: tuple,
+    add_obs: tuple,
     grid_file: str,
-    add_clouds: bool,
-    relhum_thresh: float,
     ymin: int,
     ymax: int,
-    appendix: str,
     datatypes: tuple,
-    ind: int,
-    lat: float,
-    lon: float,
+    # ind: int,
+    # lat: float,
+    # lon: float,
     loc: str,
     outpath: str,
     grid: bool,
-    show_marker: bool,
-    zeroline: bool,
     verbose: bool,
     xmin: tuple,
     xmax: tuple,
-    xrange_fix: bool,
-    single_xaxis: bool,
 ):
     """Plot vertical profiles of variables from icon, arome simulations or observations.
 
-    If 1, 3, or more variables are specified, each will be plotted individually.
-    If 2 variables are given, they will be shown in the same figure.
-
     Example command:
-    plot_mult_profiles --loc pay --add_model arome temp aro --add_model icon temp ico --add_obs rs temp --leadtime 12 --leadtime 15
-      --model_src aro /scratch/adandoy/AROME/ 21111812 --model_src ico /scratch/swester/output_icon/ICON-1/ 21111812
+    plot_mult_profiles --init 21111812 --loc pay --variable temp --model icon --model_src
+    /scratch/swester/output_icon/ICON-1/ --leadtime 12 --leadtime 14 --leadtime 16 --grid
 
     Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 
     """
-    elements, multi_axes = parse_inputs(loc, add_model, add_obs, model_src, verbose)
-
-    if verbose and multi_axes:
-        print("Employing two different axes: Bottom and Top.")
-
-    # dates_lt = [date_ref + timedelta(hours = i) for i in leadtime]
+    # check inputs
+    parse_inputs(variable, model, model_src, add_obs, loc, verbose)
 
     data_dict = get_mult_data(
-        date_ref=date_ref,
+        init=init,
+        variable=variable,
+        model=model,
+        model_src=model_src,
+        add_obs=add_obs,
         leadtimes=leadtime,
         loc=loc,
         grid=grid_file,
         ylims=(ymin, ymax),
-        elements=elements,
         verbose=verbose,
     )
 
+    # pprint(data_dict)
+
     create_mult_plot(
         data_dict=data_dict,
-        date_ref=date_ref,
-        multi_axes=multi_axes,
+        variable=variable,
+        leadtimes=leadtime,
+        date_ref=init,
         location=loc,
         xlims=(xmin, xmax),
         ylims=(ymin, ymax),
         grid=grid,
-        show_marker=show_marker,
         datatypes=datatypes,
         outpath=outpath,
-        appendix=appendix,
         verbose=verbose,
     )
 
