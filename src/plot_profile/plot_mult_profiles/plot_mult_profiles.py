@@ -6,7 +6,6 @@ Date: 04/05/2022.
 """
 
 # Standard library
-import sys
 from pprint import pprint
 
 # Third-party

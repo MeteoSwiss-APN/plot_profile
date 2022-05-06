@@ -6,7 +6,6 @@ Date: 03/05/2022.
 """
 
 # Standard library
-from pprint import pprint
 
 # Third-party
 import click

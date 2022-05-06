@@ -6,7 +6,6 @@ Date: 04/05/2022.
 """
 
 # Standard library
-import re
 import sys
 from datetime import timedelta
 from pprint import pprint
