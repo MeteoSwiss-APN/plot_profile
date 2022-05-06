@@ -17,7 +17,8 @@ import numpy as np
 import pandas as pd
 
 # First-party
-from plot_profile.utils.calc_new_vars import calculate_qv
+from plot_profile.utils.calc_new_vars import calculate_qv_from_rh
+from plot_profile.utils.calc_new_vars import calculate_qv_from_tdew
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.variables import vdf
 
@@ -296,6 +297,10 @@ def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
         cmd = cmd + " -C 34 -w 22"
     elif device == "mwr":
         cmd = cmd + " -C 38 -w 31"
+    elif device == "lidar":
+        cmd = cmd + " -w 30 -c 1 -W 1117 -C 38"
+    elif device == "ralmo":
+        cmd = cmd + " -w 30 -C 38 -c 2 -W 1104"
     else:
         print(f"Unknown profile obs device: {device}.")
         sys.exit(1)
@@ -340,7 +345,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
         print(f"  timestamps: {t1}, {t2}")
 
     # profile-based data
-    if device in ["rs", "mwr"]:
+    if device in ["rs", "mwr", "lidar", "ralmo"]:
 
         # call dwh retrieve for profile-based data
         raw_data = dwh_profile(
@@ -443,6 +448,75 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             # lw_net = lw_down - lw_up
             raw_data[f"net_calc:{dwn_id}:{up_id}:"] = raw_data[dwn_id] - raw_data[up_id]
 
+        # if specific humidity, need to retrieve P and tdew or rel_hum
+        elif "qv" in vars_str:
+
+            # 2m: calculate qv from tdew (rh not available)
+            if device == "2m":
+
+                # air pressure and dewp temp measurment ids
+                press_id = str(vdf["press"].dwh_id[device])
+                dewp_temp_id = vdf["dewp_temp"].dwh_id[device]
+                open_vars = f"{press_id},{dewp_temp_id}"
+
+                # call dwh retrieve for surface-based data
+                raw_data = dwh_surface(
+                    station_name=sdf[station].dwh_name,
+                    vars_str=open_vars,
+                    start=t1,
+                    end=t2,
+                    verbose=verbose,
+                )
+
+                # calculate specific humidity
+                raw_data["qv"] = (
+                    calculate_qv_from_tdew(
+                        Press=raw_data[press_id],
+                        Tdew=raw_data[dewp_temp_id],
+                        verbose=verbose,
+                    )
+                    * 1000  # from kg/kg to g/kg
+                )
+
+            # tower: calculate from rh (tdew not available)
+            elif device in ["2m_tower", "10m_tower", "30m_tower"]:
+
+                # air pressure and dewp temp measurment ids
+                press_id = vdf["press"].dwh_id[
+                    "2m"
+                ]  # pressure only available at 2 meter
+                rel_hum_id = vdf["rel_hum"].dwh_id[device]
+                temp_id = vdf["temp"].dwh_id[device]
+                open_vars = f"{press_id},{rel_hum_id},{temp_id}"
+
+                # call dwh retrieve for surface-based data
+                raw_data = dwh_surface(
+                    station_name=sdf[station].dwh_name,
+                    vars_str=open_vars,
+                    start=t1,
+                    end=t2,
+                    verbose=verbose,
+                )
+
+                # as pressure is measured by 2m device, we have some Na values
+                # so we propagate last valid observation forward to next valid
+                raw_data = raw_data.fillna(method="ffill")
+
+                # calculate specific humidity
+                raw_data["qv"] = (
+                    calculate_qv_from_rh(
+                        Press=raw_data[press_id],
+                        rh=raw_data[rel_hum_id],
+                        T=raw_data[temp_id],
+                        verbose=verbose,
+                    )
+                    * 1000  # from kg/kg to g/kg
+                )
+
+            # should not happen in principle
+            else:
+                print(f"Device: {device} not available for qv.")
+
         # if vertical temperature gradient we need to calculate it (between 30m and 10m)
         elif "grad_temp" in vars_str:
 
@@ -460,7 +534,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
             # gradT = (Ttop - Tbot)/(alt_top - alt_bot)
             raw_data[f"grad_temp:{top_id}:{bot_id}"] = (
-                raw_data[f"{top_id}"] - raw_data[f"{bot_id}"]
+                raw_data[top_id] - raw_data[bot_id]
             ) / 20
 
             if verbose:

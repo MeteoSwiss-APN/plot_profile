@@ -35,16 +35,48 @@ def calculate_grad(var_bot, var_top, alt_bot, alt_top, verbose=False):
     return grad
 
 
-def calculate_rh(T, qv, P=1013.5, verbose=False):
+def calculate_tdew_from_rh(rh, T, temperature_metric="celsius", verbose=False):
+    """Calculate dew point temperature from relative humidity and temperature.
+
+    Args:
+        rh (pd series):    air relative humidity in %
+        T (pd series):     air temperature in °C
+        temperature_metric (str, optional): Input temperature unit. Defaults to "celsius".
+
+    Returns:
+        pandas series: dew point temperature timeseries (in °C or K)
+
+    """
+    if verbose:
+        print(
+            "Calculating dew point temperature (dewp_temp) from relative humidity and temp."
+        )
+
+    if temperature_metric != "celsius":
+        if verbose:
+            print("Assuming input temperature unit is Kelvin for rh calculation.")
+        T = T - 273  # K to °C
+
+    # inspired from humidity.to.dewpoint in:
+    # https://github.com/geanders/weathermetrics/blob/master/R/moisture_conversions.R
+    Tdew = (rh / 100) ** (1 / 8) * (112 + (0.9 * T)) - 112 + (0.1 * T)  # in °C
+
+    if temperature_metric != "celsius":
+        Tdew = Tdew + 273  # °C to K
+
+    return Tdew
+
+
+def calculate_rh_from_qv(T, qv, Press=1013.5, verbose=False):
     """Convert specific humidity into relative humidity.
 
     Args:
-        P (pd series):   air pressure timeseries
-        T (pd series):   air temperature timeseries
-        qv (pd series):  specific humidity timeseries
+        Press (pd series):   air pressure in hPa
+        T (pd series):       air temperature in °C
+        qv (pd series):      specific humidity in kg/kg
 
     Returns:
-        pandas series: relative humidity timeseries
+        pandas series: relative humidity series in %
 
     """
     if verbose:
@@ -54,9 +86,8 @@ def calculate_rh(T, qv, P=1013.5, verbose=False):
 
     # inspired from "qair2rh" function in:
     # https://github.com/PecanProject/pecan/blob/master/modules/data.atmosphere/R/metutils.R
-    # P in hPa, T in °C,  qv in kg/kg
     es = 6.112 * np.exp((17.67 * T) / (T + 243.5))
-    e = qv * 1e-3 * P / (0.378 * qv * 1e-3 + 0.622)
+    e = qv * 1e-3 * Press / (0.378 * qv * 1e-3 + 0.622)
 
     rh = e / es
 
@@ -69,15 +100,15 @@ def calculate_rh(T, qv, P=1013.5, verbose=False):
     return rh
 
 
-def calculate_qv(P, Td, verbose=False):
+def calculate_qv_from_tdew(Press, Tdew, verbose=False):
     """Calculate specific humidity from pressure and dew point temperature.
 
     Args:
-        P (pd series): air pressure timeseries
-        Td (pd series): dewp temperature timeseries
+        Press (pd series):   air pressure in hPa
+        Tdew (pd series):    dew point temperature in °C
 
     Returns:
-        pandas series: specific humidity timeseries
+        pandas series: specific humidity series in kg/kg
 
     """
     if verbose:
@@ -85,18 +116,40 @@ def calculate_qv(P, Td, verbose=False):
 
     # after eq. 4.24 in Practical Meteorology from Stull
     # P in hPa, Td in °C and qv in kg/kg
-    e = 6.112 * np.exp((17.67 * Td) / (Td + 243.5))
-    qv = (0.622 * e) / (P - (0.378 * e))
+    e = 6.112 * np.exp((17.67 * Tdew) / (Tdew + 243.5))
+    qv = (0.622 * e) / (Press - (0.378 * e))
 
     return qv
 
 
-def calculate_wind_velocity(u, v, verbose=False):
+def calculate_qv_from_rh(Press, rh, T, verbose=False):
+    """Calculate specific humidity from pressure, relative humidity and temperature.
+
+    Args:
+        Press (pd series):   air pressure series in hPa
+        rh    (pd series):   air relative humidity in %
+        T     (pd series):   air temperature in K
+
+    Returns:
+        pandas series: specific humidity series in kg/kg
+
+    """
+    if verbose:
+        print("Calculating specific humidity (qv) from press and relative humidity.")
+
+    Tdew = calculate_tdew_from_rh(rh, T)
+
+    qv = calculate_qv_from_tdew(Press, Tdew)
+
+    return qv
+
+
+def calculate_wind_vel_from_uv(u, v, verbose=False):
     """Calculate wind velocity from U, V components.
 
     Args:
         u (pd series) u wind component in m/s
-        v (pd series) u wind component in m/s
+        v (pd series) v wind component in m/s
 
     Returns:
         pd series: wind velocity in m/s
@@ -112,7 +165,7 @@ def calculate_wind_velocity(u, v, verbose=False):
     return wind_vel
 
 
-def calculate_wind_direction(u, v, verbose=False):
+def calculate_wind_dir_from_uv(u, v, verbose=False):
     """Calculate wind direction from U, V components.
 
     Args:
@@ -191,7 +244,7 @@ def calc_new_var_profiles(df, new_var, verbose=False):
 
     ## Relative humidity
     if new_var == "rel_hum":
-        values = calculate_rh(
+        values = calculate_rh_from_qv(
             T=df["temp"],
             qv=df["qv"],
             verbose=verbose,
@@ -201,9 +254,9 @@ def calc_new_var_profiles(df, new_var, verbose=False):
 
     ## Specific humidity
     elif new_var == "qv":
-        values = calculate_qv(
-            P=df["press"],
-            Td=df["dewp_temp"],
+        values = calculate_qv_from_tdew(
+            Press=df["press"],
+            Tdew=df["dewp_temp"],
             verbose=verbose,
         )
         # delete remaining columns
@@ -211,13 +264,13 @@ def calc_new_var_profiles(df, new_var, verbose=False):
 
     ## Wind velocity
     elif new_var == "wind_vel":
-        values = calculate_wind_velocity(u=df["u"], v=df["v"], verbose=verbose)
+        values = calculate_wind_vel_from_uv(u=df["u"], v=df["v"], verbose=verbose)
         # delete remaining columns
         del df["u"], df["v"]
 
     ## Wind direction
     elif new_var == "wind_dir":
-        values = calculate_wind_direction(u=df["u"], v=df["v"], verbose=verbose)
+        values = calculate_wind_dir_from_uv(u=df["u"], v=df["v"], verbose=verbose)
         # delete remaining columns
         del df["u"], df["v"]
 
@@ -286,7 +339,7 @@ def calc_new_var_timeseries(df, new_var, levels, verbose=False):
 
     ## Relative humidity
     elif new_var == "rel_hum":
-        values = calculate_rh(
+        values = calculate_rh_from_qv(
             T=df[f"temp{sufix_levels[0]}"],
             qv=df[f"qv{sufix_levels[0]}"],
             verbose=verbose,
@@ -296,19 +349,24 @@ def calc_new_var_timeseries(df, new_var, levels, verbose=False):
         del df[f"temp{sufix_levels[0]}"], df[f"qv{sufix_levels[0]}"]
 
     ## Specific humidity
-    elif new_var == "qv":
-        values = calculate_qv(
-            P=df[f"press{sufix_levels[0]}"],
-            Td=df[f"dewp_temp{sufix_levels[0]}"],
+    elif new_var == "qv" or "2m_qv":
+        if new_var == "2m_qv":
+            prefix = "2m_"
+        else:
+            prefix = ""
+
+        values = calculate_qv_from_tdew(
+            Press=df[f"press{sufix_levels[0]}"],
+            Tdew=df[f"{prefix}dewp_temp{sufix_levels[0]}"],
             verbose=verbose,
         )
 
         # delete remaining columns
-        del df[f"press{sufix_levels[0]}"], df[f"dewp_temp{sufix_levels[0]}"]
+        del df[f"press{sufix_levels[0]}"], df[f"{prefix}dewp_temp{sufix_levels[0]}"]
 
     ## Wind velocity
     elif new_var == "wind_vel":
-        values = calculate_wind_velocity(
+        values = calculate_wind_vel_from_uv(
             u=df[f"u{sufix_levels[0]}"], v=df[f"v{sufix_levels[0]}"], verbose=verbose
         )
 
@@ -317,7 +375,7 @@ def calc_new_var_timeseries(df, new_var, levels, verbose=False):
 
     ## Wind direction
     elif new_var == "wind_dir":
-        values = calculate_wind_direction(
+        values = calculate_wind_dir_from_uv(
             u=df[f"u{sufix_levels[0]}"], v=df[f"v{sufix_levels[0]}"], verbose=verbose
         )
 
