@@ -14,6 +14,7 @@ import pandas as pd
 
 # First-party
 from plot_profile.utils.stations import sdf
+from plot_profile.utils.utils import get_cubehelix_colors
 from plot_profile.utils.utils import linestyle_dict
 from plot_profile.utils.utils import save_fig
 from plot_profile.utils.variables import vdf
@@ -77,10 +78,12 @@ def create_mult_plot(
     unit = variable.unit
     var_long = variable.long_name
 
-    color = variable.color
+    # def color list
+    colors = get_cubehelix_colors(len(leadtimes), 0.1, 0.8)
 
     device_namelist = []
     device_title = None
+    dev_index = -1
 
     # plotting
     for i, device in enumerate(devices):
@@ -94,6 +97,7 @@ def create_mult_plot(
 
         if device_name not in device_namelist:
             device_namelist.append(device_name)
+            dev_index += 1
 
         # 1) retrieve df
         try:
@@ -128,7 +132,8 @@ def create_mult_plot(
         # equivalent to if observations
         if device_name != device:
             lt = device.split("~")[1]
-            index = list(leadtimes).index(int(lt))
+            lt_index = list(leadtimes).index(int(lt))
+
             label = f"{var_long}: {device_name.upper()} (+{lt}h)"
 
             # define unit for the bottom axis
@@ -144,14 +149,14 @@ def create_mult_plot(
             ax.plot(
                 x,
                 altitude,
-                color=color,
-                linestyle=linestyle_dict[index],
+                color=colors[lt_index],
+                linestyle=linestyle_dict[dev_index],
                 label=label,
             )
 
         # if model, a df column for each leadtime
         else:
-            for k, lt in enumerate(leadtimes):
+            for lt_index, lt in enumerate(leadtimes):
 
                 label = f"{var_long}: {device_name.upper()} (+{lt}h)"
 
@@ -162,14 +167,14 @@ def create_mult_plot(
 
                 # avoid KeyError if column name is "0"
                 columns = df.columns
-                x = df[columns[k + 1]]
+                x = df[columns[lt_index + 1]]
 
                 # choose correct axes for the current variable and plot data
                 ax.plot(
                     x,
                     altitude,
-                    color=color,
-                    linestyle=linestyle_dict[k],
+                    color=colors[lt_index],
+                    linestyle=linestyle_dict[dev_index],
                     label=label,
                 )
     # title
