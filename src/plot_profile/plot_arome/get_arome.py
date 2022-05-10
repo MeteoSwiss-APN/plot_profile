@@ -66,7 +66,7 @@ def slice_top_bottom_V2(df_height, alt_top=None, alt_bot=None, verbose=False):
     crit = pd.Series(
         len(df_height) * [False]
     )  # change False to NaN if so desired (other changes necessary as well!)
-    print(type(alt_top))
+
     if not (type(alt_bot) == float or type(alt_bot) == int):
         if verbose:
             print("No bottom specified, use minimal height.")
@@ -76,8 +76,6 @@ def slice_top_bottom_V2(df_height, alt_top=None, alt_bot=None, verbose=False):
         if verbose:
             print("No bottom specified, use maximal height.")
         alt_top = 1e6
-
-    print(alt_top)
 
     for i, height in enumerate(df_height):
         if alt_bot < height < alt_top:
