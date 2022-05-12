@@ -10,6 +10,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib import cm
 
 # First-party
 from plot_profile.utils.stations import sdf
@@ -213,6 +214,25 @@ colour_dict = {
     8: "chartreuse",
     9: "peru",
 }
+
+
+def get_cubehelix_colors(number_of_colors, start=0.1, stop=0.7):
+    """Get colors list from cubehelix colormap.
+
+    Args:
+        number_of_colors (int):   number of colors to be in the list
+        start (float, optional): color or the first color. Defaults to 0.1.
+        stop (float, optional):  color of the last color. Defaults to 0.7.
+
+    Returns:
+        list : list of colors
+
+    """
+    cm_subsection = np.linspace(start, stop, number_of_colors)
+
+    colors = [cm.cubehelix(x) for x in cm_subsection]
+
+    return colors
 
 
 def get_dim_names(ds_var, verbose):

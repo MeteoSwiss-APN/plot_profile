@@ -32,7 +32,7 @@ from plot_profile.plot_mult_profiles.plot_mult_profiles import create_mult_plot
 )
 # add model output to plot ! ex: arome, icon
 @click.option(
-    "--model",
+    "--add_model",
     required=False,
     type=str,
     help="Model name (ex: arome, icon)",
@@ -132,7 +132,7 @@ from plot_profile.plot_mult_profiles.plot_mult_profiles import create_mult_plot
 def main(
     init: click.DateTime,
     variable: str,
-    model: str,
+    add_model: str,
     model_src: str,
     leadtime: tuple,
     add_obs: tuple,
@@ -153,19 +153,19 @@ def main(
     """Plot vertical profiles of variables from icon, arome simulations or observations.
 
     Example command:
-    plot_mult_profiles --init 21111812 --loc pay --variable temp --model icon --model_src
+    plot_mult_profiles --init 21111812 --loc pay --variable temp --add_model icon --model_src
     /scratch/swester/output_icon/ICON-1/ --leadtime 12 --leadtime 14 --leadtime 16 --grid
 
     Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 
     """
     # check inputs
-    parse_inputs(variable, model, model_src, add_obs, loc, verbose)
+    parse_inputs(variable, add_model, model_src, add_obs, loc, verbose)
 
     data_dict = get_mult_data(
         init=init,
         variable=variable,
-        model=model,
+        model=add_model,
         model_src=model_src,
         add_obs=add_obs,
         leadtimes=leadtime,
