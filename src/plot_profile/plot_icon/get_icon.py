@@ -21,6 +21,7 @@ import xarray as xr
 # First-party
 from plot_profile.utils.utils import deaverage
 from plot_profile.utils.utils import get_dim_names
+from plot_profile.utils.utils import get_icon_name
 from plot_profile.utils.utils import slice_top_bottom
 from plot_profile.utils.variables import vdf
 
@@ -381,11 +382,15 @@ def get_icon_timeseries(
             column_label = f"{variable}~{level}"
 
         var = vdf[variable]
-        try:
-            ds_var = ds[var.icon_name]
-        except KeyError:
-            print(f"{var.icon_name} cannot be found in forecast file")
-            continue
+
+        # find correct icon name from list of possible names
+        var.icon_name = get_icon_name(ds, var.icon_names, verbose)
+
+        # dataset with only one specific variable
+        ds_var = ds[var.icon_name]
+        #        except KeyError:
+        #            print(f"{var.icon_name} cannot be found in forecast file")
+        #            continue
 
         # assume that variable is of structure:
         # a) time, height, N cells

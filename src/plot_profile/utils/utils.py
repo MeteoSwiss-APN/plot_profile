@@ -215,6 +215,35 @@ colour_dict = {
 }
 
 
+def get_icon_name(ds, icon_names, verbose):
+    """Determine icon name for this variable from list of possible names.
+
+    Args:
+        ds (xr.dataset): dataset
+        icon_names (list): list of possible names
+
+    Returns:
+        icon_name (str)
+
+    """
+    for name in icon_names:
+        try:
+            # test name
+            dummy = ds[name]
+
+            # return this
+            if verbose:
+                print(f"  found {name} in dataset.")
+            return name
+
+        except:
+            if verbose:
+                print(f"  {name} does not match.")
+
+    print(f"!  not matching name in icon_names in variables.py")
+    sys.exit(1)
+
+
 def get_dim_names(ds_var, verbose):
     """Retrieve dimension names for specific variable in xarray dataframe.
 
