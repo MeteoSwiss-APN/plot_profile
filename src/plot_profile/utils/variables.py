@@ -42,6 +42,7 @@ vdf = pd.DataFrame(
         "2m_temp",
         "tqv",
         "tqc",
+        "tqc_dia",
         "u",
         "v",
         "ver_vis",
@@ -277,9 +278,7 @@ vdf["qc"].mult = 1000
 # diagnostic cloud water: qc_dia
 vdf["qc_dia"].short_name = "qc_dia"
 vdf["qc_dia"].icon_name = "tot_qc_dia"
-vdf["qc_dia"].icon_names = [
-    "tot_qc_dia",
-]
+vdf["qc_dia"].icon_names = ["tot_qc_dia"]
 vdf["qc_dia"].long_name = "Diagnostic cloud water"
 vdf["qc_dia"].unit = "g/kg"
 vdf["qc_dia"].min_value = -0.01
@@ -287,12 +286,11 @@ vdf["qc_dia"].max_value = 0.07
 vdf["qc_dia"].color = "darkblue"
 vdf["qc_dia"].mult = 1000
 
+
 # diagnostic cloud ice: qi_dia
 vdf["qi_dia"].short_name = "qi_dia"
 vdf["qi_dia"].icon_name = "tot_qi_dia"
-vdf["qi_dia"].icon_names = [
-    "tot_qi_dia",
-]
+vdf["qi_dia"].icon_names = ["tot_qi_dia"]
 vdf["qi_dia"].long_name = "Diagnostic cloud ice"
 vdf["qi_dia"].unit = "g/kg"
 vdf["qi_dia"].min_value = -0.01
@@ -489,6 +487,14 @@ vdf["tqc"].icon_name = "tqc"
 vdf["tqc"].icon_names = ["TQC", "tqc"]
 vdf["tqc"].long_name = "Liquid water path"
 vdf["tqc"].unit = "kg/m2"
+
+
+# total column integrated diagnostic cloud water: tqc_dia
+vdf["tqc_dia"].short_name = "tqc_dia"
+vdf["tqc_dia"].icon_name = "tqc_dia"
+vdf["tqc_dia"].icon_names = ["tqc_dia"]
+vdf["tqc_dia"].long_name = "Diagnostic liquid water path"
+vdf["tqc_dia"].unit = "kg/m2"
 
 # x wind
 vdf["u"].short_name = "u"
