@@ -182,7 +182,8 @@ def get_icon(
     variables_list,
     alt_bot,
     alt_top,
-    verbose,
+    full_levels=False,
+    verbose=False,
 ):
     """Retrieve vertical profile of variable from icon simulation.
 
@@ -197,6 +198,7 @@ def get_icon(
         var_shortname (str):    variable shortname
         alt_bot (int):          lower boundary of plot
         alt_top (int):          upper boundary of plot
+        full_levels(int):       set to True if variables are defined on full levels
 
     Returns:
         pandas dataframe:       icon simulation values
@@ -216,7 +218,12 @@ def get_icon(
         ind, height, size = index_height_from_grid_file(lat, lon, grid, verbose)
 
         # create pandas objects of height values
-        df_height = pd.Series(data=calc_hhl(height))
+        if full_levels == True:
+            df_height = pd.Series(data=height)
+            if verbose:
+                print("Variables are on full levels.")
+        else:
+            df_height = pd.Series(data=calc_hhl(height))
 
         # reverse order of df_height s.t. it is from bottom to top
         df_height = df_height.iloc[::-1].reset_index(drop=True)

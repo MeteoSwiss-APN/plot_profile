@@ -23,12 +23,12 @@ from plot_profile.utils.stations import sdf
 from plot_profile.utils.utils import calc_qv_from_td
 from plot_profile.utils.utils import check_inputs
 from plot_profile.utils.utils import slice_top_bottom
+from plot_profile.utils.variables import vdf
 
 # from ipdb import set_trace
 
 
 def parse_inputs(loc, add_model, add_obs, model_src, verbose):
-
     # create a dict out of model_src. each model id should be one key.
     model_src_dict = {}
     model_ids = []
@@ -136,6 +136,8 @@ def get_data(
             folder = element[3]
             init = element[4]
 
+            full_levels = vdf[var_name].icon_hhl
+
             if var_name == "wind_vel" or var_name == "wind_dir":
                 var_open_icon = ["u", "v"]
 
@@ -163,13 +165,16 @@ def get_data(
                     variables_list=var_open_icon,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
+                    full_levels=full_levels,
                     verbose=verbose,
                 )
 
                 if var_open_icon != var_name:
                     tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                     tmp_df.set_axis(["height"] + var_open_icon, axis=1, inplace=True)
-                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+                    tmp_df = calc_new_var_profiles(
+                        tmp_df, var_name, device="icon", verbose=verbose
+                    )
 
                 else:
                     # re-format output from get_icon slightly
@@ -212,13 +217,16 @@ def get_data(
                     variables_list=var_open_icon,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
+                    full_levels=full_levels,
                     verbose=verbose,
                 )
 
                 if var_open_icon != var_name:
                     tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                     tmp_df.set_axis(["height"] + var_open_icon, axis=1, inplace=True)
-                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+                    tmp_df = calc_new_var_profiles(
+                        tmp_df, var_name, device="icon", verbose=verbose
+                    )
 
                 else:
                     # re-format output from get_icon slightly
@@ -244,6 +252,7 @@ def get_data(
 
             if var_name == "qv":
                 var_open_arome = ["press", "dewp_temp"]
+                var_open_arome = ["press", "temp", "rel_hum"]
 
             elif var_name == "wind_vel" or var_name == "wind_dir":
                 var_open_arome = ["u", "v"]
@@ -276,7 +285,9 @@ def get_data(
                 ):  # equivalent to "if var needs to be calculated"
                     tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                     tmp_df.set_axis(["height"] + var_open_arome, axis=1, inplace=True)
-                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+                    tmp_df = calc_new_var_profiles(
+                        tmp_df, var_name, device="pe_arome", verbose=verbose
+                    )
 
                 else:
                     # re-format output from get_arome_profiles slightly
@@ -326,7 +337,9 @@ def get_data(
 
                     tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                     tmp_df.set_axis(["height"] + var_open_arome, axis=1, inplace=True)
-                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+                    tmp_df = calc_new_var_profiles(
+                        tmp_df, var_name, device="pe_arome", verbose=verbose
+                    )
 
                 else:
 

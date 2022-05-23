@@ -165,12 +165,13 @@ def calculate_wind_vel_from_uv(u, v, verbose=False):
     return wind_vel
 
 
-def calculate_wind_dir_from_uv(u, v, verbose=False):
+def calculate_wind_dir_from_uv(u, v, modulo_180=False, verbose=False):
     """Calculate wind direction from U, V components.
 
     Args:
-        u (pd series) u wind component in m/s
-        v (pd series) v wind component in m/s
+        u (pd series):     u wind component in m/s
+        v (pd series):     v wind component in m/s
+        modulo_180 (bool): if True, retruned angle will be between [-180,180]
 
     Returns:
         pd series: wind direction in °
@@ -187,6 +188,11 @@ def calculate_wind_dir_from_uv(u, v, verbose=False):
     # https://github.com/blaylockbk/Ute_WRF/blob/master/functions/wind_calcs.py
 
     wind_dir = (270 - np.rad2deg(np.arctan2(v, u))) % 360
+
+    # if requested convert from [0,360] to [-180,180]
+    if modulo_180 == True:
+        wind_dir = (wind_dir + 180) % 360 - 180
+        # wind_dir  = np.rad2deg(np.arctan2(v, u))
 
     return wind_dir
 
