@@ -39,6 +39,7 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
 
     # iterate through list of models and add init & folder to it
     l_model = []
+    height_lvl_icon = []
     for model in add_model:
         if model[2] not in model_ids:
             print(
@@ -48,8 +49,21 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
                 f"--- (Could just be a typo. Make sure the model ids in the --add_model & --model_src flags match)"
             )
             sys.exit(1)
+
+        # append True if variables is in height full levels, False if not
+        if model[0] == "icon":
+            height_lvl_icon.append(vdf[model[1]].icon_hfl)
+
         model = tuple(list(model) + (model_src_dict[model[2]]))
         l_model.append(model)
+
+    # icon variables must be on the same height levels
+    if height_lvl_icon:
+        if not (height_lvl_icon.count(height_lvl_icon[0]) == len(height_lvl_icon)):
+            print(
+                "!--- Requested icon variables are not defined on the same height levels."
+            )
+            sys.exit(1)
 
     if add_obs:
         l_obs = list(add_obs)
@@ -74,6 +88,7 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
 
     # check, that the provided variables at most require 2 units
     multi_axes = check_units(vars)
+
     return elements, multi_axes
 
 
@@ -136,7 +151,7 @@ def get_data(
             folder = element[3]
             init = element[4]
 
-            full_levels = vdf[var_name].icon_hhl
+            full_levels = vdf[var_name].icon_hfl
 
             if var_name == "wind_vel" or var_name == "wind_dir":
                 var_open_icon = ["u", "v"]
