@@ -235,6 +235,35 @@ def get_cubehelix_colors(number_of_colors, start=0.1, stop=0.7):
     return colors
 
 
+def get_icon_name(ds, icon_names, verbose):
+    """Determine icon name for this variable from list of possible names.
+
+    Args:
+        ds (xr.dataset): dataset
+        icon_names (list): list of possible names
+
+    Returns:
+        icon_name (str)
+
+    """
+    for name in icon_names:
+        try:
+            # test name
+            dummy = ds[name]
+
+            # return this
+            if verbose:
+                print(f"  found {name} in dataset.")
+            return name
+
+        except:
+            if verbose:
+                print(f"  {name} does not match.")
+
+    print(f"!  not matching name in icon_names in variables.py")
+    sys.exit(1)
+
+
 def get_dim_names(ds_var, verbose):
     """Retrieve dimension names for specific variable in xarray dataframe.
 
@@ -274,11 +303,11 @@ def get_dim_names(ds_var, verbose):
     dim_level = None
 
     # loop over dims given in dataset
-    for dim_names in ds_var.dims:
+    for dim_name in ds_var.dims:
 
         # check for time names
         for time_name in possible_time_names:
-            if time_name in dim_names:
+            if time_name == dim_name:
                 dim_time = time_name
 
                 if verbose:
@@ -287,7 +316,7 @@ def get_dim_names(ds_var, verbose):
 
         # check for index names
         for index_name in possible_index_names:
-            if index_name in dim_names:
+            if index_name == dim_name:
                 dim_index = index_name
 
                 if verbose:
@@ -296,7 +325,7 @@ def get_dim_names(ds_var, verbose):
 
         # check for level names
         for level_name in possible_level_names:
-            if level_name in dim_names:
+            if level_name == dim_name:
                 dim_level = level_name
 
                 if verbose:
