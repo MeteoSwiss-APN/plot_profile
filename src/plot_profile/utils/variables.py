@@ -40,6 +40,7 @@ vdf = pd.DataFrame(
         "sw_net",
         "temp",
         "2m_temp",
+        "tke",
         "tqv",
         "tqc",
         "tqc_dia",
@@ -62,6 +63,7 @@ vdf = pd.DataFrame(
         "min_value",
         "max_value",
         "dwh_id",
+        "icon_hfl",
         # line appearance
         "color",
         "marker",
@@ -85,6 +87,7 @@ vdf.loc["arome_name"] = None
 vdf.loc["min_value"][:] = None
 vdf.loc["max_value"][:] = None
 vdf.loc["dwh_id"][:] = None
+vdf.loc["icon_hfl"] = False
 vdf.loc["color"] = "blue"
 vdf.loc["marker"][:] = "o"
 vdf.loc["linestyle"] = "solid"
@@ -316,6 +319,7 @@ vdf["qv"].dwh_id = {
     "2m_tower": "qv",
     "10m_tower": "qv",
     "30m_tower": "qv",
+    "rs": "qv",
     "ralmo": "4919",
 }
 
@@ -356,7 +360,7 @@ vdf["rel_hum"].arome_name = "Hu"
 vdf["rel_hum"].unit = "%"
 vdf["rel_hum"].min_value = 0
 vdf["rel_hum"].max_value = 100
-vdf["rel_hum"].mult = 100
+# vdf["rel_hum"].mult = 100
 vdf["rel_hum"].dwh_id = {
     "rs": "746",
     "2m_tower": "3698",
@@ -472,6 +476,14 @@ vdf["2m_temp"].mult = 1
 vdf["2m_temp"].plus = -273
 vdf["2m_temp"].plus_arome = -273
 vdf["2m_temp"].avg = False
+
+# turblent kinetic energy; tke
+vdf["tke"].short_name = "tke"
+vdf["tke"].icon_name = "TKE"
+vdf["tke"].arome_name = "TKE"
+vdf["tke"].long_name = "Turbulent kinetic energy"
+vdf["tke"].icon_hfl = True
+vdf["tke"].unit = "m2/s2"
 
 # total water vapour: tqv
 vdf["tqv"].short_name = "tqv"

@@ -23,12 +23,12 @@ from plot_profile.utils.stations import sdf
 from plot_profile.utils.utils import calc_qv_from_td
 from plot_profile.utils.utils import check_inputs
 from plot_profile.utils.utils import slice_top_bottom
+from plot_profile.utils.variables import vdf
 
 # from ipdb import set_trace
 
 
 def parse_inputs(loc, add_model, add_obs, model_src, verbose):
-
     # create a dict out of model_src. each model id should be one key.
     model_src_dict = {}
     model_ids = []
@@ -39,6 +39,7 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
 
     # iterate through list of models and add init & folder to it
     l_model = []
+    height_lvl_icon = []
     for model in add_model:
         if model[2] not in model_ids:
             print(
@@ -48,8 +49,21 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
                 f"--- (Could just be a typo. Make sure the model ids in the --add_model & --model_src flags match)"
             )
             sys.exit(1)
+
+        # append True if variables is in height full levels, False if not
+        if model[0] == "icon":
+            height_lvl_icon.append(vdf[model[1]].icon_hfl)
+
         model = tuple(list(model) + (model_src_dict[model[2]]))
         l_model.append(model)
+
+    # icon variables must be on the same height levels
+    if height_lvl_icon:
+        if not (height_lvl_icon.count(height_lvl_icon[0]) == len(height_lvl_icon)):
+            print(
+                "!--- Requested icon variables are not defined on the same height levels."
+            )
+            sys.exit(1)
 
     if add_obs:
         l_obs = list(add_obs)
@@ -74,6 +88,7 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
 
     # check, that the provided variables at most require 2 units
     multi_axes = check_units(vars)
+
     return elements, multi_axes
 
 
@@ -136,6 +151,8 @@ def get_data(
             folder = element[3]
             init = element[4]
 
+            full_levels = vdf[var_name].icon_hfl
+
             if var_name == "wind_vel" or var_name == "wind_dir":
                 var_open_icon = ["u", "v"]
 
@@ -163,13 +180,16 @@ def get_data(
                     variables_list=var_open_icon,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
+                    full_levels=full_levels,
                     verbose=verbose,
                 )
 
                 if var_open_icon != var_name:
                     tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                     tmp_df.set_axis(["height"] + var_open_icon, axis=1, inplace=True)
-                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+                    tmp_df = calc_new_var_profiles(
+                        tmp_df, var_name, device="icon", verbose=verbose
+                    )
 
                 else:
                     # re-format output from get_icon slightly
@@ -212,13 +232,16 @@ def get_data(
                     variables_list=var_open_icon,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
+                    full_levels=full_levels,
                     verbose=verbose,
                 )
 
                 if var_open_icon != var_name:
                     tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                     tmp_df.set_axis(["height"] + var_open_icon, axis=1, inplace=True)
-                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+                    tmp_df = calc_new_var_profiles(
+                        tmp_df, var_name, device="icon", verbose=verbose
+                    )
 
                 else:
                     # re-format output from get_icon slightly
@@ -244,6 +267,7 @@ def get_data(
 
             if var_name == "qv":
                 var_open_arome = ["press", "dewp_temp"]
+                var_open_arome = ["press", "temp", "rel_hum"]
 
             elif var_name == "wind_vel" or var_name == "wind_dir":
                 var_open_arome = ["u", "v"]
@@ -276,7 +300,9 @@ def get_data(
                 ):  # equivalent to "if var needs to be calculated"
                     tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                     tmp_df.set_axis(["height"] + var_open_arome, axis=1, inplace=True)
-                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+                    tmp_df = calc_new_var_profiles(
+                        tmp_df, var_name, device="pe_arome", verbose=verbose
+                    )
 
                 else:
                     # re-format output from get_arome_profiles slightly
@@ -326,7 +352,9 @@ def get_data(
 
                     tmp_df = pd.concat(tmp_dict, axis=1, ignore_index=True)
                     tmp_df.set_axis(["height"] + var_open_arome, axis=1, inplace=True)
-                    tmp_df = calc_new_var_profiles(tmp_df, var_name, verbose)
+                    tmp_df = calc_new_var_profiles(
+                        tmp_df, var_name, device="pe_arome", verbose=verbose
+                    )
 
                 else:
 

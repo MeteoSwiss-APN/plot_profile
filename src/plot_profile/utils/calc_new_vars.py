@@ -165,12 +165,13 @@ def calculate_wind_vel_from_uv(u, v, verbose=False):
     return wind_vel
 
 
-def calculate_wind_dir_from_uv(u, v, verbose=False):
+def calculate_wind_dir_from_uv(u, v, modulo_180=False, verbose=False):
     """Calculate wind direction from U, V components.
 
     Args:
-        u (pd series) u wind component in m/s
-        v (pd series) v wind component in m/s
+        u (pd series):     u wind component in m/s
+        v (pd series):     v wind component in m/s
+        modulo_180 (bool): if True, retruned angle will be between [-180,180]
 
     Returns:
         pd series: wind direction in °
@@ -187,6 +188,11 @@ def calculate_wind_dir_from_uv(u, v, verbose=False):
     # https://github.com/blaylockbk/Ute_WRF/blob/master/functions/wind_calcs.py
 
     wind_dir = (270 - np.rad2deg(np.arctan2(v, u))) % 360
+
+    # if requested convert from [0,360] to [-180,180]
+    if modulo_180 == True:
+        wind_dir = (wind_dir + 180) % 360 - 180
+        # wind_dir  = np.rad2deg(np.arctan2(v, u))
 
     return wind_dir
 
@@ -225,12 +231,13 @@ def calc_rho_arome(p, t, qc, qv, verbose=False):
     return rho
 
 
-def calc_new_var_profiles(df, new_var, verbose=False):
+def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
     """Calculate vert. profile of requested variable from model output variables.
 
     Args:
         df (DataFrame):            model output variables
         new_var (str):             name of the variable to be calculated
+        device (str):              device name. Defaults to "arome".
         verbose (bool, optional):  print details. Defaults to False.
 
     Returns:
@@ -254,13 +261,24 @@ def calc_new_var_profiles(df, new_var, verbose=False):
 
     ## Specific humidity
     elif new_var == "qv":
-        values = calculate_qv_from_tdew(
-            Press=df["press"],
-            Tdew=df["dewp_temp"],
-            verbose=verbose,
-        )
-        # delete remaining columns
-        del df["press"], df["dewp_temp"]
+        if device == "pe_arome":
+            values = calculate_qv_from_rh(
+                Press=df["press"],
+                T=df["temp"],
+                rh=df["rel_hum"],
+                verbose=verbose,
+            )
+            # delete remaining columns
+            del df["press"], df["temp"], df["rel_hum"]
+
+        else:
+            values = calculate_qv_from_tdew(
+                Press=df["press"],
+                Tdew=df["dewp_temp"],
+                verbose=verbose,
+            )
+            # delete remaining columns
+            del df["press"], df["dewp_temp"]
 
     ## Wind velocity
     elif new_var == "wind_vel":
@@ -280,9 +298,14 @@ def calc_new_var_profiles(df, new_var, verbose=False):
     # convert values to pandas series
     values = pd.Series(values, name=new_var)
 
-    # TODO si jamais icon detecter et appliquer les convertisseurs d'icon
     # do some unity conversions
-    values = values * vdf.loc["mult_arome"][new_var] + vdf.loc["plus_arome"][new_var]
+    if device == "arome" or "pe_arome":
+        values = (
+            values * vdf.loc["mult_arome"][new_var] + vdf.loc["plus_arome"][new_var]
+        )
+
+    if device == "icon":
+        values = values * vdf.loc["mult"][new_var] + vdf.loc["plus"][new_var]
 
     # add values column to the dataframe
     df = pd.concat([df, values], axis=1)
