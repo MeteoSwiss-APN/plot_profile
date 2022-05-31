@@ -165,7 +165,7 @@ def calculate_wind_vel_from_uv(u, v, verbose=False):
     return wind_vel
 
 
-def calculate_wind_dir_from_uv(u, v, modulo_180=False, verbose=False):
+def calculate_wind_dir_from_uv(u, v, modulo_180=False, unwrap=False, verbose=False):
     """Calculate wind direction from U, V components.
 
     Args:
@@ -193,6 +193,9 @@ def calculate_wind_dir_from_uv(u, v, modulo_180=False, verbose=False):
     if modulo_180 == True:
         wind_dir = (wind_dir + 180) % 360 - 180
         # wind_dir  = np.rad2deg(np.arctan2(v, u))
+
+    if unwrap == True:
+        wind_dir = np.unwrap(p=wind_dir, period=360)
 
     return wind_dir
 
@@ -288,7 +291,9 @@ def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
 
     ## Wind direction
     elif new_var == "wind_dir":
-        values = calculate_wind_dir_from_uv(u=df["u"], v=df["v"], verbose=verbose)
+        values = calculate_wind_dir_from_uv(
+            u=df["u"], v=df["v"], unwrap=True, verbose=verbose
+        )
         # delete remaining columns
         del df["u"], df["v"]
 
