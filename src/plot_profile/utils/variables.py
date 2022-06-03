@@ -35,6 +35,8 @@ vdf = pd.DataFrame(
         "lw_down",
         "lw_up",
         "lw_net",
+        "slhf",
+        "sshf",
         "sw_down",
         "sw_up",
         "sw_net",
@@ -76,7 +78,7 @@ vdf = pd.DataFrame(
         "plus_arome",
         "avg",
         "avg_arome",
-        "acc",
+        "acc_arome",
     ],
 )
 
@@ -98,7 +100,7 @@ vdf.loc["plus"][:] = 0
 vdf.loc["plus_arome"][:] = 0
 vdf.loc["avg"][:] = False
 vdf.loc["avg_arome"][:] = False
-vdf.loc["acc"][:] = False
+vdf.loc["acc_arome"][:] = False
 
 
 # fill variable dataframe with specific values
@@ -132,7 +134,7 @@ vdf["clc"].long_name = "Cloud cover"
 vdf["clc"].unit = "%"
 vdf["clc"].min_value = -0.05
 vdf["clc"].max_value = 1.05
-vdf["clcl"].mult_arome = 100
+vdf["clc"].mult_arome = 100
 vdf["clc"].color = "yellowgreen"
 vdf["clc"].colormap = "bone"
 
@@ -145,7 +147,6 @@ vdf["clcl"].long_name = "Low cloud cover"
 vdf["clcl"].unit = "%"
 vdf["clcl"].min_value = -0.05
 vdf["clcl"].max_value = 1.05
-vdf["clcl"].mult_arome = 0.01
 vdf["clcl"].color = "peru"
 vdf["clcl"].colormap = "bone"
 
@@ -277,6 +278,7 @@ vdf["qc"].max_value = 0.07
 vdf["qc"].color = "darkblue"
 vdf["qc"].colormap = "YlGn"
 vdf["qc"].mult = 1000
+vdf["qc"].mult_arome = 1000
 
 # diagnostic cloud water: qc_dia
 vdf["qc_dia"].short_name = "qc_dia"
@@ -326,6 +328,7 @@ vdf["qv"].dwh_id = {
 # 2m specific humidity: 2m_qv
 vdf["2m_qv"].short_name = "2m_qv"
 vdf["2m_qv"].icon_name = "qv_2m"
+vdf["2m_qv"].icon_names = ["qv_2m"]
 vdf["2m_qv"].arome_name = "2m_qv"
 vdf["2m_qv"].long_name = "2m specific humidity"
 vdf["2m_qv"].unit = "g/kg"
@@ -404,8 +407,30 @@ vdf["lw_net"].icon_names = [
 vdf["lw_net"].arome_name = "LW"
 vdf["lw_net"].mult_arome = 1 / 3600
 vdf["lw_net"].avg = True
-vdf["lw_net"].acc = True
+vdf["lw_net"].acc_arome = True
 vdf["lw_net"].dwh_id = {"2m": "net_calc:175:1531:"}
+
+# radiation: shortwave downward
+vdf["slhf"].short_name = "slhf"
+vdf["slhf"].long_name = "Surface latent heat flux"
+vdf["slhf"].unit = "W/m2"
+vdf["slhf"].icon_name = "alhfl_s"
+vdf["slhf"].icon_names = ["ashfl_s"]
+vdf["slhf"].arome_name = "slhf"
+vdf["slhf"].acc_arome = True
+vdf["slhf"].avg = True
+vdf["slhf"].mult_arome = 1 / 3600
+
+# radiation: shortwave downward
+vdf["sshf"].short_name = "sshf"
+vdf["sshf"].long_name = "Surface sensible heat flux"
+vdf["sshf"].unit = "W/m2"
+vdf["sshf"].icon_name = "ashfl_s"
+vdf["sshf"].icon_names = ["ashfl_s"]
+vdf["sshf"].arome_name = "sshf"
+vdf["sshf"].acc_arome = True
+vdf["sshf"].avg = True
+vdf["sshf"].mult_arome = 1 / 3600
 
 # radiation: shortwave downward
 vdf["sw_down"].short_name = "sw_down"
@@ -431,7 +456,7 @@ vdf["sw_net"].icon_names = ["asob_s", "ASOD_S"]
 vdf["sw_net"].arome_name = "SW"
 vdf["sw_net"].mult_arome = 1 / 3600
 vdf["sw_net"].avg = True
-vdf["sw_net"].acc = True
+vdf["sw_net"].acc_arome = True
 vdf["sw_net"].dwh_id = {"2m": "net_calc:96:1871:"}
 
 # temperature: temp

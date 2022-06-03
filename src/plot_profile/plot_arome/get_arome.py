@@ -366,7 +366,7 @@ def get_arome_timeseries(
                 values = xr_data.variables[var_aro][:, level - 1, dy, dx]
 
             # decumulating vars
-            if vdf.loc["acc"][var] == True:
+            if vdf.loc["acc_arome"][var] == True:
                 if verbose:
                     print("Decumalating arome vars")
 
