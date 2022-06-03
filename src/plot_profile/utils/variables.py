@@ -411,28 +411,6 @@ vdf["lw_net"].acc_arome = True
 vdf["lw_net"].dwh_id = {"2m": "net_calc:175:1531:"}
 
 # radiation: shortwave downward
-vdf["slhf"].short_name = "slhf"
-vdf["slhf"].long_name = "Surface latent heat flux"
-vdf["slhf"].unit = "W/m2"
-vdf["slhf"].icon_name = "alhfl_s"
-vdf["slhf"].icon_names = ["ashfl_s"]
-vdf["slhf"].arome_name = "slhf"
-vdf["slhf"].acc_arome = True
-vdf["slhf"].avg = True
-vdf["slhf"].mult_arome = 1 / 3600
-
-# radiation: shortwave downward
-vdf["sshf"].short_name = "sshf"
-vdf["sshf"].long_name = "Surface sensible heat flux"
-vdf["sshf"].unit = "W/m2"
-vdf["sshf"].icon_name = "ashfl_s"
-vdf["sshf"].icon_names = ["ashfl_s"]
-vdf["sshf"].arome_name = "sshf"
-vdf["sshf"].acc_arome = True
-vdf["sshf"].avg = True
-vdf["sshf"].mult_arome = 1 / 3600
-
-# radiation: shortwave downward
 vdf["sw_down"].short_name = "sw_down"
 vdf["sw_down"].long_name = "Downward SW rad"
 vdf["sw_down"].unit = "W/m2"
@@ -458,6 +436,28 @@ vdf["sw_net"].mult_arome = 1 / 3600
 vdf["sw_net"].avg = True
 vdf["sw_net"].acc_arome = True
 vdf["sw_net"].dwh_id = {"2m": "net_calc:96:1871:"}
+
+# surface latent heat flux
+vdf["slhf"].short_name = "slhf"
+vdf["slhf"].long_name = "Surface latent heat flux"
+vdf["slhf"].unit = "W/m2"
+vdf["slhf"].icon_name = "alhfl_s"
+vdf["slhf"].icon_names = ["ashfl_s"]
+vdf["slhf"].arome_name = "slhf"
+vdf["slhf"].acc_arome = True
+vdf["slhf"].avg = True
+vdf["slhf"].mult_arome = 1 / 3600
+
+# surface sensible heat flux
+vdf["sshf"].short_name = "sshf"
+vdf["sshf"].long_name = "Surface sensible heat flux"
+vdf["sshf"].unit = "W/m2"
+vdf["sshf"].icon_name = "ashfl_s"
+vdf["sshf"].icon_names = ["ashfl_s"]
+vdf["sshf"].arome_name = "sshf"
+vdf["sshf"].acc_arome = True
+vdf["sshf"].avg = True
+vdf["sshf"].mult_arome = 1 / 3600
 
 # temperature: temp
 vdf["temp"].short_name = "temp"
