@@ -179,9 +179,10 @@ def dwh2pandas(cmd, verbose):
         f"{header_line[0].iloc[0]} {header_line[1].iloc[0]} {header_line[2].iloc[0]}"
     )
     if check == "records read: 0":
-        print(
-            f"--- WARNING: For the given time period, location and/or device, no data could be retrieved. Returning empty dataframe."
-        )
+        if verbose:
+            print(
+                f"--- WARNING: For the given time period, location and/or device, no data could be retrieved. Returning empty dataframe."
+            )
         return pd.DataFrame()
 
     # parse the command line output into pandas dataframe
@@ -199,7 +200,10 @@ def dwh2pandas(cmd, verbose):
     # check if no data is available for the time period
     if data.empty:
         # TODO: Code should not break but return empty dataframe
-        raise SystemExit("--- WARN: no DWH data available.")
+        # raise SystemExit("--- WARN: no DWH data available.")
+        if verbose:
+            print("WARN: no DWH data available.")
+        return pd.DataFrame()
     else:
         if verbose:
             with pd.option_context(
