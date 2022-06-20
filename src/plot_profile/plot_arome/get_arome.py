@@ -93,7 +93,7 @@ def calc_arome_height(dx, dy, verbose=False):
         verbose (bool):  print details
 
     Returns:
-        pandas series: arome height (asl) level of the grid point
+        pandas series: arome height (asl) levels over the grid point
 
     """
     if verbose:
@@ -112,6 +112,35 @@ def calc_arome_height(dx, dy, verbose=False):
     ]  # ground alt above sea level
 
     df_height = pd.Series(nc_physio + nc_alti)
+
+    return df_height
+
+
+def calc_arome_height_agl(dx, dy, verbose=False):
+    """Calculate height levels above GROUND level in arome.
+
+    Args:
+        dx (int):        x-coordinate in arome domain
+        dy (int):        y-coordinate in arome domain
+        verbose (bool):  print details
+
+    Returns:
+        pandas series: arome height (agl) levels over the grid point
+
+    """
+    if verbose:
+        print(f"Calculating arome levels hegihts above the ({dx},{dy}) grid point")
+
+    # file containing arome heights data (could be any file)
+    height_data = nc.Dataset(
+        "/scratch/adandoy/AROME/20211118T1200P/P.arome-forecast.payerne+0000_00.nc",
+        "r",
+    )
+
+    # open altitudes above sea level
+    nc_alti = height_data.groups["P"].variables["Altitude"][:]  # alt above ground level
+
+    df_height = pd.Series(nc_alti)
 
     return df_height
 
@@ -273,7 +302,7 @@ def get_arome_profiles(
 
 
 def get_arome_timeseries(
-    lat, lon, vars, init, levels, start_lt, end_lt, folder, verbose
+    lat, lon, vars, init, levels, start_lt, end_lt, folder, verbose=False
 ):
     """Retrieve timeseries from AROME outputs.
 
@@ -310,7 +339,6 @@ def get_arome_timeseries(
             levels,
         ]
 
-    print(levels, vars)
     for var in vars:
 
         # is var availible in our Arome files ?
