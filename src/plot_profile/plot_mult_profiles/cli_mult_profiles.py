@@ -65,7 +65,7 @@ from plot_profile.plot_mult_profiles.plot_mult_profiles import create_mult_plot
     help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
 )
 @click.option("--ymin", type=int, help="Altitude bottom. Def: surface.")
-@click.option("--ymax", default=8000, type=int, help="Altitude top. Def: 8000")
+@click.option("--ymax", default=2000, type=int, help="Altitude top. Def: 2000")
 @click.option(
     "--datatypes",
     type=click.Choice(
