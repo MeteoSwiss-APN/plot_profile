@@ -14,7 +14,6 @@ import pandas as pd
 
 # First-party
 from plot_profile.plot_arome.get_arome import get_arome_profiles
-# from plot_profile.plot_arome.get_arome import get_arome_profiles
 from plot_profile.plot_icon.get_icon import get_icon
 from plot_profile.plot_timeseries.parse_timeseries_inputs import check_units
 from plot_profile.utils.calc_new_vars import calc_new_var_profiles
@@ -289,6 +288,7 @@ def get_data(
                     lat=lat,
                     lon=lon,
                     variables_list=var_open_arome,  # list of str or str
+                    member_ids=[0],  # 0 for deterministic model
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
                     verbose=verbose,
@@ -341,6 +341,7 @@ def get_data(
                     lat=lat,
                     lon=lon,
                     variables_list=var_open_arome,
+                    member_ids=[0],
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
                     verbose=verbose,

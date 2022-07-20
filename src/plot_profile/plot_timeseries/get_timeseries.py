@@ -3,6 +3,7 @@
 from pprint import pprint
 
 # Third-party
+import numpy as np
 import pandas as pd
 
 # First-party
@@ -101,7 +102,9 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 if (
                     var_name != var_open_icon
                 ):  # equivalent to "if var needs to be calculated"
-                    df = calc_new_var_timeseries(df, var_name, levels, verbose)
+                    df = calc_new_var_timeseries(
+                        df, var_name, levels, sdf[loc].lat, sdf[loc].lon, verbose
+                    )
 
                 del df["timestamp"]
                 timeseries_dict[f"icon~{id}"] = pd.concat(
@@ -149,7 +152,9 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 if (
                     var_name != var_open_icon
                 ):  # equivalent to "if var needs to be calculated"
-                    df = calc_new_var_timeseries(df, var_name, levels, verbose)
+                    df = calc_new_var_timeseries(
+                        df, var_name, levels, sdf[loc].lat, sdf[loc].lon, verbose
+                    )
 
                 timeseries_dict[f"icon~{id}"] = df
 
@@ -181,6 +186,10 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 var_open_arome = "temp"
                 levels = [486, 506]
                 do_interpolation = True
+
+            elif var_name == "tqc":
+                var_open_arome = ["press", "temp", "qc", "rel_hum"]
+                levels = np.arange(1, 21)
 
             else:
                 var_open_arome = var_name
@@ -224,7 +233,9 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 if (
                     var_name != var_open_arome
                 ):  # equivalent to "if var needs to be calculated"
-                    df = calc_new_var_timeseries(df, var_name, levels, verbose)
+                    df = calc_new_var_timeseries(
+                        df, var_name, levels, sdf[loc].lat, sdf[loc].lon, verbose
+                    )
 
                 del df["timestamp"]
                 timeseries_dict[f"arome~{id}"] = pd.concat(
@@ -269,7 +280,9 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                 if (
                     var_name != var_open_arome
                 ):  # equivalent to "if var needs to be calculated"
-                    df = calc_new_var_timeseries(df, var_name, levels, verbose)
+                    df = calc_new_var_timeseries(
+                        df, var_name, levels, sdf[loc].lat, sdf[loc].lon, verbose
+                    )
 
                 timeseries_dict[f"arome~{id}"] = df
 

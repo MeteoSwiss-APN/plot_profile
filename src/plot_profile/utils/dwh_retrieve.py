@@ -179,9 +179,10 @@ def dwh2pandas(cmd, verbose):
         f"{header_line[0].iloc[0]} {header_line[1].iloc[0]} {header_line[2].iloc[0]}"
     )
     if check == "records read: 0":
-        print(
-            f"--- WARNING: For the given time period, location and/or device, no data could be retrieved. Returning empty dataframe."
-        )
+        if verbose:
+            print(
+                f"--- WARNING: For the given time period, location and/or device, no data could be retrieved. Returning empty dataframe."
+            )
         return pd.DataFrame()
 
     # parse the command line output into pandas dataframe
@@ -199,7 +200,10 @@ def dwh2pandas(cmd, verbose):
     # check if no data is available for the time period
     if data.empty:
         # TODO: Code should not break but return empty dataframe
-        raise SystemExit("--- WARN: no DWH data available.")
+        # raise SystemExit("--- WARN: no DWH data available.")
+        if verbose:
+            print("WARN: no DWH data available.")
+        return pd.DataFrame()
     else:
         if verbose:
             with pd.option_context(
@@ -239,20 +243,36 @@ def dwh_surface(station_name, vars_str, start, end, verbose=False):
         print(f"  from {start} to {end}")
         print(f"  at {station_name}.")
 
-    # retrieve_cscs command:
-    cmd = (
-        "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
-        + " -s surface "
-        + " -i nat_abr,"
-        + station_name
-        + " -p "
-        + vars_str
-        + " -t "
-        + start
-        + "-"
-        + end
-        + " --use-limitation 50"
-    )
+    if "2537" in vars_str or "5547" in vars_str:
+        # retrieve_cscs command:
+        cmd = (
+            "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
+            + f" -s profile_integral"
+            + " -i int_ind,06610"
+            + " -p "
+            + vars_str
+            + " -t "
+            + start
+            + "-"
+            + end
+            + " --use-limitation 50"
+            + " -C 38 -w 31"
+        )
+    else:
+        # retrieve_cscs command:
+        cmd = (
+            "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
+            + f" -s surface"
+            + " -i nat_abr,"
+            + station_name
+            + " -p "
+            + vars_str
+            + " -t "
+            + start
+            + "-"
+            + end
+            + " --use-limitation 50"
+        )
 
     # run command
     data = dwh2pandas(cmd, verbose)
@@ -422,7 +442,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 return new_df
 
     # surface-based data
-    elif device in ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower"]:
+    elif device in ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower", "mwri"]:
 
         # if net lw/sw radiation is required we need to calculate it
         if "net_calc" in vars_str:

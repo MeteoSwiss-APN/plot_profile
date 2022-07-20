@@ -93,7 +93,7 @@ def calc_arome_height(dx, dy, verbose=False):
         verbose (bool):  print details
 
     Returns:
-        pandas series: arome height (asl) level of the grid point
+        pandas series: arome height (asl) levels over the grid point
 
     """
     if verbose:
@@ -116,6 +116,35 @@ def calc_arome_height(dx, dy, verbose=False):
     return df_height
 
 
+def calc_arome_height_agl(dx, dy, verbose=False):
+    """Calculate height levels above GROUND level in arome.
+
+    Args:
+        dx (int):        x-coordinate in arome domain
+        dy (int):        y-coordinate in arome domain
+        verbose (bool):  print details
+
+    Returns:
+        pandas series: arome height (agl) levels over the grid point
+
+    """
+    if verbose:
+        print(f"Calculating arome levels hegihts above the ({dx},{dy}) grid point")
+
+    # file containing arome heights data (could be any file)
+    height_data = nc.Dataset(
+        "/scratch/adandoy/AROME/20211118T1200P/P.arome-forecast.payerne+0000_00.nc",
+        "r",
+    )
+
+    # open altitudes above sea level
+    nc_alti = height_data.groups["P"].variables["Altitude"][:]  # alt above ground level
+
+    df_height = pd.Series(nc_alti)
+
+    return df_height
+
+
 def get_arome_profiles(
     folder,
     date,
@@ -123,6 +152,7 @@ def get_arome_profiles(
     lat,
     lon,
     variables_list,
+    member_ids,
     alt_bot,
     alt_top,
     verbose,
@@ -136,6 +166,7 @@ def get_arome_profiles(
         lat (float):            latitude of location
         lon (float):            longitude of location
         variables_list (str):   variable shortname
+        member_ids (list of int):  specific ensemble members to return (for all ids) ([0] for deterministic model)
         alt_bot (int):          lower boundary of plot
         alt_top (int):          upper boundary of plot
         verbose (bool):         print details
@@ -176,6 +207,12 @@ def get_arome_profiles(
             variables_list,
         ]
 
+    # same for leadtime
+    if isinstance(leadtime, int):
+        leadtime = [
+            leadtime,
+        ]
+
     ## Create values Data Frame
 
     for var in variables_list:
@@ -189,6 +226,12 @@ def get_arome_profiles(
             var_aro = vdf.loc["arome_name"][var]  # name of variables in arome
             if verbose:
                 print(f"Searching for {var} (called {var_aro}) in Arome.")
+
+        # members name list
+        if member_ids == [0]:  # 0 for deterministic model
+            members_name = [var_aro]
+        else:
+            members_name = list(map((lambda x: var_aro + str(x)), member_ids))
 
         # load nc files as xarray dataset
         if verbose:
@@ -216,12 +259,18 @@ def get_arome_profiles(
             xr.backends.NetCDF4DataStore(ncgrp)
         )  # nc to xarray dataset
 
+        # keep only requested members
+        xr_data = xr_data[members_name]
+
         for i in files[1:]:  # all the files except the first wich is already openend
             nc_data = nc.Dataset(i, "r")  # open DS with netDCF4 modules
             ncgrp = nc_data.groups[var_aro]  # selecting the group we need
             xr_data_tmp = xr.open_dataset(
                 xr.backends.NetCDF4DataStore(ncgrp)
             )  # converting it to xarray Dataset
+
+            # keep only requested members
+            xr_data = xr_data[members_name]
 
             xr_data = xr.concat(
                 [xr_data, xr_data_tmp], dim="time"
@@ -230,26 +279,30 @@ def get_arome_profiles(
         if verbose:
             print("Finished loading files into xarray dataset.")
 
-        # subselect values at the right grid point and do conversions
-        values = (
-            xr_data.variables[var_aro][:, :, dy, dx] * vdf.loc["mult_arome"][var]
-            + vdf.loc["plus_arome"][var]
-        )
+        for i, member in enumerate(members_name):
+            # subselect values at the right grid point and do conversions
+            values = (
+                xr_data.variables[member][:, :, dy, dx] * vdf.loc["mult_arome"][var]
+                + vdf.loc["plus_arome"][var]
+            )
 
-        # fill into dataframe
-        df_values = pd.DataFrame(columns=leadtime, data=values.transpose())
+            # fill into dataframe
+            df_values = pd.DataFrame(columns=leadtime, data=values.transpose())
 
-        # only extract the relevant altitude levels (encoded in the crit series; True --> relevant)
-        df_values = df_values[crit]
+            # only extract the relevant altitude levels (encoded in the crit series; True --> relevant)
+            df_values = df_values[crit]
 
-        # add to dictionary
-        data_dict[var] = df_values
+            # add to dictionary
+            if member_ids[i] == 0:
+                data_dict[f"{var}"] = df_values
+            else:
+                data_dict[f"{var}~{member_ids[i]}"] = df_values
 
     return data_dict
 
 
 def get_arome_timeseries(
-    lat, lon, vars, init, levels, start_lt, end_lt, folder, verbose
+    lat, lon, vars, init, levels, start_lt, end_lt, folder, verbose=False
 ):
     """Retrieve timeseries from AROME outputs.
 
@@ -286,7 +339,6 @@ def get_arome_timeseries(
             levels,
         ]
 
-    print(levels, vars)
     for var in vars:
 
         # is var availible in our Arome files ?
@@ -366,7 +418,7 @@ def get_arome_timeseries(
                 values = xr_data.variables[var_aro][:, level - 1, dy, dx]
 
             # decumulating vars
-            if vdf.loc["acc"][var] == True:
+            if vdf.loc["acc_arome"][var] == True:
                 if verbose:
                     print("Decumalating arome vars")
 

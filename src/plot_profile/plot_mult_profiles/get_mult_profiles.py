@@ -249,6 +249,7 @@ def get_mult_data(
                     lat=lat,
                     lon=lon,
                     variables_list=var_open,
+                    member_ids=[0],  # 0 for deterministic model
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
                     verbose=verbose,
@@ -287,6 +288,7 @@ def get_mult_data(
                     lat=lat,
                     lon=lon,
                     variables_list=var_open,
+                    member_ids=[0],
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
                     verbose=verbose,

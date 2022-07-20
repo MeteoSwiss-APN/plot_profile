@@ -9,11 +9,12 @@ import sys
 # Third-party
 import numpy as np
 import pandas as pd
+#from ipdb import set_trace
 
 # First-party
+from plot_profile.plot_arome.get_arome import calc_arome_height_agl
+from plot_profile.plot_arome.get_arome import coord_2_arome_pts
 from plot_profile.utils.variables import vdf
-
-# from ipdb import set_trace
 
 
 def calculate_grad(var_bot, var_top, alt_bot, alt_top, verbose=False):
@@ -165,7 +166,7 @@ def calculate_wind_vel_from_uv(u, v, verbose=False):
     return wind_vel
 
 
-def calculate_wind_dir_from_uv(u, v, modulo_180=False, verbose=False):
+def calculate_wind_dir_from_uv(u, v, modulo_180=False, unwrap=False, verbose=False):
     """Calculate wind direction from U, V components.
 
     Args:
@@ -194,41 +195,99 @@ def calculate_wind_dir_from_uv(u, v, modulo_180=False, verbose=False):
         wind_dir = (wind_dir + 180) % 360 - 180
         # wind_dir  = np.rad2deg(np.arctan2(v, u))
 
+    if unwrap == True:
+        wind_dir = np.unwrap(p=wind_dir, period=360)
+
     return wind_dir
 
 
-# TODO: a tester !!! je ne sais pas si ca marche
-def calc_rho_arome(p, t, qc, qv, verbose=False):
+def calc_rho_arome(df, levels, verbose=False):
     """Calculate air density.
 
     Args:
-        p (pd series):   air pressure (Pa)
-        t (pd series):   air temperature (K)
-        qc (pd series): liquid water content (kg/kg)
-        qv (pd series): specific humidity (kg/kg)
+            p (pd series):   air pressure (Pa)
+            t (pd series):   air temperature (K)
+            qc (pd series):  liquid water content (kg/kg)
+            rh (pd series):  air relative humidity in %
 
     Returns:
-        pd series :      air density (kg/m**3)
+        dict :      air density (kg/m**3)
 
     """
     if verbose:
         print("Calculating air density (RHO) from press, temp, qc and qv")
 
-    # series must have the same shapes
-    if not p.shape == t.shape == qc.shape == qv.shape:
-        print(f"--- ! shapes of press, temp, qc and qv don't match !")
-        sys.exit(1)
+    rho = {}
 
     # constants
     r_d = 287.05  # gas constant for dry air
     r_v = 461.51  # gas constant for moist air
     rvd_m_o = r_v / r_d - 1
 
-    # density, after calrho in meteo_utilities from COSMO-code
-    # rho = press/(r_d * temp * ( 1 + rvd_m_o * qv - qc))
-    rho = p / (r_d * t * (1 + rvd_m_o * qv - qc))
+    for level in levels:
+        p = df[f"press~{level}"]  # in Pa
+        t = df[f"temp~{level}"]  # in K
+        qc = df[f"qc~{level}"]  # in kg/kg
+
+        qv = calculate_qv_from_rh(
+            Press=p, rh=df[f"rel_hum~{level}"], T=t, verbose=verbose
+        )
+
+        # density, after calrho in meteo_utilities from COSMO-code
+        # rho = press/(r_d * temp * ( 1 + rvd_m_o * qv - qc))
+        rho[level] = p / (r_d * t * (1 + rvd_m_o * qv - qc))
 
     return rho
+
+
+def integrate_over_z(df, param_name, levels, lat, lon, verbose=False):
+    """Integrate variable over vertical coordinates.
+
+    Args:
+        p (pd series):        air pressure (Pa)
+        t (pd series):        air temperature (K)
+        rh (pd series):       air relative humidity in %
+        df (DataFrame):       contains series and param to integrate
+        param_name (str):     param to integrate name (ex: qc)
+        levels (list of int): vertical levels
+
+    Returns:
+        pd Series: integrated parameter
+
+    """
+    if verbose:
+        print(f"Integrating {param_name} over the vertical dimension.")
+
+    values = pd.Series()
+
+    # get air density dataFrame
+    rho = calc_rho_arome(df, levels)
+    rho = pd.DataFrame.from_dict(rho)
+
+    # get height levels in arome
+    dx, dy = coord_2_arome_pts(lat, lon)
+    heights = calc_arome_height_agl(dx, dy)
+    altitudes = heights[levels[0] - 1 : levels[-1]]
+
+    # adding the 0 level (ground)
+    altitudes = np.insert(altitudes.to_numpy(), 0, 0)
+
+    # level top - level base
+    level_thickness = altitudes[1:] - altitudes[:-1]
+
+    # select only var to integrate
+    crit = list(map((lambda x: f"{param_name}~" + str(x)), levels))
+    df = df[crit]
+
+    for i in df.index:
+        values.loc[i] = np.sum(
+            np.array(df.loc[[i]]) * np.array(rho.loc[[i]]) * level_thickness
+        )
+
+    if verbose:
+        print(f"Succesfully integrated {param_name} over vertical dimension.")
+
+    return values
 
 
 def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
@@ -288,7 +347,9 @@ def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
 
     ## Wind direction
     elif new_var == "wind_dir":
-        values = calculate_wind_dir_from_uv(u=df["u"], v=df["v"], verbose=verbose)
+        values = calculate_wind_dir_from_uv(
+            u=df["u"], v=df["v"], unwrap=False, verbose=verbose
+        )
         # delete remaining columns
         del df["u"], df["v"]
 
@@ -313,7 +374,7 @@ def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
     return df
 
 
-def calc_new_var_timeseries(df, new_var, levels, verbose=False):
+def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
     """Calculate timeseries of requested variable from model output variables.
 
     Args:
@@ -372,7 +433,7 @@ def calc_new_var_timeseries(df, new_var, levels, verbose=False):
         del df[f"temp{sufix_levels[0]}"], df[f"qv{sufix_levels[0]}"]
 
     ## Specific humidity
-    elif new_var == "qv" or "2m_qv":
+    elif new_var in ["qv", "2m_qv"]:
         if new_var == "2m_qv":
             prefix = "2m_"
         else:
@@ -386,6 +447,17 @@ def calc_new_var_timeseries(df, new_var, levels, verbose=False):
 
         # delete remaining columns
         del df[f"press{sufix_levels[0]}"], df[f"{prefix}dewp_temp{sufix_levels[0]}"]
+
+    ## Integrated cloud/vapor water
+    elif new_var == "tqc":
+        values = integrate_over_z(df, "qc", levels, lat, lon, verbose)
+        for level in levels:
+            del (
+                df[f"press~{level}"],
+                df[f"rel_hum~{level}"],
+                df[f"temp~{level}"],
+                df[f"qc~{level}"],
+            )
 
     ## Wind velocity
     elif new_var == "wind_vel":
