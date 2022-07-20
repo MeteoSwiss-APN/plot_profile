@@ -44,6 +44,7 @@ vdf = pd.DataFrame(
         "temp_surf",
         "2m_temp",
         "tke",
+        "tqr",
         "tqv",
         "tqc",
         "tqc_dia",
@@ -525,7 +526,14 @@ vdf["tqv"].icon_name = "TQV"
 vdf["tqv"].icon_names = ["TQV", "tqv"]
 vdf["tqv"].long_name = "Total water vapour"
 vdf["tqv"].unit = "kg/m2"
-vdf["tqv"].dwh_id = {"mwr": "2537"}
+vdf["tqv"].dwh_id = {"mwri": "2537"}
+
+# total water vapour: tqr
+vdf["tqr"].short_name = "tqr"
+vdf["tqr"].icon_name = "TQR"
+vdf["tqr"].icon_names = ["TQR", "tqr"]
+vdf["tqr"].long_name = "Total column integrated rain"
+vdf["tqr"].unit = "kg/m2"
 
 # liquid water path : tqc
 vdf["tqc"].short_name = "tqc"
@@ -534,8 +542,9 @@ vdf["tqc"].arome_name = "tqc"
 vdf["tqc"].icon_names = ["TQC", "tqc"]
 vdf["tqc"].long_name = "Liquid water path"
 vdf["tqc"].mult_arome = 1e-3
+vdf["tqc"].mult = 1
 vdf["tqc"].unit = "kg/m2"
-vdf["tqc"].dwh_id = {"mwr": "5547"}
+vdf["tqc"].dwh_id = {"mwri": "5547"}
 
 # total column integrated diagnostic cloud water: tqc_dia
 vdf["tqc_dia"].short_name = "tqc_dia"

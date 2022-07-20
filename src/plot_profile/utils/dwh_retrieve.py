@@ -243,20 +243,36 @@ def dwh_surface(station_name, vars_str, start, end, verbose=False):
         print(f"  from {start} to {end}")
         print(f"  at {station_name}.")
 
-    # retrieve_cscs command:
-    cmd = (
-        "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
-        + " -s surface "
-        + " -i nat_abr,"
-        + station_name
-        + " -p "
-        + vars_str
-        + " -t "
-        + start
-        + "-"
-        + end
-        + " --use-limitation 50"
-    )
+    if "2537" in vars_str or "5547" in vars_str:
+        # retrieve_cscs command:
+        cmd = (
+            "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
+            + f" -s profile_integral"
+            + " -i int_ind,06610"
+            + " -p "
+            + vars_str
+            + " -t "
+            + start
+            + "-"
+            + end
+            + " --use-limitation 50"
+            + " -C 38 -w 31"
+        )
+    else:
+        # retrieve_cscs command:
+        cmd = (
+            "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
+            + f" -s surface"
+            + " -i nat_abr,"
+            + station_name
+            + " -p "
+            + vars_str
+            + " -t "
+            + start
+            + "-"
+            + end
+            + " --use-limitation 50"
+        )
 
     # run command
     data = dwh2pandas(cmd, verbose)
@@ -426,7 +442,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 return new_df
 
     # surface-based data
-    elif device in ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower"]:
+    elif device in ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower", "mwri"]:
 
         # if net lw/sw radiation is required we need to calculate it
         if "net_calc" in vars_str:
