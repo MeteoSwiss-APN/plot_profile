@@ -45,13 +45,16 @@ Plot radiosoundings
 
 plot_profiles
 =============
-Compare vertical profiles of e.g. radiosounding
-  
-``plot_profiles``: compare vertical profiles of radiosounding and models for 1 specific valid time
+Compare vertical profiles of e.g. temperature measured by radiosounding and simulated by model *for 1 specific leadtime*.
+``exp`` and ``ref`` serve as identifiers to connect an ``add_model``-statement to the ``model_src``.
 
-  ``plot_profiles --loc pay --date 21111900 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812``
+``plot_profiles --loc pay --date 21111900 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812``
+
+.. image:: example_graphs/profiles_211119_00_pay_icon~ref_temp_icon~exp_temp_rs_temp.png
+  :width: 300
   
-  ! "exp" and "ref" serve as identifiers to connect an add_model-statement to the model_src
+plot_timeseries
+===============
   
 - ``plot_timeseries``: timeseries of observed and modelled variables
 
@@ -76,7 +79,7 @@ Compare vertical profiles of e.g. radiosounding
   ! for some reason currently not understood the start_leadtime is not correctly used on the x-axis, always use *--start_leadtime 0*
 
 
-
+-------
 Credits
 -------
 
@@ -85,9 +88,9 @@ This package was created with `Cookiecutter`_ and the `MeteoSwiss-APN/mch-python
 .. _`Cookiecutter`: https://github.com/audreyr/cookiecutter
 .. _`MeteoSwiss-APN/mch-python-blueprint`: https://github.com/MeteoSwiss-APN/mch-python-blueprint
 
+-------
 TO DO's
 -------
-- allow for multiple icon_names in variables.py
 - allow different filename-formats for ICON-files
 - output filename of plot_timeseries is funky
 - heatmap x-axis tick labeling ignores --start_leadtime
