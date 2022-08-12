@@ -7,8 +7,7 @@ import click
 from . import __version__
 
 
-# pylint: disable=W0613  # unused-argument (param)
-def print_version(ctx, param, value: bool) -> None:
+def print_version(ctx, value: bool) -> None:
     """Print the version number and exit."""
     if value:
         click.echo(__version__)
