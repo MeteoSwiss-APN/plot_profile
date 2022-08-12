@@ -29,10 +29,19 @@ plot_rs
 Plot radiosoundings
 
 ``plot_rs --date 2021111912 --params temp --params dewp_temp --alt_top 2500`` 
+
+.. image:: example_graphs/rs_211119_12_temp_dewp_temp_pay.png
+  :width: 400
   
 ``plot_rs --date 2022011112 --params temp --clouds --relhum_thresh 95 --grid``
+
+.. image:: example_graphs/rs_220111_12_temp_pay.png
+  :width: 400
   
 ``plot_rs --date 2022041912 --params temp --params dewp_temp --params wind_vel --params wind_dir``
+
+.. image:: example_graphs/rs_220419_12_temp_dewp_temp_wind_vel_wind_dir_pay.png
+  :width: 400
 
 plot_profiles
 =============
