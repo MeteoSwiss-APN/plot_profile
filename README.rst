@@ -4,6 +4,7 @@ plot_profile
 
 *plot_profile* is a Python-based command line tool to retrieve and visualise both observational data as well as variables simulated with ICON
 
+------------
 Installation
 ------------
 1. ``git clone https://github.com/MeteoSwiss-APN/plot_profile.git``
@@ -14,22 +15,30 @@ Installation
 
 *I am not sure whether step 2 and 3 are required*
 
+-----
 Usage
 -----
-1. ``conda activate plot_profile``
-2. Available entry-points (show available options with ``--help``)
+First run ``conda activate plot_profile``.
 
-- ``plot_rs``: plot radiousounding
+The available entrypoints can be displayed with: ``plot_profile -h``.
+
+Below you find example commands for each entrypoint.
+
+plot_rs
+=======
+Plot radiosoundings
+
+``plot_rs --date 2021111912 --params temp --params dewp_temp --alt_top 2500`` 
   
-  Example commands:
+``plot_rs --date 2022011112 --params temp --clouds --relhum_thresh 95 --grid``
   
-  ``plot_rs --date 2021111912 --params temp --params dewp_temp --alt_top 2500``
+``plot_rs --date 2022041912 --params temp --params dewp_temp --params wind_vel --params wind_dir``
+
+plot_profiles
+=============
+Compare vertical profiles of e.g. radiosounding
   
-  ``plot_rs --date 2022011112 --params temp --clouds --relhum_thresh 95 --grid``
-  
-  ``plot_rs --date 2022041912 --params temp --params dewp_temp --params wind_vel --params wind_dir``
-  
-- ``plot_profiles``: compare vertical profiles of radiosounding and models for 1 specific valid time
+``plot_profiles``: compare vertical profiles of radiosounding and models for 1 specific valid time
 
   ``plot_profiles --loc pay --date 21111900 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812``
   
