@@ -16,6 +16,8 @@ from plot_profile.plot_profiles.get_profiles import get_data
 from plot_profile.plot_profiles.get_profiles import parse_inputs
 from plot_profile.plot_profiles.plot_profiles import create_plot
 
+# from ipdb import set_trace
+
 
 @click.command()
 # MANDATORY: date, loc
@@ -40,6 +42,12 @@ from plot_profile.plot_profiles.plot_profiles import create_plot
     type=(str, click.Path(exists=True), click.DateTime(formats=["%y%m%d%H"])),
     multiple=True,
     help="Specify for each model ID, one source flag. I.e. <model_id> <folder> <init>",
+)
+@click.option(
+    "--grid_src",
+    type=(str, click.Path(exists=True)),
+    multiple=True,
+    help="Specify for each model ID, one source for the grid. I.e. <model_id> <path/to/grid.nc>",
 )
 @click.option(
     "--add_obs",
@@ -139,9 +147,10 @@ def main(
     date: click.DateTime,
     loc: str,
     # Models, Devices and Variables
+    add_obs: tuple,
     add_model: tuple,
     model_src: tuple,
-    add_obs: tuple,
+    grid_src: tuple,
     grid_file: str,
     # Axes Limits
     ymin: float,
@@ -163,7 +172,9 @@ def main(
         plot_profiles --loc pay --date 21111900 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812
 
     """
-    elements, multi_axes = parse_inputs(loc, add_model, add_obs, model_src, verbose)
+    elements, multi_axes = parse_inputs(
+        loc, add_model, add_obs, model_src, grid_file, grid_src, verbose
+    )
 
     if verbose and multi_axes:
         print("Employing two different axes: Bottom and Top.")
@@ -171,7 +182,6 @@ def main(
     data_dict, lt_dict = get_data(
         date=date,
         loc=loc,
-        grid=grid_file,
         ylims=(ymin, ymax),
         elements=elements,
         verbose=verbose,
