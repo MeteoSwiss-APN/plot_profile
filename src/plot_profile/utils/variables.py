@@ -365,9 +365,9 @@ vdf["rel_hum"].arome_name = "Hu"
 vdf["rel_hum"].unit = "%"
 vdf["rel_hum"].min_value = 0
 vdf["rel_hum"].max_value = 100
-# vdf["rel_hum"].mult = 100
 vdf["rel_hum"].dwh_id = {
     "rs": "746",
+    "2m": "98",
     "2m_tower": "3698",
     "10m_tower": "4953",
     "30m_tower": "4961",
