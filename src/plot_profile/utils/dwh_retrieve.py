@@ -442,7 +442,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 return new_df
 
     # surface-based data
-    elif device in ["5cm", "2m", "2m_tower", "10m_tower", "30m_tower", "mwri"]:
+    elif device in ["5cm", "2m", "2m_tower", "10m", "10m_tower", "30m_tower", "mwri"]:
 
         # if net lw/sw radiation is required we need to calculate it
         if "net_calc" in vars_str:
