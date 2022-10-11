@@ -17,7 +17,7 @@ from .plot_rs import create_plot
 
 
 @click.command()
-@click.option("--station", default="06610", help="Name or DWH of station. Def: 06610")
+@click.option("--loc", default="pay", help="Name station. Def: pay")
 @click.option(
     "--date", default="202108310000", help="start date: YYYYMMDDHH00. Def: 2021083100"
 )
@@ -107,7 +107,7 @@ from .plot_rs import create_plot
 )
 def main(
     *,
-    station: str,
+    loc: str,
     date: str,
     params: tuple,
     alt_bot: int,
@@ -148,8 +148,9 @@ def main(
     # Preparations:
 
     # get station dataframe
-    if station in ["06610", "pay", "payerne"]:
-        station = sdf["pay"]
+    if loc in ["pay", "inn"]:
+        print(f"Found station: {loc}.")
+        station = sdf[loc]
     else:
         print(f"{station} not yet defined!")
         sys.exit(1)

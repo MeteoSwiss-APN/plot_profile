@@ -284,6 +284,7 @@ def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
     """Retrieve profile-based data from DWH.
 
     Args:
+        device      (str)
         station_id  (str):  DWH ID of station (number as string!)
         vars_str    (str):  DWH IDs of variables, separated by comma
         start       (str):  YYYYmmddHH

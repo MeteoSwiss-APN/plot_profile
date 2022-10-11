@@ -88,7 +88,8 @@ sdf = pd.DataFrame(
         "hoe",  # Hörnli
         "ilz",  # Ilanz
         "ifl",  # Innsbruck Flughafen
-        "iun",  # Innsbruck Universitä,  # Innsbruck Universität
+        "inn",  # Innsbruck Radiosondierung
+        "iun",  # Innsbruck Universität
         "int",  # Interlaken
         "ins",  # Ins
         "jun",  # Jungfraujoch
@@ -671,6 +672,15 @@ sdf["ifl"].dwh_name = "OSINN"
 sdf["ifl"].lat = 47.25846
 sdf["ifl"].lon = 11.3521825
 sdf["ifl"].elevation = 581
+
+# Innsbruck Radiosondierung
+sdf["inn"].short_name = "inn"
+sdf["inn"].long_name = "Innsbruck"
+sdf["inn"].dwh_id = "11120"
+sdf["inn"].dwh_name = "INN"
+sdf["inn"].lat = 47.25846
+sdf["inn"].lon = 11.3521825
+sdf["inn"].elevation = 581
 
 # Innsbruck Universität
 sdf["iun"].short_name = "iun"
