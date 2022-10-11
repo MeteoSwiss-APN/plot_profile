@@ -149,7 +149,8 @@ def index_height_from_grid_file(lat, lon, grid, verbose):
 
     # convert from radians to degrees if given in radians
     if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
-        print("Assuming that lats and lons of grid file are given in radians.")
+        if verbose:
+            print("Assuming that lats and lons of grid file are given in radians.")
         lats_grid = np.rad2deg(lats_grid)
         lons_grid = np.rad2deg(lons_grid)
 

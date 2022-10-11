@@ -49,7 +49,9 @@ vdf = pd.DataFrame(
         "tqc",
         "tqc_dia",
         "u",
+        "u_10m",
         "v",
+        "v_10m",
         "ver_vis",
         "wind_dir",
         "wind_vel",
@@ -569,6 +571,22 @@ vdf["v"].icon_names = ["V", "v"]
 vdf["v"].arome_name = "V"
 vdf["v"].unit = "m/s"
 
+# u_10m
+vdf["u_10m"].short_name = "u_10m"
+vdf["u_10m"].long_name = "10m wind velocity in x"
+vdf["u_10m"].icon_name = "u_10m"
+vdf["u_10m"].icon_names = ["U_10M", "u_10m"]
+vdf["u_10m"].arome_name = "U_10M"
+vdf["u_10m"].unit = "m/s"
+
+# v_10m
+vdf["v_10m"].short_name = "v_10m"
+vdf["v_10m"].long_name = "10m wind velocity in y"
+vdf["v_10m"].icon_name = "v_10m"
+vdf["v_10m"].icon_names = ["V_10M", "v_10m"]
+vdf["v_10m"].arome_name = "v_10m"
+vdf["v_10m"].unit = "m/s"
+
 # vertical visibility: ver_vis
 vdf["ver_vis"].short_name = "ver_vis"
 vdf["ver_vis"].long_name = "Vertical visibility"
@@ -596,7 +614,7 @@ vdf["wind_vel"].long_name = "Wind velocity"
 vdf["wind_vel"].unit = "m/s"
 vdf["wind_vel"].min_value = 0
 vdf["wind_vel"].max_value = 30
-vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196", "lidar": "748"}
+vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196", "lidar": "748", "10m": "196"}
 
 # !!! if adding new variable: don't forget to add at the top and in cli-file!!!
 
