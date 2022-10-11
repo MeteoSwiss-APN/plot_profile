@@ -148,7 +148,7 @@ def create_plot(
 
             # specify marker
             if ("icon" in device) and show_marker:
-                marker = "d"
+                marker = "o"
             else:
                 marker = None
 

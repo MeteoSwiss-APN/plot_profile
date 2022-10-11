@@ -335,24 +335,56 @@ def get_dim_names(ds_var, verbose):
     return dim_time, dim_index, dim_level
 
 
-def decumulate(arr):
-    """De-cumulate values in array.
+def get_grid_names(ds_grid, verbose=False):
 
-    Values of some variables have been cumulated
-    since beginning of the model simulation.
+    possible_lats_names = ["clat", "clat_1"]
+    possible_lons_names = ["clon", "clon_1"]
+    possible_height_names = [
+        "HHL",
+        "hhl",
+        "HEIGHT",
+    ]
+    possible_index_names = ["cells_1", "ncells", "cells"]
 
-    Args:
-        arr (1d array): arome output variable
+    for coo in ds_grid.coords:
 
-    Returns:
-        1d numpy nd array: de-averaged output
+        # clat
+        for name in possible_lats_names:
+            if name == coo:
+                lats_name = name
+                if verbose:
+                    print(f"Found lats_name: {lats_name}.")
+                break
 
-    """
-    arr = arr.to_numpy()
-    arr = arr[1:] - arr[:-1]
-    arr = np.insert(arr, 0, np.nan)
+        # clon
+        for name in possible_lons_names:
+            if name == coo:
+                lons_name = name
+                if verbose:
+                    print(f"Found lons_name: {lons_name}.")
+                break
 
-    return arr
+    for var in ds_grid.variables:
+
+        # half level height
+        for name in possible_height_names:
+            if name == var:
+                height_name = name
+                if verbose:
+                    print(f"Found height_name: {height_name}.")
+                break
+
+    for dim in ds_grid[height_name].dims:
+
+        # cell index name for height variable
+        for name in possible_index_names:
+            if name == dim:
+                height_index_name = name
+                if verbose:
+                    print(f"Found height index name: {height_index_name}.")
+                break
+
+    return lats_name, lons_name, height_name, height_index_name
 
 
 def deaverage(arr):
@@ -380,6 +412,26 @@ def deaverage(arr):
         de_arr[i] = arr[i] * (i) - arr[i - 1] * (i - 1)
 
     return de_arr
+
+
+def decumulate(arr):
+    """De-cumulate values in array.
+
+    Values of some variables have been cumulated
+    since beginning of the model simulation.
+
+    Args:
+        arr (1d array): arome output variable
+
+    Returns:
+        1d numpy nd array: de-averaged output
+
+    """
+    arr = arr.to_numpy()
+    arr = arr[1:] - arr[:-1]
+    arr = np.insert(arr, 0, np.nan)
+
+    return arr
 
 
 def calc_qv_from_td(td, p):

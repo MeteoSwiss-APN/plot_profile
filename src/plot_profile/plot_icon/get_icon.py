@@ -21,6 +21,7 @@ import xarray as xr
 # First-party
 from plot_profile.utils.utils import deaverage
 from plot_profile.utils.utils import get_dim_names
+from plot_profile.utils.utils import get_grid_names
 from plot_profile.utils.utils import get_icon_name
 from plot_profile.utils.utils import slice_top_bottom
 from plot_profile.utils.variables import vdf
@@ -131,7 +132,6 @@ def index_height_from_grid_file(lat, lon, grid, verbose):
         print(
             "Assuming that variable's grid corresponds to clat_1 and clon_1 from grid-file"
         )
-        print(" with uuid FC046F09-ED97-850E-1E31-8927421B2B60.")
 
     # load grid file
     if verbose:
@@ -142,9 +142,10 @@ def index_height_from_grid_file(lat, lon, grid, verbose):
         print("Grid file does not exist!")
         sys.exit(1)
 
+    lats_name, lons_name, height_name, height_index_name = get_grid_names(ds_grid)
     # load latitude and longitude grid of constants file
-    lats_grid = ds_grid.clat_1.values
-    lons_grid = ds_grid.clon_1.values
+    lats_grid = ds_grid[lats_name].values
+    lons_grid = ds_grid[lons_name].values
 
     # convert from radians to degrees if given in radians
     if lats_grid.max() < 2.0 and lons_grid.max() < 2.0:
@@ -163,11 +164,8 @@ def index_height_from_grid_file(lat, lon, grid, verbose):
         print(f"{lats_grid[ind]:.4f}, {lons_grid[ind]:.4f}")
 
     # load HEIGHT from grid file
-    try:
-        height = ds_grid.isel(cells_1=ind)["HEIGHT"].values
-    except KeyError:
-        print(f"Variable HEIGHT does not exist in grid file: {grid}")
-        sys.exit(1)
+    ds_height = ds_grid[height_name]
+    height = ds_height.isel(**{height_index_name: ind}).values
 
     return ind, height, lats_grid.size
 

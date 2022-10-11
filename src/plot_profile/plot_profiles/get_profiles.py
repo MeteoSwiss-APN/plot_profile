@@ -27,7 +27,22 @@ from plot_profile.utils.variables import vdf
 # from ipdb import set_trace
 
 
-def parse_inputs(loc, add_model, add_obs, model_src, verbose):
+def parse_inputs(loc, add_model, add_obs, model_src, grid_file, grid_src, verbose):
+    """Parse inputs given to plot_profiles specifying variables, devices and models.
+
+    Args:
+        loc (str): _description_
+        add_model (_type_): _description_
+        add_obs (_type_): _description_
+        model_src (_type_): _description_
+        grid_file (_type_): _description_
+        grid_src (_type_): _description_
+        verbose (_type_): _description_
+
+    Returns:
+        elements (list): List of tuples for each line which will appear in figure.
+
+    """
     # create a dict out of model_src. each model id should be one key.
     model_src_dict = {}
     model_ids = []
@@ -37,23 +52,33 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
         model_ids.append(id)
 
     # iterate through list of models and add init & folder to it
-    l_model = []
-    height_lvl_icon = []
+    l_model = []  # list of entries for all model inputs
+    height_lvl_icon = []  # list of booleans for half (false) or full (true) levels
     for model in add_model:
-        if model[2] not in model_ids:
+        model_id = model[2]
+        if model_id not in model_ids:
             print(
-                f"--- No model source information provided for model w/ id: {model[2]}"
+                f"--- No model source information provided for model w/ id: {model_id}"
             )
             print(
                 f"--- (Could just be a typo. Make sure the model ids in the --add_model & --model_src flags match)"
             )
             sys.exit(1)
 
+        # extract path to grid from either grid_file or grid_src
+        # if no grid_src is specified, use (default) grid for all
+        if not grid_src:
+            grid = grid_file
+        else:
+            grid_dict = dict(grid_src)
+            grid = grid_dict[model_id]
+
+        # to later check consistency between half and full levels:
         # append True if variables is in height full levels, False if not
         if model[0] == "icon":
             height_lvl_icon.append(vdf[model[1]].icon_hfl)
 
-        model = tuple(list(model) + (model_src_dict[model[2]]))
+        model = model + tuple(model_src_dict[model_id]) + (grid,)
         l_model.append(model)
 
     # icon variables must be on the same height levels
@@ -94,7 +119,6 @@ def parse_inputs(loc, add_model, add_obs, model_src, verbose):
 def get_data(
     date,
     loc,
-    grid,
     ylims,
     elements,
     verbose,
@@ -149,6 +173,7 @@ def get_data(
             model_id = element[2]
             folder = element[3]
             init = element[4]
+            grid = element[5]
 
             full_levels = vdf[var_name].icon_hfl
 
