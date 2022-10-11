@@ -49,6 +49,10 @@ Plot radiosoundings
 
 .. image:: example_graphs/rs_220419_12_temp_dewp_temp_wind_vel_wind_dir_pay.png
   :width: 400
+  
+``plot_rs --date 2022041912 --params temp --params dewp_temp --params wind_vel --params wind_dir --loc inn``
+
+Innsbruck radiosounding currently not available in DWH.
 
 plot_profiles
 =============
