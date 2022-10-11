@@ -52,10 +52,11 @@ Plot radiosoundings
 .. image:: example_graphs/rs_220419_12_temp_dewp_temp_wind_vel_wind_dir_pay.png
   :width: 400
   
-``plot_rs --date 2022041912 --params temp --params dewp_temp --params wind_vel --params wind_dir --loc inn``
+``plot_rs --date 2017101602 --params temp --params dewp_temp --loc inn``
 
-Innsbruck radiosounding currently not available in DWH.
-
+.. image:: example_graphs/rs_171016_02_temp_dewp_temp_inn.png
+  :width: 400
+  
 plot_profiles
 =============
 Compare vertical profiles of e.g. temperature measured by radiosounding and simulated by model *for 1 specific leadtime*.
