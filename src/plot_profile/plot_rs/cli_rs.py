@@ -149,7 +149,7 @@ def main(
 
     # get station dataframe
     if loc in ["pay", "inn"]:
-        print(f"Found station: {loc}.")
+        print(f"--- Specified station: {loc}.")
         station = sdf[loc]
     else:
         print(f"{station} not yet defined!")
