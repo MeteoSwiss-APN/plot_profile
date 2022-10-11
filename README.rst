@@ -28,6 +28,8 @@ The filenames need to follow the MeteoSwiss-style convention: lfffDDHHMMSS.nc
 First activate the conda environment: ``conda activate plot_profile``.
 
 The available entrypoints of the package can be displayed with: ``plot_profile -h``.
+The available stations can be listed with: ``plot_profile --stations``.
+The available variables can be listed with: ``plot_profile --variables``.
 
 Below you find example commands and corresponding graphs for each entrypoint.
 
