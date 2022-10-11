@@ -87,6 +87,9 @@ sdf = pd.DataFrame(
         "hll",  # Hallau
         "hoe",  # Hörnli
         "ilz",  # Ilanz
+        "ifl",  # Innsbruck Flughafen
+        "inn",  # Innsbruck Radiosondierung
+        "iun",  # Innsbruck Universität
         "int",  # Interlaken
         "ins",  # Ins
         "jun",  # Jungfraujoch
@@ -660,6 +663,33 @@ sdf["jun"].dwh_name = "JUN"
 sdf["jun"].lat = 46.547556
 sdf["jun"].lon = 7.985444
 sdf["jun"].elevation = 3571
+
+# Innsbruck Flughafen
+sdf["ifl"].short_name = "ifl"
+sdf["ifl"].long_name = "Innsbruck Flughafen"
+sdf["ifl"].dwh_id = "11121"
+sdf["ifl"].dwh_name = "OSINN"
+sdf["ifl"].lat = 47.25846
+sdf["ifl"].lon = 11.3521825
+sdf["ifl"].elevation = 581
+
+# Innsbruck Radiosondierung
+sdf["inn"].short_name = "inn"
+sdf["inn"].long_name = "Innsbruck"
+sdf["inn"].dwh_id = "11120"
+sdf["inn"].dwh_name = "INN"
+sdf["inn"].lat = 47.25846
+sdf["inn"].lon = 11.3521825
+sdf["inn"].elevation = 581
+
+# Innsbruck Universität
+sdf["iun"].short_name = "iun"
+sdf["iun"].long_name = "Innsbruck Universität"
+sdf["iun"].dwh_id = "11320"
+sdf["iun"].dwh_name = "OSINU"
+sdf["iun"].lat = 47.2642889
+sdf["iun"].lon = 11.3861614
+sdf["iun"].elevation = 578
 
 # Interlaken
 sdf["int"].short_name = "int"
