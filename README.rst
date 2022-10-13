@@ -13,9 +13,9 @@ Installation
 2. ``conda activate base``
 3. ``conda install pip``
 4. ``conda deactivate``
-5. ``make venv install`` (or: ``install-dev``)
-
-*I am not sure whether step 2 and 3 are required*
+5. ``module load python``
+6. ``cd plot_profile``
+7. ``make venv install-dev`` (or just: ``install``)
 
 -----
 Usage
@@ -31,7 +31,14 @@ The available entrypoints of the package can be displayed with: ``plot_profile -
 The available stations can be listed with: ``plot_profile --stations``.
 The available variables can be listed with: ``plot_profile --variables``.
 
-Below you find example commands and corresponding graphs for each entrypoint.
+Further down you find example commands and corresponding graphs for each entrypoint.
+
+Most important options
+======================
+
+- ``date``: Init or valid date in format YYMMDDHH, except for radiosounding plots which include the year
+- ``height_file``: Full path to file containing HEIGHT/HHL-field. Default points to icon-1e-dev-lfff00000000c.nc
+- ...
 
 plot_rs
 =======
@@ -66,6 +73,11 @@ Compare vertical profiles of e.g. temperature measured by radiosounding and simu
 
 - ``model_src``: *identifier path date*
 
+``plot_profiles --loc ifl --date 19091312 --add_model icon temp ref --add_model icon qv ref --model_src ref /store/s83/swester/teamx/tdf_2019091212/output/ 19091212 --height_src ref /store/s83/swester/teamx/tdf_2019091212/output/19091212/lfff00000000c.nc``
+
+.. image:: example_graphs/profiles_190913_12_ifl_icon~ref_temp_qv.png
+  :width: 300
+
 ``plot_profiles --loc pay --date 21111900 --add_obs rs temp --add_model icon temp ref --add_model icon temp exp --model_src ref /scratch/swester/output_icon/ICON-1/ 21111812 --model_src exp /scratch/swester/output_icon/exp1/ 21111812``
 
 .. image:: example_graphs/profiles_211119_00_pay_icon~ref_temp_icon~exp_temp_rs_temp.png
@@ -75,6 +87,13 @@ plot_timeseries
 ===============
 Timeseries of 1 or multiple observed and/or modelled variables. The selected variables overall may not have more than 2 differing units.
 
+! ``start`` of variables which are accumulated in ICON (radiation, precip) always has to match the init-date of the simulation
+
+``plot_timeseries --loc ulr --start 19091212 --end 19091318 --add_obs 2m sw_down --add_model icon sw_down 1 exp --model_src exp  /store/s83/swester/teamx/tdf_2019091212/output/ 19091212 --height_file /store/s83/swester/teamx/tdf_2019091212/output/19091212/lfff00000000c.nc``
+
+.. image:: example_graphs/timeseries_190912_12-190913_18_ulr_icon~exp_sw_down~1_2m_sw_down.png
+  :width: 400
+  
 ``plot_timeseries --loc pay --start 21111900 --end 21111912 --add_obs 2m ver_vis --add_obs 2m cbh``
 
 .. image:: example_graphs/timeseries_211119_00-211119_12_pay_2m_ver_vis_2m_cbh.png
@@ -89,6 +108,12 @@ plot_icon_profiles
 ==================
 Plot profiles of 1 variable for multiple leadtimes. Option to add observations of the same variable for times where they are available.
 It is possible to plot 2 different variables in 1 graph. If more than 2 variables are specified, 3 separate plots are created.
+
+
+``plot_icon_profiles --date 17101512 --folder /store/s83/swester/teamx/cap_2017101512/output/ --var temp --leadtime 6 --leadtime 8 --leadtime 10 --leadtime 12 --leadtime 14 --height_file /store/s83/swester/teamx/cap_2017101512/output/17101512/lfff00000000c.nc --loc ifl``
+
+.. image:: example_graphs/profile_icon-1_171015_12_+6_+14_ifl_temp.png
+  :width: 300
 
 ``plot_icon_profiles --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var qc --var qc_dia --leadtime 18  --loc pay``
 
@@ -106,6 +131,11 @@ plot_icon_heatmap
 Plot heatmaps (also called "time-height-crosssections") of modelled 3D variables. Optionally add cloud base height measured by ceilometers.
 
 ! for some reason currently not understood the start_leadtime is not correctly used on the x-axis, always use *--start_leadtime 0*
+
+``plot_icon_heatmap --date 17101512 --folder /store/s83/swester/teamx/cap_2017101512/output/ --var temp --alt_top 2500 --start_leadtime 0 --end_leadtime 18 --loc ifl --height_file /store/s83/swester/teamx/cap_2017101512/output/17101512/lfff00000000c.nc``
+
+.. image:: example_graphs/heatmap_icon-1_171015_12_+0_+18_ifl_temp.png
+  :width: 500
 
 ``plot_icon_heatmap --date 21111812 --folder /scratch/swester/output_icon/ICON-1/ --var temp --alt_top 2000 --start_leadtime 0 --end_leadtime 12 --verbose``
 
