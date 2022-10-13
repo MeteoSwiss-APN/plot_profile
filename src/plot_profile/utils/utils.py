@@ -454,3 +454,14 @@ def calc_qv_from_td(td, p):
     # td=td+273.15
     # qv = (622*6.113*np.exp(5423*(td-273.15)/(td*273.15)))/p
     return qv
+
+
+def parse_grid_file(height_file, model_src):
+
+    if not height_file:
+        grid = Path(model_src, "lfff00000000c.nc")
+    else:
+        grid = Path(model_src, height_file)
+
+    print(grid)
+    return grid

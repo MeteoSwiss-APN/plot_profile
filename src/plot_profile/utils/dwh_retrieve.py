@@ -315,7 +315,7 @@ def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
     )
 
     if device == "rs":
-        cmd = cmd  # + " -C 34 -w 22"
+        cmd = cmd + " -C 34 -w 22"
     elif device == "mwr":
         cmd = cmd + " -C 38 -w 31"
     elif device == "lidar":

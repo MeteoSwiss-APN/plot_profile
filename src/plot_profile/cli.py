@@ -74,9 +74,11 @@ def main() -> None:
 
      - plot_rs: Radiosoundings
 
-     - plot_icon_profilse: ICON profiles
+     - plot_profiles: Vertical profiles from ICON and observations for 1 specific time.
 
-     - plot_rs_icon: Compare ICON profiles to radiosoundings
+     - plot_icon_profiles: Vertical profiles from ICON only for multiple leadtimes.
+
+     - plot_timeseries: Timeseries  from ICON and observations from start to end.
 
      - plot_icon_heatmap: Heatmap of ICON vertical variables
 
