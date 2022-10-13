@@ -157,11 +157,4 @@ This package was created with `Cookiecutter`_ and the `MeteoSwiss-APN/mch-python
 .. _`Cookiecutter`: https://github.com/audreyr/cookiecutter
 .. _`MeteoSwiss-APN/mch-python-blueprint`: https://github.com/MeteoSwiss-APN/mch-python-blueprint
 
--------
-TO DO's
--------
-- check uuid of vertical grid
-- allow different filename-formats for ICON-files
-- output filename of plot_timeseries is funky
-- heatmap x-axis tick labeling ignores --start_leadtime
-- if dwh-dataframe is empty, (icon-)plot should still be produced, just without data
+
