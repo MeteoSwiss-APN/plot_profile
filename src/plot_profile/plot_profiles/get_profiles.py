@@ -27,7 +27,7 @@ from plot_profile.utils.variables import vdf
 # from ipdb import set_trace
 
 
-def parse_inputs(loc, add_model, add_obs, model_src, grid_file, grid_src, verbose):
+def parse_inputs(loc, add_model, add_obs, model_src, height_file, height_src, verbose):
     """Parse inputs given to plot_profiles specifying variables, devices and models.
 
     Args:
@@ -35,8 +35,8 @@ def parse_inputs(loc, add_model, add_obs, model_src, grid_file, grid_src, verbos
         add_model (_type_): _description_
         add_obs (_type_): _description_
         model_src (_type_): _description_
-        grid_file (_type_): _description_
-        grid_src (_type_): _description_
+        height_file (_type_): _description_
+        height_src (_type_): _description_
         verbose (_type_): _description_
 
     Returns:
@@ -65,12 +65,12 @@ def parse_inputs(loc, add_model, add_obs, model_src, grid_file, grid_src, verbos
             )
             sys.exit(1)
 
-        # extract path to grid from either grid_file or grid_src
-        # if no grid_src is specified, use (default) grid for all
-        if not grid_src:
-            grid = grid_file
+        # extract path to grid from either height_file or height_src
+        # if no height_src is specified, use (default) grid for all
+        if not height_src:
+            grid = height_file
         else:
-            grid_dict = dict(grid_src)
+            grid_dict = dict(height_src)
             grid = grid_dict[model_id]
 
         # to later check consistency between half and full levels:

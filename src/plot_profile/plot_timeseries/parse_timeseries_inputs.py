@@ -67,44 +67,44 @@ def parse_inputs(loc, var, device, add_model, add_obs, model_src, verbose):
     for dev, var in zip(devs, vars):
 
         if verbose:
-            print('checking inputs for: ', dev, var)
+            print("checking inputs for: ", dev, var)
         check_inputs(var=var, dev=dev, loc=loc, verbose=verbose)
 
     # check, that the provided variables at most require 2 units
     multi_axes = check_units(vars)
 
-
     #################################################################################################################
     #################################################################################################################
-    # CREATE TIMESERIES PLOTS USING THE --VAR & --DEVICE FLAGS
-    if device and var:
-        device, variable = list(device), list(var)
+    # legacy code
+    ## CREATE TIMESERIES PLOTS USING THE --VAR & --DEVICE FLAGS
+    # if device and var:
+    #    device, variable = list(device), list(var)
 
-        # CASE 1: multiple devices, 1 variable --> plot this one variable for all devices
-        if len(variable) == 1 and len(device) > 1:
-            vars = [variable[0]] * len(device)
-            devs = list(device)
+    #    # CASE 1: multiple devices, 1 variable --> plot this one variable for all devices
+    #    if len(variable) == 1 and len(device) > 1:
+    #        vars = [variable[0]] * len(device)
+    #        devs = list(device)
 
-        # CASE 2: 1 device, multiple variables --> plot all variables for the single device
-        elif len(device) == 1 and len(variable) > 1:
-            devs = [device[0]] * len(variable)
-            vars = list(variable)
+    #    # CASE 2: 1 device, multiple variables --> plot all variables for the single device
+    #    elif len(device) == 1 and len(variable) > 1:
+    #        devs = [device[0]] * len(variable)
+    #        vars = list(variable)
 
-        # CASE 3: multiple devices and multiple variables --> require len(device)==len(var)
-        #  otherwise the assignment of variables to devices is ambiguous --> throw warning and exit
-        elif len(device) == len(variable):
-            devs = list(device)
-            vars = list(variable)
+    #    # CASE 3: multiple devices and multiple variables --> require len(device)==len(var)
+    #    #  otherwise the assignment of variables to devices is ambiguous --> throw warning and exit
+    #    elif len(device) == len(variable):
+    #        devs = list(device)
+    #        vars = list(variable)
 
-        else:
-            print(f"Assignement of devices and variables cannot be done explicitly.")
-            print(
-                f"Review command. (#variables: {len(variable)}, #devices: {len(device)})"
-            )
-            sys.exit(1)
+    #    else:
+    #        print(f"Assignement of devices and variables cannot be done explicitly.")
+    #        print(
+    #            f"Review command. (#variables: {len(variable)}, #devices: {len(device)})"
+    #        )
+    #        sys.exit(1)
 
-        elements = []
-        for dev, var in zip(devs, vars):
-            elements.append([dev, var])
+    #    elements = []
+    #    for dev, var in zip(devs, vars):
+    #        elements.append([dev, var])
 
     return elements, multi_axes

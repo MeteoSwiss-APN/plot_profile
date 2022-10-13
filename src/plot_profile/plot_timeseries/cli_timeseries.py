@@ -16,6 +16,7 @@ import click
 from plot_profile.plot_timeseries.get_timeseries import get_timeseries_dict
 from plot_profile.plot_timeseries.parse_timeseries_inputs import parse_inputs
 from plot_profile.plot_timeseries.plot_timeseries import create_plot
+from plot_profile.utils.utils import parse_grid_file
 
 # from ipdb import set_trace
 
@@ -118,10 +119,10 @@ from plot_profile.plot_timeseries.plot_timeseries import create_plot
     help="Specify for each model-id, one source flag. I.e. <id> <folder> <init>",
 )
 @click.option(
-    "--grid_file",
+    "--height_file",
     type=str,
     default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
-    help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
+    help="Icon file containing HEIGHT field. Def: lfff00000000c",
 )
 @click.option(
     "--outpath",
@@ -159,7 +160,7 @@ def main(
     model_src: tuple,
     add_obs: tuple,
     # Mandatory for ICON
-    grid_file: str,
+    height_file: str,
     # Optional
     ymin: tuple,
     ymax: tuple,
@@ -191,13 +192,9 @@ def main(
         end=end,
         elements=elements,
         loc=loc,
-        grid_file=grid_file,
+        height_file=height_file,
         verbose=verbose,
     )
-
-    # set_trace()
-
-    # sys.exit(1)
 
     create_plot(
         data=timeseries_dict,

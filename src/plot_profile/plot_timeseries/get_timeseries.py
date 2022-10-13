@@ -24,7 +24,7 @@ def get_arome():
     return print("should return AROME dataframe at this point")
 
 
-def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
+def get_timeseries_dict(start, end, elements, loc, height_file, verbose):
     timeseries_dict = {}
 
     # loop over elements
@@ -77,7 +77,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                         ),  # full hours!
                         end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                         folder=folder,
-                        grid_file=grid_file,
+                        height_file=height_file,
                         verbose=verbose,
                     )
                     do_interpolation = False  # reset
@@ -94,7 +94,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                         ),  # full hours!
                         end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                         folder=folder,
-                        grid_file=grid_file,
+                        height_file=height_file,
                         verbose=verbose,
                     )
 
@@ -127,7 +127,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                         ),  # full hours!
                         end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                         folder=folder,
-                        grid_file=grid_file,
+                        height_file=height_file,
                         verbose=verbose,
                     )
                     do_interpolation = False  # reset
@@ -144,7 +144,7 @@ def get_timeseries_dict(start, end, elements, loc, grid_file, verbose):
                         ),  # full hours!
                         end_lt=int((end - init).total_seconds() / 3600),  # full hours!
                         folder=folder,
-                        grid_file=grid_file,
+                        height_file=height_file,
                         verbose=verbose,
                     )
 

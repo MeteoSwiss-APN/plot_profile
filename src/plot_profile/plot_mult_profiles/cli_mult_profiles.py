@@ -1,4 +1,7 @@
-"""Purpose: define command line inputs for plot_mult_profiles.
+"""Purpose: Define command line inputs for plot_mult_profiles.
+
+Entry point is simply called 'plot_profiles'.
+For 'plot_icon_profiles' see plot_icon/cli_icon_profiles.py.
 
 Author: Arthur Dandoy
 
@@ -59,9 +62,9 @@ from plot_profile.plot_mult_profiles.plot_mult_profiles import create_mult_plot
 )
 # options with default value
 @click.option(
-    "--grid_file",
+    "--height_file",
     type=str,
-    default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
+    default="/store/s83/swester/HEIGHT_ICON-1E.nc",
     help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
 )
 @click.option("--ymin", type=int, help="Altitude bottom. Def: surface.")
@@ -94,9 +97,8 @@ from plot_profile.plot_mult_profiles.plot_mult_profiles import create_mult_plot
 )
 @click.option(
     "--grid",
-    type=str,
-    default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
-    help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
+    type=bool,
+    help="Show grid in plot.",
 )
 # @click.option("--lat", type=float, help="Latitude of location.")
 # @click.option("--lon", type=float, help="Longitude of location.")
@@ -136,7 +138,7 @@ def main(
     model_src: str,
     leadtime: tuple,
     add_obs: tuple,
-    grid_file: str,
+    height_file: str,
     ymin: int,
     ymax: int,
     datatypes: tuple,
@@ -153,14 +155,14 @@ def main(
     """Plot vertical profiles of variables from icon, arome simulations or observations.
 
     Example command:
-    plot_mult_profiles --init 21111812 --loc pay --variable temp --add_model icon --model_src
-    /scratch/swester/output_icon/ICON-1/ --leadtime 12 --leadtime 14 --leadtime 16 --grid
 
     Model output is expected to be in netcdf-format in a sub-folder named after the given date.
 
     """
     # check inputs
     parse_inputs(variable, add_model, model_src, add_obs, loc, verbose)
+
+    print("---  WARNING: Currently only one height_file per plot is supported.")
 
     data_dict = get_mult_data(
         init=init,
@@ -170,7 +172,7 @@ def main(
         add_obs=add_obs,
         leadtimes=leadtime,
         loc=loc,
-        grid=grid_file,
+        grid=height_file,
         ylims=(ymin, ymax),
         verbose=verbose,
     )

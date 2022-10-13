@@ -102,7 +102,7 @@ from plot_profile.utils.utils import validtime_from_leadtime
 )
 @click.option("--ind", type=int, help="Index of location (known from previous runs).")
 @click.option(
-    "--grid",
+    "--height_file",
     type=str,
     default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
     help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
@@ -178,7 +178,7 @@ def main(
     alt_top: int,
     appendix: str,
     datatypes: tuple,
-    grid: str,
+    height_file: str,
     ind: int,
     leadtime: int,
     lat: float,
@@ -243,7 +243,7 @@ def main(
         lat=lat,
         lon=lon,
         ind=ind,
-        grid=grid,
+        grid=height_file,
         variables_list=var,
         alt_bot=alt_bot,
         alt_top=alt_top,

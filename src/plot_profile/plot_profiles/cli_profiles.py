@@ -44,7 +44,7 @@ from plot_profile.plot_profiles.plot_profiles import create_plot
     help="Specify for each model ID, one source flag. I.e. <model_id> <folder> <init>",
 )
 @click.option(
-    "--grid_src",
+    "--height_src",
     type=(str, click.Path(exists=True)),
     multiple=True,
     help="Specify for each model ID, one source for the grid. I.e. <model_id> <path/to/grid.nc>",
@@ -56,7 +56,7 @@ from plot_profile.plot_profiles.plot_profiles import create_plot
     help="Specify which device/variable should be added to plot.",
 )
 @click.option(
-    "--grid_file",
+    "--height_file",
     type=str,
     default="/store/s83/swester/grids/HEIGHT_ICON-1E.nc",
     help="Icon file containing HEIGHT field. Def: ICON-1E operational 2021",
@@ -150,8 +150,8 @@ def main(
     add_obs: tuple,
     add_model: tuple,
     model_src: tuple,
-    grid_src: tuple,
-    grid_file: str,
+    height_src: tuple,
+    height_file: str,
     # Axes Limits
     ymin: float,
     ymax: float,
@@ -173,7 +173,7 @@ def main(
 
     """
     elements, multi_axes = parse_inputs(
-        loc, add_model, add_obs, model_src, grid_file, grid_src, verbose
+        loc, add_model, add_obs, model_src, height_file, height_src, verbose
     )
 
     if verbose and multi_axes:

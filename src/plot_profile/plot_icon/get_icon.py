@@ -113,7 +113,7 @@ def calc_hfl(hhl):
     return hfl
 
 
-def index_height_from_grid_file(lat, lon, grid, verbose):
+def index_height_from_height_file(lat, lon, grid, verbose):
     """Retrieve index and height for specific grid point.
 
     Args:
@@ -130,7 +130,7 @@ def index_height_from_grid_file(lat, lon, grid, verbose):
     """
     if verbose:
         print(
-            "Assuming that variable's grid corresponds to clat_1 and clon_1 from grid-file"
+            "Assuming that variable's grid corresponds to clat_1 and clon_1 from height-file"
         )
 
     # load grid file
@@ -215,7 +215,7 @@ def get_icon(
 
     # index and height only have to be retrieved once
     if not ind:
-        ind, height, size = index_height_from_grid_file(lat, lon, grid, verbose)
+        ind, height, size = index_height_from_height_file(lat, lon, grid, verbose)
 
         # create pandas objects of height values
         if full_levels == True:
@@ -310,7 +310,7 @@ def get_icon(
 
 
 def get_icon_timeseries(
-    lat, lon, vars, init, level, start_lt, end_lt, folder, grid_file, verbose
+    lat, lon, vars, init, level, start_lt, end_lt, folder, height_file, verbose
 ):
     """Retrieve timeseries from ICON output.
 
@@ -323,12 +323,12 @@ def get_icon_timeseries(
         start_lt (int): start leadtime
         end_lt (int): end leadtime
         folder (str): folder containing subfolders with icon runs
-        grid_file (str): icon-1 grid file
+        height_file (str): icon-1 height file
         verbose (bool): print details
 
     """
     # determine index of loc from grid file
-    ind, height, size = index_height_from_grid_file(lat, lon, grid_file, verbose)
+    ind, height, size = index_height_from_height_file(lat, lon, height_file, verbose)
 
     hhl = calc_hhl(height)
 
@@ -433,7 +433,7 @@ def get_icon_timeseries(
 
 
 def get_icon_hm(
-    lat, lon, var, init, height_list, start_lt, end_lt, folder, grid_file, verbose
+    lat, lon, var, init, height_list, start_lt, end_lt, folder, height_file, verbose
 ):
     """Retrieve timeseries of an interpolated var for Arome outputs.
 
@@ -446,7 +446,7 @@ def get_icon_hm(
         start_lt (int):                start leadtime
         end_lt (int):                  end leadtime
         folder (str):                  folder containing subfolders with icon runs
-        grid_file (str):               icon-1 grid file
+        height_file (str):               icon-1 grid file
         verbose (bool):                print details
 
     Returns:
@@ -456,7 +456,7 @@ def get_icon_hm(
     # create df which collects icon variables
     df = pd.DataFrame()
 
-    ind, height, size = index_height_from_grid_file(lat, lon, grid_file, verbose)
+    ind, height, size = index_height_from_height_file(lat, lon, height_file, verbose)
 
     hfl = calc_hfl(height)
 
