@@ -18,12 +18,6 @@ DEFAULT_VENV_NAME = plot_profile#
 export DEFAULT_VENV_NAME
 
 #------------------------------------------------------------------------------
-
-# Options for all calls to up-do-date pip (i.e., AFTER `pip install -U pip`)
-# Example: `--use-feature=2020-resolver` before the new resolver became the default
-PIP_OPTS = --use-feature=in-tree-build
-export PIP_OPTS
-
 #
 # Targets conditional on ${CHAIN}.
 #
