@@ -49,6 +49,9 @@ def get_timeseries_dict(start, end, elements, loc, height_file, verbose):
             if var_name == "wind_dir" or var_name == "wind_vel":
                 var_open_icon = ["u", "v"]
 
+            if var_name == "wind_dir_10m" or var_name == "wind_vel_10m":
+                var_open_icon = ["u_10m", "v_10m"]
+
             elif var_name == "rel_hum":
                 var_open_icon = ["temp", "qv"]
 

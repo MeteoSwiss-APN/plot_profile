@@ -54,7 +54,9 @@ vdf = pd.DataFrame(
         "v_10m",
         "ver_vis",
         "wind_dir",
+        "wind_dir_10m",
         "wind_vel",
+        "wind_vel_10m",
     ],
     # attributes
     index=[
@@ -263,11 +265,13 @@ vdf["hor_vis"].dwh_id = {"2m": "1547"}
 
 # pressure: press
 vdf["press"].short_name = "press"
-vdf["press"].icon_names = ["p", "P"]
+vdf["press"].icon_names = ["p","P"]
+vdf["press"].icon_name = "p"
 vdf["press"].arome_name = "P"
 vdf["press"].long_name = "Pressure"
 vdf["press"].unit = "hPa"
 vdf["press"].mult_arome = 0.01
+vdf["press"].mult = 0.01
 vdf["press"].dwh_id = {"rs": "744", "2m": "90"}
 
 # cloud water: qc
@@ -606,6 +610,15 @@ vdf["wind_dir"].min_value = 0
 vdf["wind_dir"].max_value = 360
 vdf["wind_dir"].dwh_id = {"rs": "743", "10m_tower": "197", "lidar": "743"}
 
+# wind direction: wind_dir_10m
+vdf["wind_dir_10m"].short_name = "wind_dir_10m"
+vdf["wind_dir_10m"].icon_name = "wind_dir_10m"
+vdf["wind_dir_10m"].long_name = "Wind direction at 10m"
+vdf["wind_dir_10m"].unit = "°"
+vdf["wind_dir_10m"].min_value = 0
+vdf["wind_dir_10m"].max_value = 360
+vdf["wind_dir_10m"].dwh_id = { "10m_tower": "197"}
+
 # wind velocity: wind_vel
 vdf["wind_vel"].short_name = "wind_vel"
 vdf["wind_vel"].icon_name = "wind_vel"
@@ -615,6 +628,16 @@ vdf["wind_vel"].unit = "m/s"
 vdf["wind_vel"].min_value = 0
 vdf["wind_vel"].max_value = 30
 vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196", "lidar": "748", "10m": "196"}
+
+# wind velocity: wind_vel 10m
+vdf["wind_vel_10m"].short_name = "wind_vel_10m"
+vdf["wind_vel_10m"].icon_name = "wind_vel_10m"
+vdf["wind_vel_10m"].long_name = "Wind velocity at 10m"
+vdf["wind_vel_10m"].unit = "m/s"
+vdf["wind_vel_10m"].min_value = 0
+vdf["wind_vel_10m"].max_value = 30
+vdf["wind_vel_10m"].dwh_id = {"10m_tower": "196"}
+
 
 # !!! if adding new variable: don't forget to add at the top and in cli-file!!!
 

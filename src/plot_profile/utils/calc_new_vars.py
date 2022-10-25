@@ -239,7 +239,6 @@ def calc_rho_arome(df, levels, verbose=False):
 
     return rho
 
-
 def integrate_over_z(df, param_name, levels, lat, lon, verbose=False):
     """Integrate variable over vertical coordinates.
 
@@ -477,6 +476,26 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
         # delete remaining columns
         del df[f"u{sufix_levels[0]}"], df[f"v{sufix_levels[0]}"]
 
+    ## Wind velocity 10m
+    elif new_var == "wind_vel_10m":
+        values = calculate_wind_vel_from_uv(
+            u=df[f"u_10m{sufix_levels[0]}"], v=df[f"v_10m{sufix_levels[0]}"], verbose=verbose
+        )
+
+        # delete remaining columns
+        del df[f"u_10m{sufix_levels[0]}"], df[f"v_10m{sufix_levels[0]}"]
+
+
+    ## Wind direction 10m
+    elif new_var == "wind_dir_10m":
+        values = calculate_wind_dir_from_uv(
+            u=df[f"u_10m{sufix_levels[0]}"], v=df[f"v_10m{sufix_levels[0]}"], verbose=verbose
+        )
+
+        # delete remaining columns
+        del df[f"u_10m{sufix_levels[0]}"], df[f"v_10m{sufix_levels[0]}"]
+    
+    
     else:
         print(f"--- ! Variable {new_var} calculation not available yet.")
         sys.exit(1)
