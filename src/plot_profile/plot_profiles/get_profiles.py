@@ -183,6 +183,9 @@ def get_data(
             elif var_name == "rel_hum":
                 var_open_icon = ["temp", "qv"]
 
+            elif var_name == "potT":
+                var_open_icon = ["temp", "press"]
+
             else:
                 var_open_icon = var_name
 

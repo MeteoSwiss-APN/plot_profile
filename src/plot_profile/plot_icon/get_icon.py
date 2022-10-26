@@ -394,9 +394,9 @@ def get_icon_timeseries(
 
         # dataset with only one specific variable
         ds_var = ds[var.icon_name]
-        #        except KeyError:
-        #            print(f"{var.icon_name} cannot be found in forecast file")
-        #            continue
+            #    except KeyError:
+            #        print(f"{var.icon_name} cannot be found in forecast file")
+            #        continue
 
         # assume that variable is of structure:
         # a) time, height, N cells

@@ -57,6 +57,7 @@ vdf = pd.DataFrame(
         "wind_dir_10m",
         "wind_vel",
         "wind_vel_10m",
+        "potT",
     ],
     # attributes
     index=[
@@ -617,11 +618,12 @@ vdf["wind_dir_10m"].long_name = "Wind direction at 10m"
 vdf["wind_dir_10m"].unit = "°"
 vdf["wind_dir_10m"].min_value = 0
 vdf["wind_dir_10m"].max_value = 360
-vdf["wind_dir_10m"].dwh_id = { "10m_tower": "197"}
+vdf["wind_dir_10m"].dwh_id = { "10m": "197"}
 
 # wind velocity: wind_vel
 vdf["wind_vel"].short_name = "wind_vel"
 vdf["wind_vel"].icon_name = "wind_vel"
+vdf["wind_vel"].icon_names = ["wind_vel","Wind_vel"]
 vdf["wind_vel"].arome_name = "wind_vel"
 vdf["wind_vel"].long_name = "Wind velocity"
 vdf["wind_vel"].unit = "m/s"
@@ -636,8 +638,13 @@ vdf["wind_vel_10m"].long_name = "Wind velocity at 10m"
 vdf["wind_vel_10m"].unit = "m/s"
 vdf["wind_vel_10m"].min_value = 0
 vdf["wind_vel_10m"].max_value = 30
-vdf["wind_vel_10m"].dwh_id = {"10m_tower": "196"}
+vdf["wind_vel_10m"].dwh_id = {"10m": "196"}
 
+# potential Temperature -> only mandatory attributes for now
+vdf["potT"].short_name = "potT"
+vdf["potT"].long_name = "potential Temperature"
+vdf["potT"].icon_name = "potT"
+vdf["potT"].unit = "K"
 
 # !!! if adding new variable: don't forget to add at the top and in cli-file!!!
 

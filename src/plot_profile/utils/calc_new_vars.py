@@ -287,7 +287,27 @@ def integrate_over_z(df, param_name, levels, lat, lon, verbose=False):
         print(f"Succesfully integrated {param_name} over vertical dimension.")
 
     return values
+    
+##########################################################################################
+##########################################################################################
+##########################################################################################
+def calculate_potT(temp, press, temperature_metric="kelvin", verbose=False):
+    
+    #defining parameters
+    press_r = 1000                  #reference pressure (hPa)
+    Rd = 287                        #specific gas constant for dry air (J/kg*K)
+    cp = 1004                       #speific heat of dry air at constant pressure (J/kg*K)
 
+    #convert from °C to K
+    t_kelvin = np.zeros(len(temp)) ; t_kelvin = temp + 273
+
+    if verbose:
+        print("Calculating potential Temperature.")
+    
+    #compute potential temperature
+    potT = t_kelvin*(press_r/press)**(Rd/cp)
+
+    return potT
 
 def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
     """Calculate vert. profile of requested variable from model output variables.
@@ -351,6 +371,14 @@ def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
         )
         # delete remaining columns
         del df["u"], df["v"]
+
+    ## potT
+    elif new_var == "potT":
+        values = calculate_potT(
+            temp=df["temp"], press=df["press"], verbose=verbose
+        )
+        # delete remaining columns
+        del df["temp"], df["press"]
 
     else:
         print(f"{new_var} not available for calculation yet.")
