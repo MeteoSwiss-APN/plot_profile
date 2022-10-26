@@ -55,6 +55,9 @@ def get_timeseries_dict(start, end, elements, loc, height_file, verbose):
             elif var_name == "rel_hum":
                 var_open_icon = ["temp", "qv"]
 
+            elif var_name == "potT":
+                var_open_icon = ["temp", "press"]
+
             elif var_name == "grad_temp":
                 var_open_icon = "temp"
                 levels = [486, 506]

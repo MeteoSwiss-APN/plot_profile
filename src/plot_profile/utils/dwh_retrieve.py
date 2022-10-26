@@ -19,6 +19,7 @@ import pandas as pd
 # First-party
 from plot_profile.utils.calc_new_vars import calculate_qv_from_rh
 from plot_profile.utils.calc_new_vars import calculate_qv_from_tdew
+from plot_profile.utils.calc_new_vars import calculate_potT
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.variables import vdf
 
@@ -562,6 +563,32 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 print(
                     f"Calculating observed vertical temperature gradient ({vars_str})."
                 )
+        
+        # if potential temperature, need to retrieve press, temp
+        elif "potT" in vars_str:
+
+            # air pressure and temp measurment ids
+            press_id = str(vdf["press"].dwh_id[device])
+            temp_id = vdf["temp"].dwh_id[device]
+            open_vars = f"{press_id},{temp_id}"
+
+            # call dwh retrieve for surface-based data
+            raw_data = dwh_surface(
+                station_name=sdf[station].dwh_name,
+                vars_str=open_vars,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
+
+            # calculate potT
+            raw_data["potT"] = (
+                calculate_potT(
+                    temp=raw_data[temp_id],
+                    press=raw_data[press_id],
+                    verbose=verbose,
+                )
+            )
 
         else:
             # call dwh retrieve for surface-based data

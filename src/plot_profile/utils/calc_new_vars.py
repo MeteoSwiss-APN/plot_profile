@@ -523,7 +523,15 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
         # delete remaining columns
         del df[f"u_10m{sufix_levels[0]}"], df[f"v_10m{sufix_levels[0]}"]
     
-    
+   ## potential temperature
+    elif new_var == "potT":
+        values = calculate_potT(
+            temp=df[f"temp{sufix_levels[0]}"], press=df[f"press{sufix_levels[0]}"], verbose=verbose
+        )
+
+        # delete remaining columns
+        del df[f"temp{sufix_levels[0]}"], df[f"press{sufix_levels[0]}"]
+
     else:
         print(f"--- ! Variable {new_var} calculation not available yet.")
         sys.exit(1)

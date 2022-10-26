@@ -644,7 +644,9 @@ vdf["wind_vel_10m"].dwh_id = {"10m": "196"}
 vdf["potT"].short_name = "potT"
 vdf["potT"].long_name = "potential Temperature"
 vdf["potT"].icon_name = "potT"
+# vdf["potT"].icon_names = ["potT",'TH']
 vdf["potT"].unit = "K"
+vdf["potT"].dwh_id = {"2m": "potT"}
 
 # !!! if adding new variable: don't forget to add at the top and in cli-file!!!
 
