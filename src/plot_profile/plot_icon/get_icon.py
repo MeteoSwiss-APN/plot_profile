@@ -26,7 +26,7 @@ from plot_profile.utils.utils import get_icon_name
 from plot_profile.utils.utils import slice_top_bottom
 from plot_profile.utils.variables import vdf
 
-# from ipdb import set_trace
+from ipdb import set_trace
 
 
 def lfff_name(lt):
@@ -271,9 +271,16 @@ def get_icon(
 
         # specify variable (pandas dataframe with attributes)
         var = vdf[variable]
+
+        # find correct icon name from list of possible names
+        var.icon_name = get_icon_name(ds, var.icon_names, verbose)
+
+        # dataset with only one specific variable
+
         # subselect values from column
         try:
             values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
+            set_trace()
         except ValueError:
             try:
                 values = ds.isel(ncells=ind)[var.icon_name].values * var.mult + var.plus
