@@ -5,6 +5,8 @@ Author: Stephanie Westerhuis
 Date: 11/11/2021
 """
 
+#testcomment
+
 # Standard library
 import datetime as dt
 import sys
@@ -268,7 +270,7 @@ def get_icon(
         ]
 
     for variable in variables_list:
-        
+
         # specify variable (pandas dataframe with attributes)
         var = vdf[variable]
 
