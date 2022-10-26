@@ -17,12 +17,12 @@ import numpy as np
 import pandas as pd
 
 # First-party
-from plot_profile.utils.calc_new_vars import calculate_qv_from_rh
+from plot_profile.utils.calc_new_vars import calculate_potT, calculate_qv_from_rh
 from plot_profile.utils.calc_new_vars import calculate_qv_from_tdew
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.variables import vdf
 
-# from ipdb import set_trace
+#from ipdb import set_trace
 
 
 def yy2yyyy(yy):
@@ -368,15 +368,43 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
     # profile-based data
     if device in ["rs", "mwr", "lidar", "ralmo"]:
 
-        # call dwh retrieve for profile-based data
-        raw_data = dwh_profile(
-            device=device,
-            station_id=sdf[station].dwh_id,
-            vars_str=vars_str,
-            start=t1,
-            end=t2,
-            verbose=verbose,
-        )
+        # if potential temperature, need to retrieve press, temp
+        if "potT" in vars_str:
+            
+            # air pressure and temp measurment ids
+            press_id = str(vdf["press"].dwh_id[device])
+            temp_id = vdf["temp"].dwh_id[device]
+            altitude_id = vdf["altitude"].dwh_id[device]
+            open_vars = f"{press_id},{temp_id},{altitude_id}"
+            
+
+            # call dwh retrieve for surface-based data
+            raw_data = dwh_profile(
+                device=device,
+                station_id=sdf[station].dwh_id,
+                vars_str=open_vars,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
+            # calculate potT
+            raw_data["potT"] = (
+                calculate_potT(
+                    temp=raw_data[temp_id],
+                    press=raw_data[press_id],
+                    verbose=verbose,
+                )
+            )
+        else: 
+            # call dwh retrieve for profile-based data
+            raw_data = dwh_profile(
+                device=device,
+                station_id=sdf[station].dwh_id,
+                vars_str=vars_str,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
 
         if raw_data.empty:
             return raw_data
@@ -384,10 +412,12 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
         # rename column names to nice short names and
         #  make list of relevant columns
         raw_data.rename(columns={"termin": "timestamp"}, inplace=True)
+        #raw_data.rename(columns={"742": "altitude"}, inplace=True)
         relevant_vars = [
             "timestamp",
             "altitude",
         ]
+    
 
         # renaming columns of variable(s)
         for var in vars:
@@ -407,7 +437,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             raw_data.rename(columns={"level": "altitude"}, inplace=True)
 
         data = raw_data[relevant_vars]
-
+        set_trace()
         # case A) only 1 timestamp specified for profile data
         if t1 == t2:
             return data
@@ -537,6 +567,34 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             # should not happen in principle
             else:
                 print(f"Device: {device} not available for qv.")
+
+#-----------------
+        elif "potT" in vars_str:
+           #if device == "2m":
+
+                # air pressure and dewp temp measurment ids
+                press_id = str(vdf["press"].dwh_id[device])
+                temp_id = vdf["temp"].dwh_id[device]
+                open_vars = f"{press_id},{temp_id}"
+
+                # call dwh retrieve for surface-based data
+                raw_data = dwh_surface(
+                    station_name=sdf[station].dwh_name,
+                    vars_str=open_vars,
+                    start=t1,
+                    end=t2,
+                    verbose=verbose,
+                )
+
+                # calculate specific humidity
+                raw_data["potT"] = (
+                    calculate_potT(
+                        temp=raw_data[temp_id],
+                        press=raw_data[press_id],
+                        verbose=verbose,
+                    )
+                )
+#-----------------
 
         # if vertical temperature gradient we need to calculate it (between 30m and 10m)
         elif "grad_temp" in vars_str:

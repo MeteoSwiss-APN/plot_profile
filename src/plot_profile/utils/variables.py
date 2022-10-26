@@ -524,6 +524,7 @@ vdf["potT"].short_name = "potT"
 vdf["potT"].long_name = "potential Temperature"
 vdf["potT"].icon_name = "potT"
 vdf["potT"].unit = "K"
+vdf["potT"].dwh_id = {"2m": "potT", "rs": "potT"}
 
 # turblent kinetic energy; tke
 vdf["tke"].short_name = "tke"
