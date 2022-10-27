@@ -35,7 +35,7 @@ def calculate_grad(var_bot, var_top, alt_bot, alt_top, verbose=False):
 
     return grad
 
-def calculate_potT(temp, press, temperature_metric="kelvin", verbose=False):
+def calculate_pot_temp(temp, press, temperature_metric="kelvin", verbose=False):
     
     #defining parameters
     press_r = 1000                  #reference pressure (hPa)
@@ -49,9 +49,9 @@ def calculate_potT(temp, press, temperature_metric="kelvin", verbose=False):
         print("Calculating potential Temperature.")
     
     #compute potential temperature
-    potT = t_kelvin*(press_r/press)**(Rd/cp)
+    pot_temp = t_kelvin*(press_r/press)**(Rd/cp)
 
-    return potT
+    return pot_temp
 
 def calculate_tdew_from_rh(rh, T, temperature_metric="celsius", verbose=False):
     """Calculate dew point temperature from relative humidity and temperature.
@@ -371,9 +371,9 @@ def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
         del df["u"], df["v"]
 
     ## potential temperature
-    elif new_var == "potT":
-        values = calculate_potT(
-            temp=df["temp"], press=df["press"], verbose=verbose
+    elif new_var == "pot_temp":
+        values = calculate_pot_temp(
+            temp=df["temp"], press=df["press"], altitude=df["altitude"], verbose=verbose
         )
         # delete remaining columns
         del df["temp"], df["press"]
@@ -519,8 +519,8 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
         del df[f"u_10m{sufix_levels[0]}"], df[f"v_10m{sufix_levels[0]}"]
 
     ## potential temperature
-    elif new_var == "potT":
-        values = calculate_potT(
+    elif new_var == "pot_temp":
+        values = calculate_pot_temp(
             temp=df[f"temp{sufix_levels[0]}"], press=df[f"press{sufix_levels[0]}"], verbose=verbose
         )
 

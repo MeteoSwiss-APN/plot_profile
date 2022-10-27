@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 # First-party
-from plot_profile.utils.calc_new_vars import calculate_potT, calculate_qv_from_rh
+from plot_profile.utils.calc_new_vars import calculate_pot_temp, calculate_qv_from_rh
 from plot_profile.utils.calc_new_vars import calculate_qv_from_tdew
 from plot_profile.utils.stations import sdf
 from plot_profile.utils.variables import vdf
@@ -315,7 +315,7 @@ def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
     )
 
     if device == "rs":
-        cmd = cmd + " -C 34 -w 22"
+        cmd = cmd # + " -C 34 -w 22"
     elif device == "mwr":
         cmd = cmd + " -C 38 -w 31"
     elif device == "lidar":
@@ -369,7 +369,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
     if device in ["rs", "mwr", "lidar", "ralmo"]:
 
         # if potential temperature, need to retrieve press, temp
-        if "potT" in vars_str:
+        if "pot_temp" in vars_str:
             
             # air pressure and temp measurment ids
             press_id = str(vdf["press"].dwh_id[device])
@@ -387,9 +387,9 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
                 end=t2,
                 verbose=verbose,
             )
-            # calculate potT
-            raw_data["potT"] = (
-                calculate_potT(
+            # calculate pot_temp
+            raw_data["pot_temp"] = (
+                calculate_pot_temp(
                     temp=raw_data[temp_id],
                     press=raw_data[press_id],
                     verbose=verbose,
@@ -437,7 +437,7 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             raw_data.rename(columns={"level": "altitude"}, inplace=True)
 
         data = raw_data[relevant_vars]
-        set_trace()
+
         # case A) only 1 timestamp specified for profile data
         if t1 == t2:
             return data
@@ -568,33 +568,30 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
             else:
                 print(f"Device: {device} not available for qv.")
 
-#-----------------
-        elif "potT" in vars_str:
-           #if device == "2m":
+        elif "pot_temp" in vars_str:
 
-                # air pressure and dewp temp measurment ids
-                press_id = str(vdf["press"].dwh_id[device])
-                temp_id = vdf["temp"].dwh_id[device]
-                open_vars = f"{press_id},{temp_id}"
+            # air pressure and dewp temp measurment ids
+            press_id = str(vdf["press"].dwh_id[device])
+            temp_id = vdf["temp"].dwh_id[device]
+            open_vars = f"{press_id},{temp_id}"
 
-                # call dwh retrieve for surface-based data
-                raw_data = dwh_surface(
-                    station_name=sdf[station].dwh_name,
-                    vars_str=open_vars,
-                    start=t1,
-                    end=t2,
+            # call dwh retrieve for surface-based data
+            raw_data = dwh_surface(
+                station_name=sdf[station].dwh_name,
+                vars_str=open_vars,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
+
+            # calculate specific humidity
+            raw_data["pot_temp"] = (
+                calculate_pot_temp(
+                    temp=raw_data[temp_id],
+                    press=raw_data[press_id],
                     verbose=verbose,
                 )
-
-                # calculate specific humidity
-                raw_data["potT"] = (
-                    calculate_potT(
-                        temp=raw_data[temp_id],
-                        press=raw_data[press_id],
-                        verbose=verbose,
-                    )
-                )
-#-----------------
+            )
 
         # if vertical temperature gradient we need to calculate it (between 30m and 10m)
         elif "grad_temp" in vars_str:

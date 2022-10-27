@@ -44,7 +44,6 @@ vdf = pd.DataFrame(
         "temp_surf",
         "2m_temp",
         "tke",
-        "potT",
         "tqr",
         "tqv",
         "tqc",
@@ -57,7 +56,8 @@ vdf = pd.DataFrame(
         "wind_dir",
         "wind_dir_10m", 
         "wind_vel",
-        "wind_vel_10m"
+        "wind_vel_10m",
+        "pot_temp"
     ],
     # attributes
     index=[
@@ -520,11 +520,11 @@ vdf["2m_temp"].plus_arome = -273
 vdf["2m_temp"].avg = False
 
 # potential Temperature
-vdf["potT"].short_name = "potT"
-vdf["potT"].long_name = "potential Temperature"
-vdf["potT"].icon_name = "potT"
-vdf["potT"].unit = "K"
-vdf["potT"].dwh_id = {"2m": "potT", "rs": "potT"}
+vdf["pot_temp"].short_name = "pot_temp"
+vdf["pot_temp"].long_name = "potential Temperature"
+vdf["pot_temp"].icon_name = "pot_temp"
+vdf["pot_temp"].unit = "K"
+vdf["pot_temp"].dwh_id = {"2m": "pot_temp", "rs": "pot_temp"}
 
 # turblent kinetic energy; tke
 vdf["tke"].short_name = "tke"

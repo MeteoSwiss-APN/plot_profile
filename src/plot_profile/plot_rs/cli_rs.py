@@ -29,12 +29,12 @@ from .plot_rs import create_plot
             "temp",
             "dewp_temp",
             "wind_vel",
-            "potT",
+            "pot_temp",
         ],
         case_sensitive=False,
     ),
     multiple=True,
-    default=("temp", "dewp_temp", "wind_vel", "wind_dir", "potT"),
+    default=("temp", "dewp_temp", "wind_vel", "wind_dir", "pot_temp"),
     help="Def: all",
 )
 @click.option(
@@ -106,7 +106,16 @@ from .plot_rs import create_plot
     type=float,
     help="Define the maximum windvelocity. Disclaimer: Add --personal_settings flag!",
 )
-
+@click.option(
+    "--pot_temp_min",
+    type=float,
+    help="Define the minimum potential temperature. Disclaimer: Add --personal_settings flag!",
+)
+@click.option(
+    "--pot_temp_max",
+    type=float,
+    help="Define the maximum potential temperature. Disclaimer: Add --personal_settings flag!",
+)
 
 def main(
     *,
@@ -126,8 +135,8 @@ def main(
     temp_max: float,
     windvel_min: float,
     windvel_max: float,
-    potT_min: float,
-    potT_max: float,
+    pot_temp_min: float,
+    pot_temp_max: float,
 ) -> None:
     """Plot vertical profiles of balloon radiosounding data.
 
@@ -192,8 +201,8 @@ def main(
         temp_max=temp_max,
         windvel_min=windvel_min,
         windvel_max=windvel_max,
-        potT_min=potT_min,
-        potT_max=potT_max,
+        pot_temp_min=pot_temp_min,
+        pot_temp_max=pot_temp_max,
     )
 
     print("--- Done.")

@@ -128,11 +128,11 @@ def get_axis_limits(df, params, user_inputs_dict):
         windvel_max:            float       upper bound for wind velocity
         temp_min:               float       lower bound for temperature
         temp_max:               float       upper bound for temperature
-        potT_min:               float       lower bound for potential temperature
-        potT_max:               float       upper bound for potential temperature
+        pot_temp_min:               float       lower bound for potential temperature
+        pot_temp_max:               float       upper bound for potential temperature
 
     """
-    windvel_min, windvel_max, temp_min, temp_max, potT_min, potT_max = None, None, None, None, None, None
+    windvel_min, windvel_max, temp_min, temp_max, pot_temp_min, pot_temp_max = None, None, None, None, None, None
 
     # case 1: use personal settings for the axis limits that have been defined
     if user_inputs_dict["personal_settings"]:
@@ -144,7 +144,11 @@ def get_axis_limits(df, params, user_inputs_dict):
             temp_min = user_inputs_dict["temp_min"]
         if user_inputs_dict["temp_max"]:
             temp_max = user_inputs_dict["temp_max"]
-        return windvel_min, windvel_max, temp_min, temp_max
+        if user_inputs_dict["pot_temp_min"]:
+            pot_temp_min = user_inputs_dict["pot_temp_min"]
+        if user_inputs_dict["pot_temp_max"]:
+            pot_temp_max = user_inputs_dict["pot_temp_max"]
+        return windvel_min, windvel_max, temp_min, temp_max, pot_temp_min, pot_temp_max
 
     # case 2: use standard axis limits
     # > temperature range:   -100 - 30 [°C]
@@ -153,8 +157,8 @@ def get_axis_limits(df, params, user_inputs_dict):
     if user_inputs_dict["standard_settings"]:
         windvel_min, windvel_max = 0, 30
         temp_min, temp_max = -100, 30
-        potT_min, potT_max = 275,325
-        return windvel_min, windvel_max, temp_min, temp_max, potT_max, potT_min
+        pot_temp_min, pot_temp_max = 275,325
+        return windvel_min, windvel_max, temp_min, temp_max, pot_temp_max, pot_temp_min
 
     # case 3: get axis limits dynamically
     else:
@@ -168,11 +172,11 @@ def get_axis_limits(df, params, user_inputs_dict):
         if "wind_vel" in params:
             windvel_min = df["wind_vel"].min() - 0.10 * df["wind_vel"].max()
             windvel_max = df["wind_vel"].max() + 0.10 * df["wind_vel"].max()
-        if "potT" in params:
-            potT_min = df["potT"].min() - 0.5
-            potT_max = df["potT"].max() + 0.5
+        if "pot_temp" in params:
+            pot_temp_min = df["pot_temp"].min() - 0.5
+            pot_temp_max = df["pot_temp"].max() + 0.5
 
-        return windvel_min, windvel_max, temp_min, temp_max, potT_min, potT_max
+        return windvel_min, windvel_max, temp_min, temp_max, pot_temp_min, pot_temp_max
 
 
 def plot_clouds(df, relhum_thresh, print_steps, ax, case=None):
@@ -234,7 +238,7 @@ def plot_grid(ax, params, case=None):
             color = "magenta"
         if "wind_vel" in params:
             color = "cyan"
-        if "potT" in params:
+        if "pot_temp" in params:
             color ="red"
 
         ax.xaxis.grid(color=color, linestyle="--", linewidth=0.5)
@@ -319,8 +323,8 @@ def create_plot(
     temp_max,
     windvel_min,
     windvel_max,
-    potT_min,
-    potT_max
+    pot_temp_min,
+    pot_temp_max
 ):
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ prepare user inputs & get axis limits ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
     # date parts for the filename (YYMMDD)
@@ -342,8 +346,8 @@ def create_plot(
         "temp_max": temp_max,
         "windvel_min": windvel_min,
         "windvel_max": windvel_max,
-        "potT_min": potT_min,
-        "potT_max": potT_max,
+        "pot_temp_min": pot_temp_min,
+        "pot_temp_max": pot_temp_max,
     }
 
     # remove unnecessary columns from dataframe
@@ -367,7 +371,7 @@ def create_plot(
     title = f"Radiosounding @ {station.long_name}: {date_dt} UTC"
 
     df = df[relevant_df_columns]
-    windvel_min, windvel_max, temp_min, temp_max, potT_min, potT_max = get_axis_limits(
+    windvel_min, windvel_max, temp_min, temp_max, pot_temp_min, pot_temp_max = get_axis_limits(
         df, params, user_inputs_dict
     )
 
@@ -394,11 +398,11 @@ def create_plot(
             "x_min": windvel_min,
             "x_max": windvel_max,
         },
-        "potT": {
+        "pot_temp": {
             "label": "potential Temperature",
-            "xlabel": "potential Temperature [°C]",
-            "x_min": potT_min,
-            "x_max": potT_max,
+            "xlabel": "potential Temperature [K]",
+            "x_min": pot_temp_min,
+            "x_max": pot_temp_max,
         },
     }
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ start plotting pipeline ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #

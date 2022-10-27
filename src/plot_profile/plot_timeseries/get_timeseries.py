@@ -60,7 +60,7 @@ def get_timeseries_dict(start, end, elements, loc, height_file, verbose):
                 levels = [486, 506]
                 do_interpolation = True
             
-            elif var_name == "potT":
+            elif var_name == "pot_temp":
                 var_open_icon = ["temp", "press"]
 
             else:

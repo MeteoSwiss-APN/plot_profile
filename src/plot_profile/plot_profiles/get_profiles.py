@@ -183,7 +183,7 @@ def get_data(
             elif var_name == "rel_hum":
                 var_open_icon = ["temp", "qv"]
 
-            elif var_name == "potT":
+            elif var_name == "pot_temp":
                 var_open_icon = ["temp", "press"]
         
 
@@ -300,7 +300,7 @@ def get_data(
             elif var_name == "wind_vel" or var_name == "wind_dir":
                 var_open_arome = ["u", "v"]
             
-            elif var_name == "potT":
+            elif var_name == "pot_temp":
                 var_open_arome = ["press", "temp"]
 
             else:
