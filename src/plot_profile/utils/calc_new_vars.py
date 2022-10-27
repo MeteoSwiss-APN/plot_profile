@@ -256,7 +256,6 @@ def calc_rho_arome(df, levels, verbose=False):
 
     return rho
 
-
 def integrate_over_z(df, param_name, levels, lat, lon, verbose=False):
     """Integrate variable over vertical coordinates.
 
@@ -305,7 +304,27 @@ def integrate_over_z(df, param_name, levels, lat, lon, verbose=False):
         print(f"Succesfully integrated {param_name} over vertical dimension.")
 
     return values
+    
+##########################################################################################
+##########################################################################################
+##########################################################################################
+def calculate_potT(temp, press, temperature_metric="kelvin", verbose=False):
+    
+    #defining parameters
+    press_r = 1000                  #reference pressure (hPa)
+    Rd = 287                        #specific gas constant for dry air (J/kg*K)
+    cp = 1004                       #speific heat of dry air at constant pressure (J/kg*K)
 
+    #convert from °C to K
+    t_kelvin = np.zeros(len(temp)) ; t_kelvin = temp + 273
+
+    if verbose:
+        print("Calculating potential Temperature.")
+    
+    #compute potential temperature
+    potT = t_kelvin*(press_r/press)**(Rd/cp)
+
+    return potT
 
 def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
     """Calculate vert. profile of requested variable from model output variables.
@@ -500,6 +519,7 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
         # delete remaining columns
         del df[f"u{sufix_levels[0]}"], df[f"v{sufix_levels[0]}"]
 
+
      ## Wind velocity at 10m
     elif new_var == "wind_vel_10m":
         values = calculate_wind_vel_from_uv(
@@ -526,6 +546,7 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
 
         # delete remaining columns
         del df[f"temp{sufix_levels[0]}"], df[f"press{sufix_levels[0]}"]
+
     
     else:
         print(f"--- ! Variable {new_var} calculation not available yet.")
