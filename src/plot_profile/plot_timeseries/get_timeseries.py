@@ -14,6 +14,7 @@ from plot_profile.plot_icon.get_icon import get_icon_timeseries
 from plot_profile.utils.calc_new_vars import calc_new_var_timeseries
 from plot_profile.utils.dwh_retrieve import dwh_retrieve
 from plot_profile.utils.stations import sdf
+from plot_profile.get_functions_inn.get_stations_timeseries import read_acinn
 
 # from ipdb import set_trace
 
@@ -294,16 +295,28 @@ def get_timeseries_dict(start, end, elements, loc, height_file, verbose):
 
             continue
 
-        # OBS from DWH
+        # OBS from DWH or ACINN
         else:
             device = element[0]
-            data = dwh_retrieve(
-                device=device,
-                station=loc,
-                vars=var_name,
-                timestamps=[start, end],
-                verbose=verbose,
-            )
+
+            # OBS from DWH
+            if device in ["5cm", "2m", "2m_tower", "10m", "10m_tower", "30m_tower", "mwri"]:
+                data = dwh_retrieve(
+                    device=device,
+                    station=loc,
+                    vars=var_name,
+                    timestamps=[start, end],
+                    verbose=verbose,
+                )
+
+            # OBS from ACINN
+            elif device == 'ibox':
+                data = read_acinn(
+                    station=loc, 
+                    var=var_name,
+                    path_ACINN= '/users/tlezuo/data/stations/ACINNiBox/raw',
+                    timestamps=[start, end],
+                    correct_direction=True)
 
             if not data.empty:
                 timeseries_dict[f"{device}~{var_name}"] = data

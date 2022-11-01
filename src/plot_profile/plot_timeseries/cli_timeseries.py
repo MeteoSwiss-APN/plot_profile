@@ -51,6 +51,7 @@ from plot_profile.utils.utils import parse_grid_file
             "2m_tower",
             "10m_tower",
             "30m_tower",
+            "ibox",
         ],
         case_sensitive=True,
     ),

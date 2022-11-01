@@ -38,6 +38,7 @@ def yy2yyyy(yy):
         yyyy (string)
 
     """
+    
     return f"20{yy}"
 
 
@@ -368,16 +369,43 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
 
     # profile-based data
     if device in ["rs", "mwr", "lidar", "ralmo"]:
+        
+        # if potential temperature, need to retrieve press, temp
+        if "potT" in vars_str:
 
-        # call dwh retrieve for profile-based data
-        raw_data = dwh_profile(
-            device=device,
-            station_id=sdf[station].dwh_id,
-            vars_str=vars_str,
-            start=t1,
-            end=t2,
-            verbose=verbose,
-        )
+            # air pressure and temp measurment ids
+            press_id = str(vdf["press"].dwh_id[device])
+            temp_id = vdf["temp"].dwh_id[device]
+            open_vars = f"{press_id},{temp_id}"
+
+            # call dwh retrieve for surface-based data
+            raw_data = dwh_profile(
+                device=device,
+                station_id=sdf[station].dwh_id,
+                vars_str=open_vars,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
+            
+            # calculate potT
+            raw_data["potT"] = (
+                calculate_potT(
+                    temp=raw_data[temp_id],
+                    press=raw_data[press_id],
+                    verbose=verbose,
+                )
+            )
+        else: 
+            # call dwh retrieve for profile-based data
+            raw_data = dwh_profile(
+                device=device,
+                station_id=sdf[station].dwh_id,
+                vars_str=vars_str,
+                start=t1,
+                end=t2,
+                verbose=verbose,
+            )
 
         if raw_data.empty:
             return raw_data

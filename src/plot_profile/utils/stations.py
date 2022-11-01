@@ -166,6 +166,8 @@ sdf = pd.DataFrame(
         "wfj",  # Weissfluhjoch
         "wyn",  # Wynau
         "zer",  # Zermatt
+        "kols",  # Kolsass ibox
+        "weer",  # Weerberg ibox
     ],
     # attributes
     index=[
@@ -1582,3 +1584,46 @@ sdf["hai"].dwh_name = "HAI"
 sdf["hai"].lat = 47.651
 sdf["hai"].lon = 9.024
 sdf["hai"].elevation = 720
+
+# Hochhaueser ibox
+sdf["hoch"].short_name = "hoch"
+sdf["hoch"].long_name = "Hochhaueser"
+sdf["hoch"].lat = 47.28755
+sdf["hoch"].lon = 11.63122
+sdf["hoch"].elevation = 1009
+
+# Kolsass ibox
+sdf["kols"].short_name = "kols"
+sdf["kols"].long_name = "Kolsass"
+sdf["kols"].lat = 47.305
+sdf["kols"].lon = 11.622
+sdf["kols"].elevation = 547
+
+# Eggen ibox
+sdf["egg"].short_name = "egg"
+sdf["egg"].long_name = "Eggen"
+sdf["egg"].lat = 47.3165
+sdf["egg"].lon = 11.6162
+sdf["egg"].elevation = 829
+
+# Weerberg ibox
+sdf["weer"].short_name = "weer"
+sdf["weer"].long_name = "Weerberg"
+sdf["weer"].lat = 47.299
+sdf["weer"].lon = 11.672
+sdf["weer"].elevation =  930 
+
+# Terfens ibox
+sdf["terf"].short_name = "terf"
+sdf["terf"].long_name = "Terfens"
+sdf["terf"].lat = 47.325538
+sdf["terf"].lon = 11.65247
+sdf["terf"].elevation = 575 
+
+# Arbeser  ibox
+sdf["arb"].short_name = "arb"
+sdf["arb"].long_name = "Arbeser"
+sdf["arb"].lat = 47.320654
+sdf["arb"].lon = 11.746592
+sdf["arb"].elevation = 2015 
+

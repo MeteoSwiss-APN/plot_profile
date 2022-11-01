@@ -22,7 +22,7 @@ from plot_profile.utils.utils import colour_dict
 from plot_profile.utils.utils import save_fig
 from plot_profile.utils.variables import vdf
 
-# from ipdb import set_trace
+from ipdb import set_trace
 
 
 def create_plot(
@@ -125,7 +125,8 @@ def create_plot(
         if verbose:
             print(i, device)
             pprint(df)
-
+            print()
+    
         # x-axis information: dates/timestamps
         dates = pd.to_datetime(df["timestamp"], format="%Y-%m-%d %H:%M:%S")
 

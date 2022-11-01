@@ -273,7 +273,9 @@ vdf["press"].long_name = "Pressure"
 vdf["press"].unit = "hPa"
 vdf["press"].mult_arome = 0.01
 vdf["press"].mult = 0.01
-vdf["press"].dwh_id = {"rs": "744", "2m": "90"}
+vdf["press"].dwh_id = {"rs": "744", 
+    "2m": "90",
+    "ibox":"press"}
 
 # cloud water: qc
 vdf["qc"].short_name = "qc"
@@ -492,7 +494,9 @@ vdf["temp"].dwh_id = {
     "2m_tower": "3702",
     "10m_tower": "4949",
     "30m_tower": "4957",
+    "ibox":"temp",
 }
+
 
 # surface temperature
 vdf["temp_surf"].short_name = "temp_surf"
@@ -609,7 +613,7 @@ vdf["wind_dir"].long_name = "Wind direction"
 vdf["wind_dir"].unit = "°"
 vdf["wind_dir"].min_value = 0
 vdf["wind_dir"].max_value = 360
-vdf["wind_dir"].dwh_id = {"rs": "743", "10m_tower": "197", "lidar": "743"}
+vdf["wind_dir"].dwh_id = {"rs": "743", "10m_tower": "197", "lidar": "743","ibox":"wind_dir"}
 
 # wind direction: wind_dir_10m
 vdf["wind_dir_10m"].short_name = "wind_dir_10m"
@@ -629,7 +633,7 @@ vdf["wind_vel"].long_name = "Wind velocity"
 vdf["wind_vel"].unit = "m/s"
 vdf["wind_vel"].min_value = 0
 vdf["wind_vel"].max_value = 30
-vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196", "lidar": "748", "10m": "196"}
+vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196", "lidar": "748", "10m": "196","ibox":"wind_vel"}
 
 # wind velocity: wind_vel 10m
 vdf["wind_vel_10m"].short_name = "wind_vel_10m"

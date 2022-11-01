@@ -366,6 +366,7 @@ def get_icon_timeseries(
     if verbose:
         print("Finished loading files into xarray dataset.")
 
+
     # create df which collects icon variables
     #   pd.Dataframe with columns 'timestamp', 'var1~level1', 'var2', ...
     df = pd.DataFrame()
