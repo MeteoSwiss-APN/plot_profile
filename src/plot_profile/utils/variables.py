@@ -391,7 +391,7 @@ vdf["lw_down"].icon_names = [
     "athd_s",
 ]
 vdf["lw_down"].avg = True
-vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
+vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762","ibox":"lw_down"}
 
 # radiation: longwave upward
 vdf["lw_up"].short_name = "lw_up"
@@ -425,7 +425,7 @@ vdf["lw_net"].dwh_id = {"2m": "net_calc:175:1531:"}
 vdf["sw_down"].short_name = "sw_down"
 vdf["sw_down"].long_name = "Downward SW rad"
 vdf["sw_down"].unit = "W/m2"
-vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
+vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873","ibox":"sw_down"}
 vdf["sw_down"].icon_name = "asod_s"
 vdf["sw_down"].icon_names = ["asod_s", "ASOD_S", "GLOB"]
 vdf["sw_down"].avg = True
@@ -434,7 +434,7 @@ vdf["sw_down"].avg = True
 vdf["sw_up"].short_name = "sw_up"
 vdf["sw_up"].long_name = "Upward SW rad"
 vdf["sw_up"].unit = "W/m2"
-vdf["sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995"}
+vdf["sw_up"].dwh_id = {"2m": "1871", "2m_tower": "4995","ibox":"sw_up"}
 
 # radiation: shortwave net
 vdf["sw_net"].short_name = "sw_net"
@@ -614,6 +614,7 @@ vdf["wind_dir"].unit = "°"
 vdf["wind_dir"].min_value = 0
 vdf["wind_dir"].max_value = 360
 vdf["wind_dir"].dwh_id = {"rs": "743", "10m_tower": "197", "lidar": "743","ibox":"wind_dir"}
+vdf["wind_dir"].marker = 'x'
 
 # wind direction: wind_dir_10m
 vdf["wind_dir_10m"].short_name = "wind_dir_10m"
@@ -623,6 +624,7 @@ vdf["wind_dir_10m"].unit = "°"
 vdf["wind_dir_10m"].min_value = 0
 vdf["wind_dir_10m"].max_value = 360
 vdf["wind_dir_10m"].dwh_id = { "10m": "197"}
+vdf["wind_dir_10m"].marker = 'x'
 
 # wind velocity: wind_vel
 vdf["wind_vel"].short_name = "wind_vel"
@@ -634,6 +636,7 @@ vdf["wind_vel"].unit = "m/s"
 vdf["wind_vel"].min_value = 0
 vdf["wind_vel"].max_value = 30
 vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196", "lidar": "748", "10m": "196","ibox":"wind_vel"}
+
 
 # wind velocity: wind_vel 10m
 vdf["wind_vel_10m"].short_name = "wind_vel_10m"

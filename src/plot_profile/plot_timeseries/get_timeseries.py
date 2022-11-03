@@ -314,7 +314,7 @@ def get_timeseries_dict(start, end, elements, loc, height_file, verbose):
                 data = read_acinn(
                     station=loc, 
                     var=var_name,
-                    path_ACINN= '/users/tlezuo/data/stations/ACINNiBox/raw',
+                    path_ACINN= '/users/tlezuo/data/stations/ACINNiBox',
                     timestamps=[start, end],
                     correct_direction=True)
 

@@ -197,14 +197,25 @@ def create_plot(
             if (not right_unit) and (unit is not left_unit):
                 right_unit = unit
                 right_ax.set_ylabel(f"{right_unit}")
-
+            #exception for wind_dir, we want scatterplot instead of lineplot
+            if unit == '°':
+                set_trace()
+                left_ax.scatter(
+                    dates,
+                    y,
+                    color=colour_dict[colour_index],
+                    marker=variable.marker,
+                    label=label,
+                )
+                unit='done' # inhibits line plotting below
             # choose correct axes for the current variable and plot data
+           
             if unit == left_unit:
                 left_ax.plot(
                     dates,
                     y,
                     color=colour_dict[colour_index],
-                    linestyle="-",
+                    linestyle=variable.linestyle,
                     marker=marker,
                     label=label,
                 )
@@ -213,7 +224,7 @@ def create_plot(
                     dates,
                     y,
                     color=colour_dict[colour_index],
-                    linestyle="-",
+                    linestyle=variable.linestyle,
                     marker=marker,
                     label=label,
                 )

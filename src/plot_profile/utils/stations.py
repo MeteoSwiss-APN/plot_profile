@@ -166,8 +166,12 @@ sdf = pd.DataFrame(
         "wfj",  # Weissfluhjoch
         "wyn",  # Wynau
         "zer",  # Zermatt
+        "hoch",  # Hochhaeuser
         "kols",  # Kolsass ibox
+        "egg",
         "weer",  # Weerberg ibox
+        "terf",
+        "arb",
     ],
     # attributes
     index=[
