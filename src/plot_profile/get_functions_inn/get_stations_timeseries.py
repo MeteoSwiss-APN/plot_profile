@@ -100,11 +100,12 @@ def read_acinn(station, var, path_ACINN, timestamps,
                         'cnr4_sw_out_wm2':'sw_up', # RADIAT1
                         'rawdate':'timestamp'},
                 'kols': {'taact1_avg': 'temp',  # RAW_TRH_PROF: TAACT1_AVG: 2m temp [°C]
-                        'rhact1_avg': 'rh', # RAW_TRH_PROF: RHACT1_AVG: 2m rh [%]
+                        # 'rhact1_avg': 'rh', # RAW_TRH_PROF: RHACT1_AVG: 2m rh [%]
                         'pact': 'press', #RAW: PACT: air pessure at station [hPa]
-                        'wind_speed4': 'wind_vel', #SONIC_2: WIND_SPEED4: 12m wind vel [ms]
+                        'wind_speed_4': 'wind_vel', #SONIC_2: WIND_SPEED4: 12m wind vel [ms]
                         'avg_wdir4': 'wind_dir', #SONIC_2: AVG_WDIR4: 12m wind dir [deg]
                         'rawdate':'timestamp'},
+               #######
                'egg': {'ta_avg': 'temp',   # RAW: Air temperature, ventilation [°C]
                         'p_avg': 'press',   # RAW: Air pressure, in loggerbox, not aerated [hPa]
                         'wind_dir2':'wind_dir', # FLUXL: wind dir at 5.65m [deg]                        
@@ -150,26 +151,18 @@ def read_acinn(station, var, path_ACINN, timestamps,
     if len(file_ACINN) == 0:
         raise ValueError(f'No ACINN data found for {station}')
     
-    # If stored in one file
-    elif len(file_ACINN) == 1:
-        data = pd.read_csv(file_ACINN[0], delimiter=';', skiprows=1)
-        # Prepare a datetime index
-        data.index = pd.to_datetime(data.rawdate)
-        # Cut out the required period
-        data = data[start_time: end_time]
 
-    # If stored in two files
-    elif len(file_ACINN) > 1:
-        # initialize data
-        data= pd.DataFrame()
-        for file in file_ACINN: 
-            data1 = pd.read_csv(file, delimiter=';', skiprows=1)
-            # set_trace()
-            if str(var_s) in data1.columns:
-                data=data1
-                data.index = pd.to_datetime(data.rawdate)
-                data = data[start_time: end_time]
-            set_trace()
+    for file in file_ACINN: 
+        data1 = pd.read_csv(file, delimiter=';', skiprows=1)
+        # save data1 only if variable is inside
+        if str(var_s) in data1.columns:
+            data=data1
+            data.index = pd.to_datetime(data.rawdate)
+            # cut to desired time range
+            data = data[start_time: end_time]
+        
+            
+    
     for c in data.columns:
         # Delete all columns that do not contain relevant data
         if c not in acinn_v[station].keys():

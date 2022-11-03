@@ -405,6 +405,7 @@ vdf["lw_up"].dwh_id = {
     "2m": "1531",
     "2m_tower": "5118",  # no data yet in DWH
     "30m_tower": "5181",  # no data yet in DWH
+    "ibox":"lw_up"
 }
 
 # radiation: longwave net

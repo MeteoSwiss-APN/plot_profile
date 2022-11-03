@@ -199,7 +199,6 @@ def create_plot(
                 right_ax.set_ylabel(f"{right_unit}")
             #exception for wind_dir, we want scatterplot instead of lineplot
             if unit == '°':
-                set_trace()
                 left_ax.scatter(
                     dates,
                     y,
