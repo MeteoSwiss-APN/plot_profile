@@ -105,7 +105,6 @@ def read_acinn(station, var, path_ACINN, timestamps,
                         'wind_speed_4': 'wind_vel', #SONIC_2: WIND_SPEED4: 12m wind vel [ms]
                         'avg_wdir4': 'wind_dir', #SONIC_2: AVG_WDIR4: 12m wind dir [deg]
                         'rawdate':'timestamp'},
-               #######
                'egg': {'ta_avg': 'temp',   # RAW: Air temperature, ventilation [°C]
                         'p_avg': 'press',   # RAW: Air pressure, in loggerbox, not aerated [hPa]
                         'wind_dir2':'wind_dir', # FLUXL: wind dir at 5.65m [deg]                        
@@ -123,7 +122,10 @@ def read_acinn(station, var, path_ACINN, timestamps,
                         # 'wind_dir1':'wind_dir', # RAW: wind dir at 6.12 m [deg]      
                         'wind_dir2':'wind_dir', # RAW: wind dir at 11.2 m [deg]                              
                         'rawdate':'timestamp'},
-               'arb': {'taact_2m_avg': 'temp',  # RAW: Air temperature, ventilation [°C]
+               'arb': {
+                        # 'taact_2m_avg': 'temp',  # RAW: Air temperature, ventilation [°C] 2m NOT WORKING
+                        'taact_1m_avg':'temp',  # RAW: Air temperature, ventilation [°C] 1m
+                        # 'taact_3m_avg':'temp',  # RAW: Air temperature, ventilation [°C] 3m
                        'pact': 'press', # RAW: Air pressure, in loggerbox, not aerated [hPa]
                        'ws_young_avg': 'wind_vel', # RAW: Wind speed, 2m, Young Wind Monitor [ms]
                                                         # there are more for ws on1,3m but no wdir
