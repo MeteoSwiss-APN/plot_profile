@@ -39,7 +39,22 @@ def parse_timestamps_min(t):
     
     return t17
 
-def getKey(dct,value): # finds the dict key = station specific variable name for var = value
+def getKey(dct,value): # finds 
+    '''
+    Function to find the dict key = station specific variable name for a secific var = value
+
+    Parameters
+    ----------
+    dct : dictionary
+        "var_s":"var"
+    value : str
+        value=var
+        
+    Returns
+    -------
+    var_stationname : str
+        key=var_s
+    '''
     var_stationname = str([key for key in dct if (dct[key] == value)])
     var_stationname = var_stationname[2:-2] # cuts the edges of the string
     return var_stationname
