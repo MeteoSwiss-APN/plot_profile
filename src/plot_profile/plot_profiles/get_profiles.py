@@ -185,8 +185,7 @@ def get_data(
 
             elif var_name == "pot_temp":
                 var_open_icon = ["temp", "press"]
-        
-
+       
             else:
                 var_open_icon = var_name
 
