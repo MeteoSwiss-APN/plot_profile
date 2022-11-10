@@ -35,6 +35,34 @@ def calculate_grad(var_bot, var_top, alt_bot, alt_top, verbose=False):
 
     return grad
 
+def calculate_pot_temp(temp, press, temperature_metric="celsius", verbose=False):
+    """Calculate potential temperature from temperature.
+
+    Args:
+        press (pd series):   air pressure in hPa
+        temp (pd series):    air temperature in °C
+        temperature_metric (str, optional): Input temperature unit. Defaults to "celsius".
+
+    Returns:
+        pandas series: potential temperature timeseries (in K)
+
+    """
+    
+    #defining parameters
+    press_r = 1000.0                  #reference pressure (hPa)
+    Rd = 287.0                        #specific gas constant for dry air (J/kg*K)
+    cp = 1004.0                       #speific heat of dry air at constant pressure (J/kg*K)
+
+    #convert from °C to K
+    t_kelvin = np.zeros(len(temp)) ; t_kelvin = temp + 273
+
+    if verbose:
+        print("Calculating potential Temperature.")
+    
+    #compute potential temperature
+    pot_temp = t_kelvin*(press_r/press)**(Rd/cp)
+
+    return pot_temp
 
 def calculate_tdew_from_rh(rh, T, temperature_metric="celsius", verbose=False):
     """Calculate dew point temperature from relative humidity and temperature.
@@ -372,10 +400,11 @@ def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
         # delete remaining columns
         del df["u"], df["v"]
 
-    ## potT
-    elif new_var == "potT":
-        values = calculate_potT(
-            temp=df["temp"], press=df["press"], verbose=verbose
+    ## potential temperature
+    elif new_var == "pot_temp":
+        values = calculate_pot_temp(
+            temp=df["temp"], press=df["press"], altitude=df["altitude"],
+             verbose=verbose
         )
         # delete remaining columns
         del df["temp"], df["press"]
@@ -387,7 +416,7 @@ def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
     values = pd.Series(values, name=new_var)
 
     # do some unity conversions
-    if device == "arome" or "pe_arome":
+    if device == "arome" or "pe_arome": 
         values = (
             values * vdf.loc["mult_arome"][new_var] + vdf.loc["plus_arome"][new_var]
         )
@@ -431,8 +460,6 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
             sufix_levels.append("")
         else:
             sufix_levels.append(f"~{level}")
-
-    # parameters to calculate (alphabetical order):
 
     ## Gradient vertical de température
     if new_var == "grad_temp":
@@ -504,7 +531,8 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
         # delete remaining columns
         del df[f"u{sufix_levels[0]}"], df[f"v{sufix_levels[0]}"]
 
-    ## Wind velocity 10m
+
+     ## Wind velocity at 10m
     elif new_var == "wind_vel_10m":
         values = calculate_wind_vel_from_uv(
             u=df[f"u_10m{sufix_levels[0]}"], v=df[f"v_10m{sufix_levels[0]}"], verbose=verbose
@@ -513,8 +541,7 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
         # delete remaining columns
         del df[f"u_10m{sufix_levels[0]}"], df[f"v_10m{sufix_levels[0]}"]
 
-
-    ## Wind direction 10m
+    ## Wind direction at 10m
     elif new_var == "wind_dir_10m":
         values = calculate_wind_dir_from_uv(
             u=df[f"u_10m{sufix_levels[0]}"], v=df[f"v_10m{sufix_levels[0]}"], verbose=verbose
@@ -522,7 +549,16 @@ def calc_new_var_timeseries(df, new_var, levels, lat, lon, verbose=False):
 
         # delete remaining columns
         del df[f"u_10m{sufix_levels[0]}"], df[f"v_10m{sufix_levels[0]}"]
-    
+
+    ## potential temperature
+    elif new_var == "pot_temp":
+        values = calculate_pot_temp(
+            temp=df[f"temp{sufix_levels[0]}"], press=df[f"press{sufix_levels[0]}"], verbose=verbose
+        )
+
+        # delete remaining columns
+        del df[f"temp{sufix_levels[0]}"], df[f"press{sufix_levels[0]}"]
+
     
     else:
         print(f"--- ! Variable {new_var} calculation not available yet.")

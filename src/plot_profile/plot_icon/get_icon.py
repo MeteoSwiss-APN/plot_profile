@@ -275,8 +275,6 @@ def get_icon(
         # find correct icon name from list of possible names
         var.icon_name = get_icon_name(ds, var.icon_names, verbose)
 
-        # dataset with only one specific variable
-
         # subselect values from column
         try:
             values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus

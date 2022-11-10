@@ -54,11 +54,12 @@ vdf = pd.DataFrame(
         "v_10m",
         "ver_vis",
         "wind_dir",
-        "wind_dir_10m",
+        "wind_dir_10m", 
         "wind_vel",
         "wind_vel_10m",
-        "potT",
+        "pot_temp"
     ],
+    
     # attributes
     index=[
         # mandatory entries
@@ -519,6 +520,13 @@ vdf["2m_temp"].plus = -273
 vdf["2m_temp"].plus_arome = -273
 vdf["2m_temp"].avg = False
 
+# potential Temperature
+vdf["pot_temp"].short_name = "pot_temp"
+vdf["pot_temp"].long_name = "potential Temperature"
+vdf["pot_temp"].icon_name = "pot_temp"
+vdf["pot_temp"].unit = "K"
+vdf["pot_temp"].dwh_id = {"2m": "pot_temp", "rs": "pot_temp"}
+
 # turblent kinetic energy; tke
 vdf["tke"].short_name = "tke"
 vdf["tke"].icon_name = "TKE"
@@ -611,14 +619,15 @@ vdf["wind_dir"].min_value = 0
 vdf["wind_dir"].max_value = 360
 vdf["wind_dir"].dwh_id = {"rs": "743", "10m_tower": "197", "lidar": "743"}
 
-# wind direction: wind_dir_10m
+# wind direction at 10m: wind_dir_10m
 vdf["wind_dir_10m"].short_name = "wind_dir_10m"
 vdf["wind_dir_10m"].icon_name = "wind_dir_10m"
+vdf["wind_dir_10m"].arome_name = "wind_dir_10m"
 vdf["wind_dir_10m"].long_name = "Wind direction at 10m"
 vdf["wind_dir_10m"].unit = "°"
 vdf["wind_dir_10m"].min_value = 0
 vdf["wind_dir_10m"].max_value = 360
-vdf["wind_dir_10m"].dwh_id = { "10m": "197"}
+vdf["wind_dir_10m"].dwh_id = {"rs": "743", "10m": "197", "lidar": "743"}
 
 # wind velocity: wind_vel
 vdf["wind_vel"].short_name = "wind_vel"
@@ -631,20 +640,15 @@ vdf["wind_vel"].min_value = 0
 vdf["wind_vel"].max_value = 30
 vdf["wind_vel"].dwh_id = {"rs": "748", "10m_tower": "196", "lidar": "748", "10m": "196"}
 
-# wind velocity: wind_vel 10m
+# wind velocity at 10m: wind_vel_10m
 vdf["wind_vel_10m"].short_name = "wind_vel_10m"
 vdf["wind_vel_10m"].icon_name = "wind_vel_10m"
+vdf["wind_vel_10m"].arome_name = "wind_vel_10m"
 vdf["wind_vel_10m"].long_name = "Wind velocity at 10m"
 vdf["wind_vel_10m"].unit = "m/s"
 vdf["wind_vel_10m"].min_value = 0
 vdf["wind_vel_10m"].max_value = 30
-vdf["wind_vel_10m"].dwh_id = {"10m": "196"}
-
-# potential Temperature -> only mandatory attributes for now
-vdf["potT"].short_name = "potT"
-vdf["potT"].long_name = "potential Temperature"
-vdf["potT"].icon_name = "potT"
-vdf["potT"].unit = "K"
+vdf["wind_vel_10m"].dwh_id = {"rs": "748", "10m": "196", "lidar": "748"}
 
 # !!! if adding new variable: don't forget to add at the top and in cli-file!!!
 

@@ -48,6 +48,9 @@ def get_timeseries_dict(start, end, elements, loc, height_file, verbose):
             # so we first need to open theses other parameters
             if var_name == "wind_dir" or var_name == "wind_vel":
                 var_open_icon = ["u", "v"]
+            
+            elif var_name == "wind_dir_10m" or var_name == "wind_vel_10m":
+                var_open_icon = ["u_10m", "v_10m"]
 
             elif var_name == "wind_dir_10m" or var_name == "wind_vel_10m":
                 var_open_icon = ["u_10m", "v_10m"]
@@ -59,6 +62,9 @@ def get_timeseries_dict(start, end, elements, loc, height_file, verbose):
                 var_open_icon = "temp"
                 levels = [486, 506]
                 do_interpolation = True
+            
+            elif var_name == "pot_temp":
+                var_open_icon = ["temp", "press"]
 
             else:
                 var_open_icon = var_name
