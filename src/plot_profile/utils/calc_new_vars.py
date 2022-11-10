@@ -35,12 +35,23 @@ def calculate_grad(var_bot, var_top, alt_bot, alt_top, verbose=False):
 
     return grad
 
-def calculate_pot_temp(temp, press, temperature_metric="kelvin", verbose=False):
+def calculate_pot_temp(temp, press, temperature_metric="celsius", verbose=False):
+    """Calculate potential temperature from temperature.
+
+    Args:
+        press (pd series):   air pressure in hPa
+        temp (pd series):    air temperature in °C
+        temperature_metric (str, optional): Input temperature unit. Defaults to "celsius".
+
+    Returns:
+        pandas series: potential temperature timeseries (in K)
+
+    """
     
     #defining parameters
-    press_r = 1000                  #reference pressure (hPa)
-    Rd = 287                        #specific gas constant for dry air (J/kg*K)
-    cp = 1004                       #speific heat of dry air at constant pressure (J/kg*K)
+    press_r = 1000.0                  #reference pressure (hPa)
+    Rd = 287.0                        #specific gas constant for dry air (J/kg*K)
+    cp = 1004.0                       #speific heat of dry air at constant pressure (J/kg*K)
 
     #convert from °C to K
     t_kelvin = np.zeros(len(temp)) ; t_kelvin = temp + 273
@@ -373,7 +384,8 @@ def calc_new_var_profiles(df, new_var, device="arome", verbose=False):
     ## potential temperature
     elif new_var == "pot_temp":
         values = calculate_pot_temp(
-            temp=df["temp"], press=df["press"], altitude=df["altitude"], verbose=verbose
+            temp=df["temp"], press=df["press"], altitude=df["altitude"],
+             verbose=verbose
         )
         # delete remaining columns
         del df["temp"], df["press"]

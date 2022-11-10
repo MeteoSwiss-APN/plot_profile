@@ -34,7 +34,7 @@ from .plot_rs import create_plot
         case_sensitive=False,
     ),
     multiple=True,
-    default=("temp", "dewp_temp", "wind_vel", "wind_dir", "pot_temp"),
+    default=("temp", "dewp_temp", "wind_vel", "wind_dir"),
     help="Def: all",
 )
 @click.option(

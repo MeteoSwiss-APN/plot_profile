@@ -412,7 +412,6 @@ def dwh_retrieve(device, station, vars, timestamps, verbose=False):
         # rename column names to nice short names and
         #  make list of relevant columns
         raw_data.rename(columns={"termin": "timestamp"}, inplace=True)
-        #raw_data.rename(columns={"742": "altitude"}, inplace=True)
         relevant_vars = [
             "timestamp",
             "altitude",

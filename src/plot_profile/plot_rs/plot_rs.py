@@ -399,8 +399,8 @@ def create_plot(
             "x_max": windvel_max,
         },
         "pot_temp": {
-            "label": "potential Temperature",
-            "xlabel": "potential Temperature [K]",
+            "label": "Potential Temperature",
+            "xlabel": "Potential Temperature [K]",
             "x_min": pot_temp_min,
             "x_max": pot_temp_max,
         },
