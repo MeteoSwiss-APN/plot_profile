@@ -34,20 +34,6 @@ from plot_profile.utils.utils import validtime_from_leadtime
 )
 @click.option(
     "--var",
-    type=click.Choice(
-        [
-            "temp",
-            "qc",
-            "qv",
-            "clc",
-            "ddt_t_rad_lw",
-            "ddt_t_rad_sw",
-            "qc_dia",
-            "qv_dia",
-            "qi_dia",
-        ],
-        case_sensitive=True,
-    ),
     multiple=True,
     help="MANDATORY: Variable name(s).",
 )

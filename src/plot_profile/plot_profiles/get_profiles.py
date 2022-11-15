@@ -175,8 +175,6 @@ def get_data(
             init = element[4]
             grid = element[5]
 
-            full_levels = vdf[var_name].icon_hfl
-
             if var_name == "wind_vel" or var_name == "wind_dir":
                 var_open_icon = ["u", "v"]
 
@@ -185,7 +183,7 @@ def get_data(
 
             elif var_name == "pot_temp":
                 var_open_icon = ["temp", "press"]
-       
+
             else:
                 var_open_icon = var_name
 
@@ -207,7 +205,6 @@ def get_data(
                     variables_list=var_open_icon,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
-                    full_levels=full_levels,
                     verbose=verbose,
                 )
 
@@ -259,7 +256,6 @@ def get_data(
                     variables_list=var_open_icon,
                     alt_bot=ylims[0],
                     alt_top=ylims[1],
-                    full_levels=full_levels,
                     verbose=verbose,
                 )
 
@@ -298,7 +294,7 @@ def get_data(
 
             elif var_name == "wind_vel" or var_name == "wind_dir":
                 var_open_arome = ["u", "v"]
-            
+
             elif var_name == "pot_temp":
                 var_open_arome = ["press", "temp"]
 
