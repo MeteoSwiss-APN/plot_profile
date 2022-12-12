@@ -26,7 +26,7 @@ from plot_profile.utils.utils import get_icon_name
 from plot_profile.utils.utils import slice_top_bottom
 from plot_profile.utils.variables import vdf
 
-from ipdb import set_trace
+# from ipdb import set_trace
 
 
 def lfff_name(lt):
@@ -75,39 +75,40 @@ def ind_from_latlon(lats, lons, lat, lon, verbose=False):
     return ind
 
 
-def calc_hhl(hfl):
-    """Interpolate from full levels to half levels.
-
-    Args:
-        hfl (1d array): values of a variable defined on N full model levels
-
-    Returns:
-        1d array        values of this variable interpolated to N-1 half model levels
-
-    """
-    if hfl.ndim == 1:
-        hhl = hfl[1:] + (hfl[:-1] - hfl[1:]) / 2
-    else:
-        print("height field has too many dimensions")
-        sys.exit(1)
-
-    return hhl
+# def calc_hhl(hfl):
+#    """Interpolate from full levels to half levels.
+#
+#    Args:
+#        hfl (1d array): Values of a variable defined on N-1 full model levels
+#
+#    Returns:
+#        1d array        Values of this variable interpolated to N half model levels
+#
+#    """
+#    if hfl.ndim == 1:
+#        hhl = hfl[] + (hfl[] - hfl[]) / 2
+#    else:
+#        print("height field has too many dimensions")
+#        sys.exit(1)
+#
+#    return hhl
+#
 
 
 def calc_hfl(hhl):
     """Interpolate from half levels to full levels.
 
     Args:
-        hhl (1d array): values of a variable defined on N half model levels
+        hhl (1d array): Values of a variable defined on N half levels.
 
     Returns:
-        1d array        values of this variable interpolated to N-1 full model levels
+        1d array        Values of this variable interpolated to N-1 full model levels
 
     """
     if hhl.ndim == 1:
         hfl = hhl[1:] + (hhl[:-1] - hhl[1:]) / 2
     else:
-        print("height field has too many dimensions")
+        print("Input variable has too many dimensions")
         sys.exit(1)
 
     return hfl
@@ -182,7 +183,6 @@ def get_icon(
     variables_list,
     alt_bot,
     alt_top,
-    full_levels=False,
     verbose=False,
 ):
     """Retrieve vertical profile of variable from icon simulation.
@@ -198,7 +198,6 @@ def get_icon(
         var_shortname (str):    variable shortname
         alt_bot (int):          lower boundary of plot
         alt_top (int):          upper boundary of plot
-        full_levels(int):       set to True if variables are defined on full levels
 
     Returns:
         pandas dataframe:       icon simulation values
@@ -210,20 +209,38 @@ def get_icon(
     # create dictionary to collect data of height and variables
     data_dict = {}
 
+    # if var is string transform it to a 1 element list
+    if isinstance(variables_list, str):
+        variables_list = [
+            variables_list,
+        ]
+
     ### A) Grid file: latitude, longitude and altitude
     ##################################################
+
+    # first need to check whether all variables are defined on
+    # either full or half levels (but not mixed!)
+    full_levels = vdf[variables_list[0]].icon_hfl
+    for var in variables_list:
+        if vdf[var].icon_hfl != full_levels:
+            print("Variables mixed defined on half and full levels.")
+            sys.exit(1)
 
     # index and height only have to be retrieved once
     if not ind:
         ind, height, size = index_height_from_height_file(lat, lon, grid, verbose)
 
         # create pandas objects of height values
+        # if variable defined on full levels
         if full_levels == True:
+            df_height = pd.Series(data=calc_hfl(height))
+            if verbose:
+                print("Variable defined on full levels.")
+        # else variable defined on half levels
+        else:
             df_height = pd.Series(data=height)
             if verbose:
-                print("Variables are on full levels.")
-        else:
-            df_height = pd.Series(data=calc_hhl(height))
+                print("Variable defined on half levels.")
 
         # reverse order of df_height s.t. it is from bottom to top
         df_height = df_height.iloc[::-1].reset_index(drop=True)
@@ -261,12 +278,6 @@ def get_icon(
     if verbose:
         print("Finished loading files into xarray dataset.")
 
-    # if var is string transform it to a 1 element list
-    if isinstance(variables_list, str):
-        variables_list = [
-            variables_list,
-        ]
-
     for variable in variables_list:
 
         # specify variable (pandas dataframe with attributes)
@@ -278,7 +289,6 @@ def get_icon(
         # subselect values from column
         try:
             values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
-            set_trace()
         except ValueError:
             try:
                 values = ds.isel(ncells=ind)[var.icon_name].values * var.mult + var.plus
@@ -334,8 +344,6 @@ def get_icon_timeseries(
     """
     # determine index of loc from grid file
     ind, height, size = index_height_from_height_file(lat, lon, height_file, verbose)
-
-    hhl = calc_hhl(height)
 
     # directory with forecast files
     init_str = init.strftime("%y%m%d%H")
@@ -399,9 +407,9 @@ def get_icon_timeseries(
 
         # dataset with only one specific variable
         ds_var = ds[var.icon_name]
-            #    except KeyError:
-            #        print(f"{var.icon_name} cannot be found in forecast file")
-            #        continue
+        #    except KeyError:
+        #        print(f"{var.icon_name} cannot be found in forecast file")
+        #        continue
 
         # assume that variable is of structure:
         # a) time, height, N cells

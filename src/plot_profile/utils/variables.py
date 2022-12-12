@@ -54,12 +54,11 @@ vdf = pd.DataFrame(
         "v_10m",
         "ver_vis",
         "wind_dir",
-        "wind_dir_10m", 
+        "wind_dir_10m",
         "wind_vel",
         "wind_vel_10m",
-        "pot_temp"
+        "pot_temp",
     ],
-    
     # attributes
     index=[
         # mandatory entries
@@ -97,7 +96,7 @@ vdf.loc["arome_name"] = None
 vdf.loc["min_value"][:] = None
 vdf.loc["max_value"][:] = None
 vdf.loc["dwh_id"][:] = None
-vdf.loc["icon_hfl"] = False
+vdf.loc["icon_hfl"] = True
 vdf.loc["color"] = "blue"
 vdf.loc["marker"][:] = "o"
 vdf.loc["linestyle"] = "solid"
@@ -267,7 +266,7 @@ vdf["hor_vis"].dwh_id = {"2m": "1547"}
 
 # pressure: press
 vdf["press"].short_name = "press"
-vdf["press"].icon_names = ["p","P"]
+vdf["press"].icon_names = ["p", "P"]
 vdf["press"].icon_name = "p"
 vdf["press"].arome_name = "P"
 vdf["press"].long_name = "Pressure"
@@ -530,9 +529,10 @@ vdf["pot_temp"].dwh_id = {"2m": "pot_temp", "rs": "pot_temp"}
 # turblent kinetic energy; tke
 vdf["tke"].short_name = "tke"
 vdf["tke"].icon_name = "TKE"
+vdf["tke"].icon_names = ["TKE", "tke"]
 vdf["tke"].arome_name = "TKE"
 vdf["tke"].long_name = "Turbulent kinetic energy"
-vdf["tke"].icon_hfl = True
+vdf["tke"].icon_hfl = False
 vdf["tke"].unit = "m2/s2"
 
 # total water vapour: tqv
@@ -632,7 +632,7 @@ vdf["wind_dir_10m"].dwh_id = {"rs": "743", "10m": "197", "lidar": "743"}
 # wind velocity: wind_vel
 vdf["wind_vel"].short_name = "wind_vel"
 vdf["wind_vel"].icon_name = "wind_vel"
-vdf["wind_vel"].icon_names = ["wind_vel","Wind_vel"]
+vdf["wind_vel"].icon_names = ["wind_vel", "Wind_vel"]
 vdf["wind_vel"].arome_name = "wind_vel"
 vdf["wind_vel"].long_name = "Wind velocity"
 vdf["wind_vel"].unit = "m/s"
