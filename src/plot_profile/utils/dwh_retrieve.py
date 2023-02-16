@@ -149,7 +149,7 @@ def parse_vars(vars, device):
 
 
 def dwh2pandas(cmd, verbose):
-    """Run retrieve_cscs command in terminal, create pandas dataframe."""
+    """Run jretrievedwh command in terminal, create pandas dataframe."""
     if verbose:
         print("Calling: " + cmd)
 
@@ -244,9 +244,9 @@ def dwh_surface(station_name, vars_str, start, end, verbose=False):
         print(f"  at {station_name}.")
 
     if "2537" in vars_str or "5547" in vars_str:
-        # retrieve_cscs command:
+        # jretrievedwh command:
         cmd = (
-            "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
+            "/oprusers/osm/bin/jretrievedwh --show_records -j lat,lon,name,wmo_ind"
             + f" -s profile_integral"
             + " -i int_ind,06610"
             + " -p "
@@ -259,9 +259,9 @@ def dwh_surface(station_name, vars_str, start, end, verbose=False):
             + " -C 38 -w 31"
         )
     else:
-        # retrieve_cscs command:
+        # jretrievedwh command:
         cmd = (
-            "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,name,wmo_ind"
+            "/oprusers/osm/bin/jretrievedwh --show_records -j lat,lon,name,wmo_ind"
             + f" -s surface"
             + " -i nat_abr,"
             + station_name
@@ -303,7 +303,7 @@ def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
         print(f"  at {station_id}.")
 
     cmd = (
-        "/oprusers/osm/bin/retrieve_cscs --show_records -j lat,lon,elev,name,wmo_ind"
+        "/oprusers/osm/bin/jretrievedwh --show_records -j lat,lon,elev,name,wmo_ind"
         + " -s profile -p "
         + vars_str
         + " -i int_ind,"
@@ -335,7 +335,7 @@ def dwh_profile(device, station_id, vars_str, start, end, verbose=False):
 def dwh_retrieve(device, station, vars, timestamps, verbose=False):
     """Retrieve observational data from DWH.
 
-    The retrieve_cscs command works for two different observational types:
+    The jretrievedwh command works for two different observational types:
         a) surface-based data (2m stations including ceilometers & scintillometers)
         b) profile-based data (radiosoundings - 'rs', radiometers - 'mwr')
 
