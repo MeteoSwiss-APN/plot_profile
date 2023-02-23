@@ -36,9 +36,14 @@ Further down you find example commands and corresponding graphs for each entrypo
 Most important options
 ======================
 
-- ``date``: Init or valid date in format YYMMDDHH, except for radiosounding plots which include the year
-- ``height_file``: Full path to file containing HEIGHT/HHL-field. Default points to icon-1e-dev-lfff00000000c.nc
-- ...
+- ``date``: Init or valid date. -> YYMMDDHH, except for radiosounding plots which include the full year.
+- ``add_obs``: Observation, 2 arguments -> device, variable.
+- ``add_model``: Simulated variable, 3 arguments -> model, variable, identifier.
+- ``model_src``: Information about model -> identifier, folder, YYMMDDHH of simulation init.
+- ``height_src``: File containing HEIGHT/HHL -> identifier, full path.
+- ``height_file``: File containing HEIGHT/HHL -> full path.
+- ``colours``: Matplotlib colour name -> one colour for each line, ordering does not necessarily follow user input.
+- ``xmin``, ``xmax``, ``ymin``, ``ymax``: Min and max values for x- and y-axis.
 
 plot_rs
 =======
