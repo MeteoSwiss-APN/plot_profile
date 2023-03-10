@@ -260,7 +260,7 @@ def get_icon_name(ds, icon_names, verbose):
             if verbose:
                 print(f"  {name} does not match.")
 
-    print(f"!  not matching name in icon_names in variables.py")
+    print(f"!  {name} is nowhere listed  as icon_names attribute in variables.py")
     sys.exit(1)
 
 
