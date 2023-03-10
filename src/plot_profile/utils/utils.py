@@ -240,16 +240,16 @@ def get_icon_name(ds, var, verbose):
 
     Args:
         ds (xr.dataset): dataset
-        var: the 
+        var: the variable to be loaded
 
     Returns:
         icon_name (str)
-    """
 
+    """
     # If no var.icon_names are defined use icon_name (the default name)
     icon_names = var.icon_name if var.icon_names is None else var.icon_names
 
-    #Obtain fuzzy versions of variable name. Cant bee too greedy here.
+    # Obtain fuzzy versions of variable name. Cant bee too greedy here.
     name_variants = set()
     for name in icon_names:
         variants = [name, name.upper(), name.lower(), name.capitalize()]
@@ -259,7 +259,9 @@ def get_icon_name(ds, var, verbose):
     if any((match := name) in list(ds.keys()) for name in name_variants):
         return match
 
-    print(f"! {var.name} is not in input dataset. Tip: Check the spelling in icon_name and icon_names in variables.py")
+    print(
+        f"! {var.name} is not in input dataset. Tip: Check the spelling in icon_name and icon_names in variables.py"
+    )
     sys.exit(1)
 
 

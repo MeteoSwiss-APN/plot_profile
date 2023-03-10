@@ -372,9 +372,7 @@ vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 vdf["lw_up"].short_name = "lw_up"
 vdf["lw_up"].long_name = "Upward LW rad"
 vdf["lw_up"].unit = "W/m2"
-vdf["lw_up"].icon_name = [
-    "athu_s"
-]
+vdf["lw_up"].icon_name = ["athu_s"]
 vdf["lw_up"].avg = True
 vdf["lw_up"].dwh_id = {
     "2m": "1531",
@@ -387,9 +385,6 @@ vdf["lw_net"].short_name = "lw_net"
 vdf["lw_net"].long_name = "Net LW rad"
 vdf["lw_net"].unit = "W/m2"
 vdf["lw_net"].icon_name = "athb_s"
-vdf["lw_net"].icon_names = [
-    "athb_s",
-]
 vdf["lw_net"].arome_name = "LW"
 vdf["lw_net"].mult_arome = 1 / 3600
 vdf["lw_net"].avg = True
@@ -416,7 +411,6 @@ vdf["sw_net"].short_name = "sw_net"
 vdf["sw_net"].long_name = "Net SW rad"
 vdf["sw_net"].unit = "W/m2"
 vdf["sw_net"].icon_name = "asob_s"
-vdf["sw_net"].icon_names = ["asob_s"]
 vdf["sw_net"].arome_name = "SW"
 vdf["sw_net"].mult_arome = 1 / 3600
 vdf["sw_net"].avg = True
@@ -428,7 +422,6 @@ vdf["slhf"].short_name = "slhf"
 vdf["slhf"].long_name = "Surface latent heat flux"
 vdf["slhf"].unit = "W/m2"
 vdf["slhf"].icon_name = "alhfl_s"
-vdf["slhf"].icon_names = ["alhfl_s"]
 vdf["slhf"].arome_name = "slhf"
 vdf["slhf"].acc_arome = True
 vdf["slhf"].avg = True
@@ -439,7 +432,6 @@ vdf["sshf"].short_name = "sshf"
 vdf["sshf"].long_name = "Surface sensible heat flux"
 vdf["sshf"].unit = "W/m2"
 vdf["sshf"].icon_name = "ashfl_s"
-vdf["sshf"].icon_names = ["ashfl_s"]
 vdf["sshf"].arome_name = "sshf"
 vdf["sshf"].acc_arome = True
 vdf["sshf"].avg = True
@@ -448,7 +440,6 @@ vdf["sshf"].mult_arome = 1 / 3600
 # temperature: temp
 vdf["temp"].short_name = "temp"
 vdf["temp"].icon_name = "T"
-vdf["temp"].icon_names = ["t"]
 vdf["temp"].arome_name = "T"
 vdf["temp"].long_name = "Temperature"
 vdf["temp"].unit = "°C"
@@ -476,13 +467,11 @@ vdf["temp_surf"].short_name = "temp_surf"
 vdf["temp_surf"].long_name = "Weighted surface temperature"
 vdf["temp_surf"].unit = "°C"
 vdf["temp_surf"].icon_name = "T_G"
-vdf["temp_surf"].icon_names = ["t_g"]
 vdf["temp_surf"].plus = -273
 
 # 2m temperature: 2m_temp
 vdf["2m_temp"].short_name = "2m_temp"
 vdf["2m_temp"].icon_name = "T_2M"
-vdf["2m_temp"].icon_names = ["t_2m"]
 vdf["2m_temp"].arome_name = "T2m"
 vdf["2m_temp"].long_name = "2m temperature"
 vdf["2m_temp"].unit = "°C"
@@ -506,7 +495,6 @@ vdf["pot_temp"].dwh_id = {"2m": "pot_temp", "rs": "pot_temp"}
 # turblent kinetic energy; tke
 vdf["tke"].short_name = "tke"
 vdf["tke"].icon_name = "TKE"
-vdf["tke"].icon_names = ["tke"]
 vdf["tke"].arome_name = "TKE"
 vdf["tke"].long_name = "Turbulent kinetic energy"
 vdf["tke"].icon_hfl = False
@@ -515,7 +503,6 @@ vdf["tke"].unit = "m2/s2"
 # total water vapour: tqv
 vdf["tqv"].short_name = "tqv"
 vdf["tqv"].icon_name = "TQV"
-vdf["tqv"].icon_names = ["tqv"]
 vdf["tqv"].long_name = "Total water vapour"
 vdf["tqv"].unit = "kg/m2"
 vdf["tqv"].dwh_id = {"mwri": "2537"}
@@ -523,7 +510,6 @@ vdf["tqv"].dwh_id = {"mwri": "2537"}
 # total water vapour: tqr
 vdf["tqr"].short_name = "tqr"
 vdf["tqr"].icon_name = "TQR"
-vdf["tqr"].icon_names = ["tqr"]
 vdf["tqr"].long_name = "Total column integrated rain"
 vdf["tqr"].unit = "kg/m2"
 
@@ -531,7 +517,6 @@ vdf["tqr"].unit = "kg/m2"
 vdf["tqc"].short_name = "tqc"
 vdf["tqc"].icon_name = "tqc"
 vdf["tqc"].arome_name = "tqc"
-vdf["tqc"].icon_names = ["tqc"]
 vdf["tqc"].long_name = "Liquid water path"
 vdf["tqc"].mult_arome = 1e-3
 vdf["tqc"].mult = 1
@@ -541,7 +526,6 @@ vdf["tqc"].dwh_id = {"mwri": "5547"}
 # total column integrated diagnostic cloud water: tqc_dia
 vdf["tqc_dia"].short_name = "tqc_dia"
 vdf["tqc_dia"].icon_name = "tqc_dia"
-vdf["tqc_dia"].icon_names = ["tqc_dia"]
 vdf["tqc_dia"].long_name = "Diagnostic liquid water path"
 vdf["tqc_dia"].unit = "kg/m2"
 
@@ -549,7 +533,6 @@ vdf["tqc_dia"].unit = "kg/m2"
 vdf["u"].short_name = "u"
 vdf["u"].long_name = "x wind velocity"
 vdf["u"].icon_name = "U"
-vdf["u"].icon_names = ["u"]
 vdf["u"].arome_name = "U"
 vdf["u"].unit = "m/s"
 
@@ -557,7 +540,6 @@ vdf["u"].unit = "m/s"
 vdf["v"].short_name = "v"
 vdf["v"].long_name = "y wind velocity"
 vdf["v"].icon_name = "V"
-vdf["v"].icon_names = ["v"]
 vdf["v"].arome_name = "V"
 vdf["v"].unit = "m/s"
 
@@ -565,7 +547,6 @@ vdf["v"].unit = "m/s"
 vdf["u_10m"].short_name = "u_10m"
 vdf["u_10m"].long_name = "10m wind velocity in x"
 vdf["u_10m"].icon_name = "u_10m"
-vdf["u_10m"].icon_names = ["u_10m"]
 vdf["u_10m"].arome_name = "U_10M"
 vdf["u_10m"].unit = "m/s"
 
@@ -573,7 +554,6 @@ vdf["u_10m"].unit = "m/s"
 vdf["v_10m"].short_name = "v_10m"
 vdf["v_10m"].long_name = "10m wind velocity in y"
 vdf["v_10m"].icon_name = "v_10m"
-vdf["v_10m"].icon_names = ["v_10m"]
 vdf["v_10m"].arome_name = "v_10m"
 vdf["v_10m"].unit = "m/s"
 
@@ -609,7 +589,6 @@ vdf["wind_dir_10m"].dwh_id = {"rs": "743", "10m": "197", "lidar": "743"}
 # wind velocity: wind_vel
 vdf["wind_vel"].short_name = "wind_vel"
 vdf["wind_vel"].icon_name = "wind_vel"
-vdf["wind_vel"].icon_names = ["wind_vel"]
 vdf["wind_vel"].arome_name = "wind_vel"
 vdf["wind_vel"].long_name = "Wind velocity"
 vdf["wind_vel"].unit = "m/s"
