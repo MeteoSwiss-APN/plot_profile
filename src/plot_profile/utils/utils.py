@@ -235,7 +235,7 @@ def get_cubehelix_colors(number_of_colors, start=0.1, stop=0.7):
     return colors
 
 
-def get_icon_name(ds, icon_names, verbose):
+def get_icon_name(ds, var, verbose):
     """Determine icon name for this variable from list of possible names.
 
     Args:
@@ -246,21 +246,22 @@ def get_icon_name(ds, icon_names, verbose):
         icon_name (str)
 
     """
-    for name in icon_names:
-        try:
-            # test name
-            dummy = ds[name]
+    
+    for name in var.icon_names:
 
+        # test name
+        if name in list(ds.keys()):
+            
             # return this
             if verbose:
                 print(f"  found {name} in dataset.")
+            
             return name
-
-        except:
+        else:
             if verbose:
                 print(f"  {name} does not match.")
 
-    print(f"!  {name} is nowhere listed  as icon_names attribute in variables.py")
+    print(f"!  icon_names listed of variable {var.short_name} do not appear in current input dataset")
     sys.exit(1)
 
 

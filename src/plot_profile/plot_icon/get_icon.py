@@ -283,9 +283,9 @@ def get_icon(
         # specify variable (pandas dataframe with attributes)
         var = vdf[variable]
 
+#        print([i for i in ds.data_vars])
         # find correct icon name from list of possible names
-        var.icon_name = get_icon_name(ds, var.icon_names, verbose)
-
+        var.icon_name = get_icon_name(ds, var, verbose)
         # subselect values from column
         try:
             values = ds.isel(cells_1=ind)[var.icon_name].values * var.mult + var.plus
@@ -403,7 +403,7 @@ def get_icon_timeseries(
         var = vdf[variable]
 
         # find correct icon name from list of possible names
-        var.icon_name = get_icon_name(ds, var.icon_names, verbose)
+        var.icon_name = get_icon_name(ds, var, verbose)
 
         # dataset with only one specific variable
         ds_var = ds[var.icon_name]
