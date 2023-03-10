@@ -425,7 +425,7 @@ vdf["sw_down"].long_name = "Downward SW rad"
 vdf["sw_down"].unit = "W/m2"
 vdf["sw_down"].dwh_id = {"2m": "96", "2m_tower": "3873"}
 vdf["sw_down"].icon_name = "asod_s"
-vdf["sw_down"].icon_names = ["asod_s", "ASOD_S", "GLOB"]
+vdf["sw_down"].icon_names = ["asod_s", "GLOB"]
 vdf["sw_down"].avg = True
 
 # radiation: shortwave upward ("reflected")
@@ -499,7 +499,7 @@ vdf["temp_surf"].short_name = "temp_surf"
 vdf["temp_surf"].long_name = "Weighted surface temperature"
 vdf["temp_surf"].unit = "°C"
 vdf["temp_surf"].icon_name = "T_G"
-vdf["temp_surf"].icon_names = ["T_G"]
+vdf["temp_surf"].icon_names = ["t_g"]
 vdf["temp_surf"].plus = -273
 
 # 2m temperature: 2m_temp
@@ -588,7 +588,7 @@ vdf["v"].unit = "m/s"
 vdf["u_10m"].short_name = "u_10m"
 vdf["u_10m"].long_name = "10m wind velocity in x"
 vdf["u_10m"].icon_name = "u_10m"
-vdf["u_10m"].icon_names = ["U_10M", "u_10m"]
+vdf["u_10m"].icon_names = ["u_10m"]
 vdf["u_10m"].arome_name = "U_10M"
 vdf["u_10m"].unit = "m/s"
 
@@ -596,7 +596,7 @@ vdf["u_10m"].unit = "m/s"
 vdf["v_10m"].short_name = "v_10m"
 vdf["v_10m"].long_name = "10m wind velocity in y"
 vdf["v_10m"].icon_name = "v_10m"
-vdf["v_10m"].icon_names = ["V_10M", "v_10m"]
+vdf["v_10m"].icon_names = ["v_10m"]
 vdf["v_10m"].arome_name = "v_10m"
 vdf["v_10m"].unit = "m/s"
 

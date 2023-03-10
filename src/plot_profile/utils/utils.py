@@ -246,45 +246,15 @@ def get_icon_name(ds, var, verbose):
         icon_name (str)
 
     """
-    
     for name in var.icon_names:
 
-        dataset_variables = list(ds.keys())
+        #Obtain differntly spelled versions of variable name
+        variants = [name, name.upper(), name.lower(), name.capitalize()]
 
-        # Test different vaiable name spellings.
-        if name in dataset_variables:
+        # Check if any of these versions is a key (i.e., a variable) of dataset ds
+        return next(name for name in variants if name in list(ds.keys()))
 
-            # return this
-            if verbose:
-                print(f"  found {name} in dataset.")
-            
-            return name
-        elif name.upper() in dataset_variables:
-
-            # return this
-            if verbose:
-                print(f"  found {name.upper()} in dataset.")
-            
-            return name.upper()
-        elif name.lower() in dataset_variables:
-
-            # return this
-            if verbose:
-                print(f"  found {name.lower()} in dataset.")
-            
-            return name.lower()
-        elif name.capitalize() in dataset_variables:
-
-            # return this
-            if verbose:
-                print(f"  found {name.capitalize()} in dataset.")
-            
-            return name.capitalize()
-        else:
-            if verbose:
-                print(f"  {name} does not match.")
-
-    print(f"!  icon_names listed of variable {var.short_name} do not appear in current input dataset")
+    print(f"!  for e {var.short_name} no version of icon_names (defined in variables.py) appears in input")
     sys.exit(1)
 
 
