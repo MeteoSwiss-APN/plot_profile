@@ -135,7 +135,6 @@ vdf["cbh"].dwh_id = {"2m": "1541"}
 # cloud cover: clc
 vdf["clc"].short_name = "clc"
 vdf["clc"].icon_name = "clc"
-vdf["clc"].icon_names = ["clc"]
 vdf["clc"].arome_name = "fCV"
 vdf["clc"].long_name = "Cloud cover"
 vdf["clc"].unit = "%"
@@ -148,7 +147,6 @@ vdf["clc"].colormap = "bone"
 # cloud cover LOW: clcl
 vdf["clcl"].short_name = "clcl"
 vdf["clcl"].icon_name = "clcl"
-vdf["clcl"].icon_names = ["clcl"]
 vdf["clcl"].arome_name = "LCV"
 vdf["clcl"].long_name = "Low cloud cover"
 vdf["clcl"].unit = "%"
@@ -160,7 +158,6 @@ vdf["clcl"].colormap = "bone"
 # cloud cover MEDIUM: clcm
 vdf["clcm"].short_name = "clcm"
 vdf["clcm"].icon_name = "clcm"
-vdf["clcm"].icon_names = ["clcm"]
 vdf["clcm"].arome_name = "MCV"
 vdf["clcm"].long_name = "Medium cloud cover"
 vdf["clcm"].unit = "%"
@@ -173,7 +170,6 @@ vdf["clcm"].colormap = "bone"
 # cloud cover HIGH: clch
 vdf["clch"].short_name = "clch"
 vdf["clch"].icon_name = "clch"
-vdf["clch"].icon_names = ["clch"]
 vdf["clch"].arome_name = "HCV"
 vdf["clch"].long_name = "High cloud cover"
 vdf["clch"].unit = "%"
@@ -186,7 +182,6 @@ vdf["clch"].colormap = "bone"
 # cloud cover TOTAL: clct
 vdf["clct"].short_name = "clct"
 vdf["clct"].icon_name = "clct"
-vdf["clct"].icon_names = ["clct"]
 vdf["clct"].long_name = "Total cloud cover"
 vdf["clct"].unit = "%"
 vdf["clct"].min_value = -0.05
@@ -248,9 +243,6 @@ vdf["2m_dewp_temp"].plus_arome = -273
 # gradient tempearture vertical
 vdf["grad_temp"].short_name = "grad_temp"
 vdf["grad_temp"].icon_name = "grad_temp"
-vdf["grad_temp"].icon_names = [
-    "grad_temp",
-]
 vdf["grad_temp"].arome_name = "grad_temp"
 vdf["grad_temp"].long_name = "Vertical temperature gradient"
 vdf["grad_temp"].unit = "°C/m"
@@ -266,7 +258,6 @@ vdf["hor_vis"].dwh_id = {"2m": "1547"}
 
 # pressure: press
 vdf["press"].short_name = "press"
-vdf["press"].icon_names = ["p"]
 vdf["press"].icon_name = "p"
 vdf["press"].arome_name = "P"
 vdf["press"].long_name = "Pressure"
@@ -278,7 +269,6 @@ vdf["press"].dwh_id = {"rs": "744", "2m": "90"}
 # cloud water: qc
 vdf["qc"].short_name = "qc"
 vdf["qc"].icon_name = "QC"
-vdf["qc"].icon_names = [ "qc"]
 vdf["qc"].arome_name = "LWC"
 vdf["qc"].long_name = "Cloud water"
 vdf["qc"].unit = "g/kg"
@@ -292,7 +282,6 @@ vdf["qc"].mult_arome = 1000
 # diagnostic cloud water: qc_dia
 vdf["qc_dia"].short_name = "qc_dia"
 vdf["qc_dia"].icon_name = "tot_qc_dia"
-vdf["qc_dia"].icon_names = ["tot_qc_dia"]
 vdf["qc_dia"].long_name = "Diagnostic cloud water"
 vdf["qc_dia"].unit = "g/kg"
 vdf["qc_dia"].min_value = -0.01
@@ -304,7 +293,6 @@ vdf["qc_dia"].mult = 1000
 # diagnostic cloud ice: qi_dia
 vdf["qi_dia"].short_name = "qi_dia"
 vdf["qi_dia"].icon_name = "tot_qi_dia"
-vdf["qi_dia"].icon_names = ["tot_qi_dia"]
 vdf["qi_dia"].long_name = "Diagnostic cloud ice"
 vdf["qi_dia"].unit = "g/kg"
 vdf["qi_dia"].min_value = -0.01
@@ -315,7 +303,6 @@ vdf["qi_dia"].mult = 1000
 # specific humidity: qv
 vdf["qv"].short_name = "qv"
 vdf["qv"].icon_name = "QV"
-vdf["qv"].icon_names = ["qv"]
 vdf["qv"].arome_name = "qv"
 vdf["qv"].long_name = "Specific humidity"
 vdf["qv"].unit = "g/kg"
@@ -337,7 +324,6 @@ vdf["qv"].dwh_id = {
 # 2m specific humidity: 2m_qv
 vdf["2m_qv"].short_name = "2m_qv"
 vdf["2m_qv"].icon_name = "qv_2m"
-vdf["2m_qv"].icon_names = ["qv_2m"]
 vdf["2m_qv"].arome_name = "2m_qv"
 vdf["2m_qv"].long_name = "2m specific humidity"
 vdf["2m_qv"].unit = "g/kg"
@@ -351,9 +337,6 @@ vdf["2m_qv"].mult_arome = 1000
 # diagnostic humidity: qv_dia
 vdf["qv_dia"].short_name = "qv_dia"
 vdf["qv_dia"].icon_name = "tot_qv_dia"
-vdf["qv_dia"].icon_names = [
-    "tot_qv_dia",
-]
 vdf["qv_dia"].long_name = "Diagnostic humidity"
 vdf["qv_dia"].unit = "g/kg"
 vdf["qv_dia"].min_value = -0.01
@@ -365,9 +348,6 @@ vdf["qv_dia"].mult = 1000
 vdf["rel_hum"].short_name = "rel_hum"
 vdf["rel_hum"].long_name = "Relative humidity"
 vdf["rel_hum"].icon_name = "rel_hum"
-vdf["rel_hum"].icon_names = [
-    "rel_hum",
-]
 vdf["rel_hum"].arome_name = "Hu"
 vdf["rel_hum"].unit = "%"
 vdf["rel_hum"].min_value = 0
@@ -385,9 +365,6 @@ vdf["lw_down"].short_name = "lw_down"
 vdf["lw_down"].long_name = "Downward LW rad"
 vdf["lw_down"].unit = "W/m2"
 vdf["lw_down"].icon_name = "athd_s"
-vdf["lw_down"].icon_names = [
-    "athd_s",
-]
 vdf["lw_down"].avg = True
 vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 
@@ -395,8 +372,8 @@ vdf["lw_down"].dwh_id = {"2m": "175", "2m_tower": "3762"}
 vdf["lw_up"].short_name = "lw_up"
 vdf["lw_up"].long_name = "Upward LW rad"
 vdf["lw_up"].unit = "W/m2"
-vdf["lw_up"].icon_names = [
-    "athu_s",
+vdf["lw_up"].icon_name = [
+    "athu_s"
 ]
 vdf["lw_up"].avg = True
 vdf["lw_up"].dwh_id = {
