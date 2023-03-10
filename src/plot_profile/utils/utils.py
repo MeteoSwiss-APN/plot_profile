@@ -249,14 +249,37 @@ def get_icon_name(ds, var, verbose):
     
     for name in var.icon_names:
 
-        # test name
-        if name in list(ds.keys()):
-            
+        dataset_variables = list(ds.keys())
+
+        # Test different vaiable name spellings.
+        if name in dataset_variables:
+
             # return this
             if verbose:
                 print(f"  found {name} in dataset.")
             
             return name
+        elif name.upper() in dataset_variables:
+
+            # return this
+            if verbose:
+                print(f"  found {name.upper()} in dataset.")
+            
+            return name.upper()
+        elif name.lower() in dataset_variables:
+
+            # return this
+            if verbose:
+                print(f"  found {name.lower()} in dataset.")
+            
+            return name.lower()
+        elif name.capitalize() in dataset_variables:
+
+            # return this
+            if verbose:
+                print(f"  found {name.capitalize()} in dataset.")
+            
+            return name.capitalize()
         else:
             if verbose:
                 print(f"  {name} does not match.")
