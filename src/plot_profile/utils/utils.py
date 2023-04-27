@@ -10,6 +10,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import xarray as xr
 from matplotlib import cm
 
 # First-party
@@ -235,33 +236,53 @@ def get_cubehelix_colors(number_of_colors, start=0.1, stop=0.7):
     return colors
 
 
-def get_icon_name(ds, icon_names, verbose):
-    """Determine icon name for this variable from list of possible names.
+def get_icon_name(
+    dataset: xr.Dataset, variable: xr.DataArray, verbose: bool = False
+) -> str:
+    """Determine the name of the icon variable for this variable from a list of possible icon names.
+
+    This function converts all icon names and strings to lowercase and removes underscores to facilitate matching.
 
     Args:
-        ds (xr.dataset): dataset
-        icon_names (list): list of possible names
+        dataset: The input dataset.
+        variable: The variable to be loaded.
+        verbose: Whether to print extra information (default False).
 
     Returns:
-        icon_name (str)
+        The selected icon variable name.
+
+    Raises:
+        ValueError: If no matches or multiple matches are found.
 
     """
-    for name in icon_names:
-        try:
-            # test name
-            dummy = ds[name]
+    # Get the list of possible icon names, defaulting to variable.icon_name
+    # if variable.icon_names is not defined
+    icon_names = (
+        [variable.icon_name] if not variable.icon_names else variable.icon_names
+    )
 
-            # return this
-            if verbose:
-                print(f"  found {name} in dataset.")
-            return name
+    # Convert icon_names to lowercase and remove underscores
+    icon_names = [name.lower().replace("_", "") for name in icon_names]
 
-        except:
-            if verbose:
-                print(f"  {name} does not match.")
+    # Find matches between the possible icon names and the keys in the dataset
+    matches = [
+        key for key in dataset.keys() if key.lower().replace("_", "") in icon_names
+    ]
 
-    print(f"!  not matching name in icon_names in variables.py")
-    sys.exit(1)
+    if matches:
+        if len(matches) > 1:
+            msg = f"The corresponding key for {variable.name} is not unique."
+            tip = "Check spelling of icon_names in variables.py"
+            raise ValueError(f"{msg} {tip}")
+        if verbose:
+            print(f"Found icon variable name {matches[0]} for variable {variable.name}")
+
+        # Return match if no errors detected
+        return matches[0]
+
+    msg = f"No matches found for {variable.name}."
+    tip = "Check spelling of icon_names in variables.py"
+    raise ValueError(f"{msg} Possible names: {', '.join(icon_names)}. {tip}")
 
 
 def get_dim_names(ds_var, verbose):
