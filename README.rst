@@ -1,3 +1,6 @@
+$${\color{red} This \space repository \space is \space deprecated \space and \space unmaintained}$$
+
+
 ============
 plot_profile
 ============
